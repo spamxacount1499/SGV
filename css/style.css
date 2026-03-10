@@ -4042,3 +4042,177 @@ body.vault-open {
     padding: 20px 16px 60px !important;
   }
 }
+
+/* ╔═══════════════════════════════════════════════════════╗
+   ║        VAULT SIDEBAR SLIM + GAMES FULL WIDTH          ║
+   ╚═══════════════════════════════════════════════════════╝ */
+
+/* Shrink sidebar significantly so games get real estate */
+.secret-sidebar {
+  width: 120px !important;
+  min-width: 120px !important;
+  padding: 20px 0 !important;
+}
+.secret-model-btn {
+  font-size: 10px !important;
+  padding: 9px 10px 9px 12px !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.secret-sidebar-title {
+  font-size: 8px !important;
+  padding: 0 10px 8px !important;
+  letter-spacing: 2px !important;
+}
+.secret-sidebar-divider {
+  margin: 8px 10px !important;
+}
+
+/* Secret content fills all remaining space */
+.secret-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.secret-section {
+  display: none;
+  flex: 1;
+}
+.secret-section.on {
+  display: flex !important;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Gallery section */
+#sgallery {
+  flex-direction: column;
+}
+
+/* Games section — full width centered layout */
+#sgames {
+  display: none;
+  flex-direction: column;
+}
+#sgames.on {
+  display: flex !important;
+}
+#sgames .game-wrap {
+  max-width: 860px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 36px 32px 80px !important;
+  text-align: center;
+}
+
+/* Game tabs — centered and wrapping nicely */
+#sgames .game-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 0 0 28px !important;
+  border-bottom: 1px solid rgba(255,34,34,0.15) !important;
+  margin-bottom: 32px !important;
+  background: none !important;
+  backdrop-filter: none !important;
+}
+
+/* WYR cards bigger */
+#sgames .wyr-arena {
+  max-width: 100% !important;
+  gap: 20px !important;
+}
+#sgames .wyr-card img {
+  aspect-ratio: 2/3 !important;
+  max-height: 55vh !important;
+}
+
+/* HON bigger */
+#sgames .hon-stage {
+  max-width: 420px !important;
+  margin: 0 auto 28px !important;
+}
+#sgames .hon-card img {
+  aspect-ratio: 3/4 !important;
+  max-height: 58vh !important;
+}
+
+/* Rate Her bigger */
+#sgames .rtf-card {
+  max-width: 380px !important;
+  margin: 0 auto 20px !important;
+}
+#sgames .rtf-card img {
+  aspect-ratio: 3/4 !important;
+  max-height: 55vh !important;
+}
+
+/* Spin wheel centered */
+#sgames .wheel-wrap {
+  margin: 0 auto 20px !important;
+}
+
+/* FMK bigger cards */
+#sgames .fmk-arena {
+  gap: 16px !important;
+}
+
+/* Truth or dare card bigger */
+#sgames .tod-card {
+  max-width: 360px !important;
+  margin: 0 auto 20px !important;
+}
+#sgames .tod-card img {
+  aspect-ratio: 3/4 !important;
+  max-height: 55vh !important;
+}
+
+/* All other vault sections centered too */
+#stierlist .game-wrap,
+#sbracket .game-wrap,
+#smostwanted .game-wrap,
+#squiz .game-wrap,
+#sconfessions .game-wrap,
+#sdraft .game-wrap {
+  max-width: 900px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 36px 32px 80px !important;
+}
+
+/* secret layout fills full vault height */
+.secret-layout {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.secret-content {
+  height: 100%;
+}
+
+@media (max-width: 700px) {
+  .secret-sidebar {
+    width: 80px !important;
+    min-width: 80px !important;
+  }
+  .secret-model-btn {
+    font-size: 9px !important;
+    padding: 8px 6px !important;
+  }
+  #sgames .game-wrap,
+  #stierlist .game-wrap,
+  #sbracket .game-wrap,
+  #smostwanted .game-wrap,
+  #squiz .game-wrap,
+  #sconfessions .game-wrap,
+  #sdraft .game-wrap {
+    padding: 20px 14px 60px !important;
+  }
+}
