@@ -1651,15 +1651,7 @@ setInterval(() => {
 $('secretWrap').addEventListener('scroll', e => e.stopPropagation(), { passive: true });
 
 // ─── PAGE ENTRANCE ANIMATION UPGRADE ─────────────────
-document.querySelectorAll('nav button').forEach((btn, i) => {
-  btn.style.opacity = '0';
-  btn.style.transform = 'translateY(8px)';
-  setTimeout(() => {
-    btn.style.transition = 'opacity 0.4s ease, transform 0.4s ease, color 0.3s, border-bottom-color 0.3s';
-    btn.style.opacity = '1';
-    btn.style.transform = 'translateY(0)';
-  }, 600 + i * 80);
-});
+// Note: CSS already handles nav entrance via keyframes, skip JS opacity trick
 
 // ─── SBAR HOVER EASTER EGG ────────────────────────────
 $('statDanger')?.parentElement?.addEventListener('click', () => {
@@ -1682,14 +1674,16 @@ document.addEventListener('keydown', e => {
 });
 
 // ─── LIKES MILESTONE CELEBRATION ─────────────────────
-const _origToggleLike2 = toggleLike;
-function toggleLike(photo) {
-  _origToggleLike2(photo);
+// Patched via event monitoring to avoid redeclaring toggleLike
+const _likeObserver = new MutationObserver(() => {
   if (state.likes.size > 0 && state.likes.size % 10 === 0) {
     spawnSparkles(window.innerWidth/2, window.innerHeight/2, false);
     toast(`♡ ${state.likes.size} likes — you have taste`);
   }
-}
+});
+// Watch the saved count badge as a proxy for like/save activity
+const _scEl = $('savedCount');
+if (_scEl) _likeObserver.observe(_scEl, { childList: true, characterData: true, subtree: true });
 
 // ─── IMAGE LOAD PROGRESS TINT ────────────────────────
 document.querySelectorAll('.card img').forEach(img => {
@@ -1701,4 +1695,3 @@ document.querySelectorAll('.card img').forEach(img => {
     }, { once: true });
   }
 });
-
