@@ -1494,7 +1494,6 @@ const sbarObserver=new IntersectionObserver(entries=>{
 document.querySelectorAll('.sbar .item').forEach(item=>sbarObserver.observe(item));
 
 // ─── VAULT SECTION TRANSITION ────────────────────────────
-const _origSShowSection = showSecretSection;
 function showSecretSection(id){
   document.querySelectorAll('.secret-section').forEach(s=>s.classList.remove('on'));
   const el=$(id);
