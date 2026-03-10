@@ -98,10 +98,8 @@ const MODELS = {
 
 // Procedural name generator
 const NAME_WORDS = [
-  ["Sugar","Velvet","Silk","Cotton","Honey","Cherry","Peach","Rose","Blush","Cream",
-   "Soft","Sweet","Baby","Angel","Pink","Pretty","Pastel","Dreamy","Cloud","Butter"],
-  ["Rush","Danger","Menace","Poison","Spell","Trap","Strike","Sting","Bite","Kiss",
-   "Drop","Wave","Glow","Bloom","Flash","Spark","Mist","Drift","Haze","Bliss"]
+  ["Sluty","Sexy","Kinky","Bitchy","Cunty","Wet","Fuck","Pet","cute"],
+  ["Bitch","Whore","Slut","Doll","BBCToy","GirlyPop","Bimbo"]
 ];
 function genName(index) {
   return `${NAME_WORDS[0][index % NAME_WORDS[0].length]} ${NAME_WORDS[1][Math.floor(index / NAME_WORDS[0].length) % NAME_WORDS[1].length]}`;
@@ -198,10 +196,8 @@ const SECRET_MODELS = {
 
 // Edgy procedural names for secret section
 const EDGY_WORDS = [
-  ["Sexy","Bitchy","Fuckslut","BBCtoy","Whore","Freak","Slut","Cunty","Doll","Razor",
-   "Midnight","Devil","Sin","Toxic","Cruel","Savage","Feral","Lethal","Rogue","Obsidian"],
-  ["Kiss","Bite","Strike","Trap","Spell","Sting","Rush","Reign","Riot","Menace",
-   "Throne","Mercy","Flame","Hex","Vibe","Edge","Hunger","Fury","Lure","Signal"]
+  ["Sluty","Sexy","Kinky","Bitchy","Cunty","Wet","Fuck","Pet","cute"],
+  ["Bitch","Whore","Slut","Doll","BBCToy","GirlyPop","Bimbo"]
 ];
 function genSecretName(index) {
   return `${EDGY_WORDS[0][index % EDGY_WORDS[0].length]} ${EDGY_WORDS[1][Math.floor(index / EDGY_WORDS[0].length) % EDGY_WORDS[1].length]}`;
