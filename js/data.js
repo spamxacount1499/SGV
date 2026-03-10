@@ -150,7 +150,7 @@ const MODELS = {
 
 // Procedural name generator
 const NAME_WORDS = [
-  ["Sluty","Sexy","Kinky","Bitchy","Cunty","Wet","Fuck","Pet","cute"],["Bitch","Whore","Slut","Doll","BBCToy","GirlyPop","Bimbo"]
+  ["Cute"]
 ];
 function genName(index) {
   return `${NAME_WORDS[0][index % NAME_WORDS[0].length]} ${NAME_WORDS[1][Math.floor(index / NAME_WORDS[0].length) % NAME_WORDS[1].length]}`;
@@ -247,7 +247,7 @@ const SECRET_MODELS = {
 
 // Edgy procedural names for secret section
 const EDGY_WORDS = [
-  ["Sluty","Sexy","Kinky","Bitchy","Cunty","Wet","Fuck","Pet","cute"],["Bitch","Whore","Slut","Doll","BBCToy","GirlyPop","Bimbo"]
+  ["Full Consent"]
 ];
 function genSecretName(index) {
   return `${EDGY_WORDS[0][index % EDGY_WORDS[0].length]} ${EDGY_WORDS[1][Math.floor(index / EDGY_WORDS[0].length) % EDGY_WORDS[1].length]}`;
