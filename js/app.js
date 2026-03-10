@@ -1179,8 +1179,8 @@ function startStalkerMode() {
 function showStalkerPhoto() {
   const photo=stalkerPhotos[stalkerIdx%stalkerPhotos.length];
   $('stalkerImg').src=photo.src;
-  $('stalkerName').textContent=photo.name;
-  $('stalkerModel').textContent=photo.model;
+  $('stalkerName').textContent=photo.model;
+  $('stalkerModel').textContent='📍 Tulsa, Oklahoma';
   addDangerScore(photo.src,1);
   // progress bar
   const prog=$('stalkerProgress');
