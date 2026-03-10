@@ -112,7 +112,7 @@ const PHOTOS = Object.entries(MODELS).flatMap(([model, files]) =>
 );
 
 // ─── SECRET MODELS ────────────────────────────────────────────────────────────
-// Upload photos to imgs/secret/ModelName/ folder
+// Upload photos to imgs/Secret/ModelName/ folder
 
 const SECRET_MODELS = {
   Nya: [
@@ -198,7 +198,7 @@ const SECRET_MODELS = {
 
 // Edgy procedural names for secret section
 const EDGY_WORDS = [
-  ["Venom","Crimson","Shadow","Black","Scarlet","Wicked","Dark","Poison","Blood","Razor",
+  ["Sexy","Bitchy","Fuckslut","BBCtoy","Whore","Freak","Slut","Cunty","Doll","Razor",
    "Midnight","Devil","Sin","Toxic","Cruel","Savage","Feral","Lethal","Rogue","Obsidian"],
   ["Kiss","Bite","Strike","Trap","Spell","Sting","Rush","Reign","Riot","Menace",
    "Throne","Mercy","Flame","Hex","Vibe","Edge","Hunger","Fury","Lure","Signal"]
@@ -208,5 +208,5 @@ function genSecretName(index) {
 }
 let _sidx = 0;
 const SECRET_PHOTOS = Object.entries(SECRET_MODELS).flatMap(([model, files]) =>
-  files.map(file => ({ file, model, src: `imgs/secret/${model}/${file}`, name: genSecretName(_sidx++) }))
+  files.map(file => ({ file, model, src: `imgs/Secret/${model}/${file}`, name: genSecretName(_sidx++) }))
 );
