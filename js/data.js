@@ -2,7 +2,6 @@
 // To add new photos:
 // 1. Upload images to imgs/ModelName/ folder on GitHub
 // 2. Add the filename to the correct model's list below
-// That's it!
 
 const MODELS = {
   Sophie: [
@@ -99,62 +98,115 @@ const MODELS = {
 
 // Procedural name generator
 const NAME_WORDS = [
-  ["Sugar", "Velvet", "Silk", "Cotton", "Honey", "Cherry", "Peach", "Rose", "Blush", "Cream",
-   "Soft", "Sweet", "Baby", "Angel", "Pink", "Pretty", "Pastel", "Dreamy", "Cloud", "Butter"],
-  ["Rush", "Danger", "Menace", "Poison", "Spell", "Trap", "Strike", "Sting", "Bite", "Kiss",
-   "Drop", "Wave", "Glow", "Bloom", "Flash", "Spark", "Mist", "Drift", "Haze", "Bliss"]
+  ["Sugar","Velvet","Silk","Cotton","Honey","Cherry","Peach","Rose","Blush","Cream",
+   "Soft","Sweet","Baby","Angel","Pink","Pretty","Pastel","Dreamy","Cloud","Butter"],
+  ["Rush","Danger","Menace","Poison","Spell","Trap","Strike","Sting","Bite","Kiss",
+   "Drop","Wave","Glow","Bloom","Flash","Spark","Mist","Drift","Haze","Bliss"]
 ];
-
 function genName(index) {
-  const a = NAME_WORDS[0][index % NAME_WORDS[0].length];
-  const b = NAME_WORDS[1][Math.floor(index / NAME_WORDS[0].length) % NAME_WORDS[1].length];
-  return `${a} ${b}`;
+  return `${NAME_WORDS[0][index % NAME_WORDS[0].length]} ${NAME_WORDS[1][Math.floor(index / NAME_WORDS[0].length) % NAME_WORDS[1].length]}`;
 }
-
-// Build flat PHOTOS array with generated names
 let _idx = 0;
 const PHOTOS = Object.entries(MODELS).flatMap(([model, files]) =>
-  files.map(file => ({
-    file,
-    model,
-    src: `imgs/${model}/${file}`,
-    name: genName(_idx++),
-  }))
+  files.map(file => ({ file, model, src: `imgs/${model}/${file}`, name: genName(_idx++) }))
 );
 
 // ─── SECRET MODELS ────────────────────────────────────────────────────────────
 // Upload photos to imgs/secret/ModelName/ folder
-// Add filenames here
 
 const SECRET_MODELS = {
-  Nya: [],
-  Remi: [],
-  Stella: [],
+  Nya: [
+    "394675914_718031842995586_8938251816196104756_n.jpg",
+    "447918037_477254411474485_5302466815396054953_n.jpg",
+    "448481483_1678110239596432_2255065175379185250_n.jpg",
+    "448611340_341986775405776_7803304983881949874_n.jpg",
+    "459107521_1666313117487596_8772426253648689332_n.jpg",
+    "459133860_2235562600134739_1534417904961202624_n.jpg",
+    "649222431_17924484387251147_381633335657487982_n.jpg",
+    "464822224_893225842782459_5884500261163013426_n.jpg",
+    "464981879_8817293805017530_469583526137849562_n.jpg",
+    "468436085_1581514169133178_5051080155021875653_n.jpg",
+    "481499107_18488413438036986_5295850741421267572_n.jpg",
+    "491423134_18501264103036986_8988941364479106121_n.jpg",
+    "496507785_18503806213036986_31228286844367806_n.jpg",
+    "509619779_18512127373036986_328760135969397992_n.jpg",
+    "525071129_18518754118036986_6027436609033050332_n.jpg",
+    "571490806_18537769576036986_4120067689316868108_n.jpg",
+    "574194479_18537769504036986_1636908389745235455_n.jpg",
+    "573619453_18537769351036986_1895135339603056248_n.jpg",
+    "591125987_18545632000036986_6551326341740221952_n.jpg",
+  ],
+  Remi: [
+    "474001752_18012828761678675_982348178056364268_n.jpg",
+    "474535831_18012828797678675_6523638824390569293_n.jpg",
+    "491426024_18023289398678675_3962149307244527336_n.jpg",
+    "491331197_18023289353678675_6063543648145979769_n.jpg",
+    "525176385_18034713833678675_5356128970713261107_n.jpg",
+    "524915719_18034713851678675_77038316168298101_n.jpg",
+  ],
+  Stella: [
+    "355995802_2142346615955639_4769093803033930628_n.jpg",
+    "390696330_220143627556259_894432074870396499_n.jpg",
+    "391059083_1012491523400839_7857330811951955471_n.jpg",
+    "425638517_327950876260835_4830486978203982665_n (1).jpg",
+    "425638517_327950876260835_4830486978203982665_n.jpg",
+    "429898291_373250175502108_2414479435276255352_n.jpg",
+    "429815011_801335221828861_5965567448026812025_n.jpg",
+    "440869583_425691816885007_7764692198131502959_n.jpg",
+    "448556034_3410303062601711_985591005681307174_n.jpg",
+    "448474109_6436002569857504_5128682481350491337_n.jpg",
+    "446207273_1141002410447824_2581720646213183332_n.jpg",
+    "446220127_860427365894464_2092085926169452862_n.jpg",
+    "448557366_1492119285019879_3551932549100824383_n.jpg",
+    "448597793_805402405029859_7624499226718008648_n.jpg",
+    "471820725_17946581561920392_6074963588770079056_n.jpg",
+    "471945996_17946581528920392_3919700590688385397_n.jpg",
+    "470901611_17948848373920392_938302324403754339_n.jpg",
+    "474119870_17948848361920392_4349684892929770627_n.jpg",
+    "473642935_17948848325920392_4046087065191459854_n.jpg",
+    "501208215_17964172724920392_1460620563324292510_n.jpg",
+    "524133300_17970844787920392_3970083102545123306_n.jpg",
+    "542543756_17975602055920392_4308674518904631530_n.jpg",
+    "574367363_17982125615920392_3898858597836056861_n.jpg",
+    "580710710_17983147127920392_4521944478134061068_n.jpg",
+    "523419064_17970081521920392_7147186141431390393_n.jpg",
+    "522654096_17970081542920392_3494835817103775275_n.jpg",
+  ],
   Allie: [],
-  Rileigh: [],
-  Macy: [],
+  Rileigh: [
+    "429242282_241027102412428_1729042149956228417_n.jpg",
+    "429082174_378885158109561_5151808214258676837_n.jpg",
+    "429324538_1464701697441132_2397125163968803570_n.jpg",
+    "464373237_899347195059323_6393905467067058675_n.jpg",
+    "496774295_17929633899045947_6736380710143301223_n.jpg",
+    "503832926_17932510488045947_6313241917594053279_n.jpg",
+    "522389774_17937868770045947_2406055868500935408_n.jpg",
+    "520539121_17937868689045947_7345067791909071194_n.jpg",
+    "523096821_17937868734045947_4223340679637283712_n.jpg",
+    "521230345_17937868647045947_4522890520707051290_n.jpg",
+    "532246724_17940469353045947_2709920634090660936_n.jpg",
+    "551529544_17944872582045947_4472133284290078172_n.jpg",
+    "551877481_17944872534045947_3512137299420955937_n.jpg",
+  ],
+  Macy: [
+    "530811355_17867876175425391_4648063553314118882_n.jpg",
+    "529955693_17867876184425391_7094753449508759458_n.jpg",
+    "529662722_17867876109425391_4629032420872009471_n.jpg",
+    "531922069_17867877129425391_3989605248868123915_n.jpg",
+  ],
 };
 
 // Edgy procedural names for secret section
 const EDGY_WORDS = [
-  ["Venom", "Crimson", "Shadow", "Black", "Scarlet", "Wicked", "Dark", "Poison", "Blood", "Razor",
-   "Midnight", "Devil", "Sin", "Toxic", "Cruel", "Savage", "Feral", "Lethal", "Rogue", "Obsidian"],
-  ["Kiss", "Bite", "Strike", "Trap", "Spell", "Sting", "Rush", "Reign", "Riot", "Menace",
-   "Throne", "Mercy", "Flame", "Hex", "Vibe", "Edge", "Hunger", "Fury", "Lure", "Signal"]
+  ["Venom","Crimson","Shadow","Black","Scarlet","Wicked","Dark","Poison","Blood","Razor",
+   "Midnight","Devil","Sin","Toxic","Cruel","Savage","Feral","Lethal","Rogue","Obsidian"],
+  ["Kiss","Bite","Strike","Trap","Spell","Sting","Rush","Reign","Riot","Menace",
+   "Throne","Mercy","Flame","Hex","Vibe","Edge","Hunger","Fury","Lure","Signal"]
 ];
-
 function genSecretName(index) {
-  const a = EDGY_WORDS[0][index % EDGY_WORDS[0].length];
-  const b = EDGY_WORDS[1][Math.floor(index / EDGY_WORDS[0].length) % EDGY_WORDS[1].length];
-  return `${a} ${b}`;
+  return `${EDGY_WORDS[0][index % EDGY_WORDS[0].length]} ${EDGY_WORDS[1][Math.floor(index / EDGY_WORDS[0].length) % EDGY_WORDS[1].length]}`;
 }
-
 let _sidx = 0;
 const SECRET_PHOTOS = Object.entries(SECRET_MODELS).flatMap(([model, files]) =>
-  files.map(file => ({
-    file,
-    model,
-    src: `imgs/secret/${model}/${file}`,
-    name: genSecretName(_sidx++),
-  }))
+  files.map(file => ({ file, model, src: `imgs/secret/${model}/${file}`, name: genSecretName(_sidx++) }))
 );
