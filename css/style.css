@@ -3896,3 +3896,32 @@ nav button {
   .cursor-dot, .cursor-ring { display: none !important; }
   * { cursor: auto !important; }
 }
+
+/* ╔═══════════════════════════════════════════════════════╗
+   ║        Z-INDEX FIX — all overlays above vault         ║
+   ╚═══════════════════════════════════════════════════════╝ */
+
+/* Vault sits at 9000. Everything that opens ON TOP of it must be > 9000 */
+.stalker-overlay   { z-index: 9100 !important; }
+.mood-overlay      { z-index: 9200 !important; }
+.hottake-overlay   { z-index: 9200 !important; }
+.cinema-overlay    { z-index: 9100 !important; }
+.modal-overlay     { z-index: 9300 !important; }
+.pw-overlay        { z-index: 9400 !important; }
+.vault-door-overlay{ z-index: 9500 !important; }
+.page-curtain      { z-index: 99990 !important; }
+.cursor-dot,
+.cursor-ring       { z-index: 99999 !important; }
+.click-ripple      { z-index: 99998 !important; }
+.scroll-progress   { z-index: 9050 !important; }
+
+/* Vault must also cover the whole screen solidly */
+.secret-wrap {
+  z-index: 9000 !important;
+  background: #050000 !important;
+}
+
+/* Lock body when vault open — reinforced via JS but belt+suspenders */
+body.vault-open {
+  overflow: hidden !important;
+}
