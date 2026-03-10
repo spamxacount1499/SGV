@@ -83,6 +83,8 @@ function checkPassword() {
 function openVault() {
   state.secretUnlocked = true;
   $('secretWrap').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.body.classList.add('vault-open');
   // show spotlight
   if (SECRET_PHOTOS.length) {
     const featured = rand(SECRET_PHOTOS);
@@ -115,7 +117,12 @@ function initVaultContent() {
   todNext();
   buildDraft();
 }
-$('secretExit').addEventListener('click', () => $('secretWrap').classList.remove('open'));
+$('secretExit').addEventListener('click', () => {
+  $('secretWrap').classList.remove('open');
+  document.body.style.overflow = '';
+  document.body.classList.remove('vault-open');
+  setVaultCursor(false);
+});
 
 // ─── VAULT SIDEBAR ───────────────────────────────────────────────────────────
 function updateSecretSidebarCounts() {
@@ -1456,15 +1463,7 @@ document.addEventListener('mousemove',e=>{
 });
 
 // ─── KEYBOARD SHORTCUTS ───────────────────────────────────
-document.addEventListener('keydown',e=>{
-  if($('modalOverlay').classList.contains('open')) return;
-  if($('secretWrap').classList.contains('open')) return;
-  if(e.key==='g'||e.key==='G') showTab('moodboard');
-  if(e.key==='p'||e.key==='P') showTab('games');
-  if(e.key==='q'||e.key==='Q') showTab('quiz');
-  if(e.key==='c'||e.key==='C') showTab('confessions');
-  if(e.key==='s'||e.key==='S') showTab('saved');
-});
+// (removed nav hotkeys)
 
 // ─── STATS BAR COUNTER ANIMATION ─────────────────────────
 function animateCount(el, target, duration=800){
@@ -1658,19 +1657,7 @@ $('statDanger')?.parentElement?.addEventListener('click', () => {
 });
 
 // ─── AUTO-FOCUS SEARCH (press /) ──────────────────────
-document.addEventListener('keydown', e => {
-  if (e.key === '/' && !$('modalOverlay').classList.contains('open')) {
-    e.preventDefault();
-    // visually highlight model tabs as a 'filter hint'
-    document.querySelectorAll('.model-tab').forEach((t, i) => {
-      setTimeout(() => {
-        t.style.borderColor = 'rgba(244,167,185,0.5)';
-        setTimeout(() => t.style.borderColor = '', 600);
-      }, i * 40);
-    });
-    toast('💡 Click a name to filter');
-  }
-});
+// (removed)
 
 // ─── LIKES MILESTONE CELEBRATION ─────────────────────
 // Patched via event monitoring to avoid redeclaring toggleLike
