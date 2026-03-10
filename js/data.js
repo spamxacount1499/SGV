@@ -91,15 +91,66 @@ const MODELS = {
     "meow.jpg-e1761771308354.webp",
   ],
   Demi: [],
-  Breckie: [],
+  Breckie: [
+    "1 (261).jpg",
+    "1 (263).jpg",
+    "1 (63).jpg",
+    "1 (72).jpg",
+    "1 (54).jpg",
+    "photo_2023-09-17_08-14-05.jpg",
+    "photo_2023-09-19_10-05-40.jpg",
+    "1 (176).jpg",
+    "1 (167).jpg",
+    "1 (256).jpg",
+    "1 (175).jpg",
+    "1 (11).jpg",
+    "1 (60).jpg",
+    "1 (56).jpg",
+    "1 (160).jpg",
+    "1 (126).jpg",
+    "1 (100).jpg",
+    "1 (92).jpg",
+    "1 (83).jpg",
+    "1 (75).jpg",
+    "1 (8).jpg",
+    "1 (42).jpg",
+    "1 (70).jpg",
+    "1 (47).jpg",
+    "1 (55).jpg",
+    "1 (53).jpg",
+    "1 (26).jpg",
+    "1 (6).png",
+    "1 (7).jpg",
+    "1 (48).jpg",
+    "1 (19).jpg",
+    "1 (25).jpg",
+    "1 (17).jpg",
+    "1 (22).jpg",
+    "1 (20).jpg",
+    "1 (37).jpg",
+    "1 (51).jpg",
+    "1 (12).jpg",
+    "1 (6).jpg",
+    "1 (13).jpg",
+    "1 (18).jpg",
+    "1 (8).png",
+    "1 (10).jpg",
+    "1 (5).png",
+    "1 (5).jpg",
+    "1 (4).png",
+    "1 (4).jpg",
+    "1 (3).jpg",
+    "1 (2).jpg",
+    "1 (1).png",
+    "1 (1).jpg",
+  ],
   Corinna: [],
   Sky: [],
 };
 
 // Procedural name generator
 const NAME_WORDS = [
-  ["Sluty","Sexy","Kinky","Bitchy","Cunty","Wet","Fuck","Pet","cute"],
-  ["Bitch","Whore","Slut","Doll","BBCToy","GirlyPop","Bimbo"]
+  ["Sluty","Sexy","Kinky","Bitchy","Cunty","Wet","Fuck","Pet","cute"],["Bitch","Whore","Slut","Doll","BBCToy","GirlyPop","Bimbo"]
 ];
 function genName(index) {
   return `${NAME_WORDS[0][index % NAME_WORDS[0].length]} ${NAME_WORDS[1][Math.floor(index / NAME_WORDS[0].length) % NAME_WORDS[1].length]}`;
@@ -196,8 +247,7 @@ const SECRET_MODELS = {
 
 // Edgy procedural names for secret section
 const EDGY_WORDS = [
-  ["Sluty","Sexy","Kinky","Bitchy","Cunty","Wet","Fuck","Pet","cute"],
-  ["Bitch","Whore","Slut","Doll","BBCToy","GirlyPop","Bimbo"]
+  ["Sluty","Sexy","Kinky","Bitchy","Cunty","Wet","Fuck","Pet","cute"],["Bitch","Whore","Slut","Doll","BBCToy","GirlyPop","Bimbo"]
 ];
 function genSecretName(index) {
   return `${EDGY_WORDS[0][index % EDGY_WORDS[0].length]} ${EDGY_WORDS[1][Math.floor(index / EDGY_WORDS[0].length) % EDGY_WORDS[1].length]}`;
