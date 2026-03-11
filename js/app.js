@@ -1168,7 +1168,15 @@ function showShesA() {
 $('shesABtn')&&$('shesABtn').addEventListener('click',showShesA);
 
 // ─── STALKER MODE ─────────────────────────────────────────────────────────────
-let stalkerTimer=null, stalkerIdx=0, stalkerPhotos=[], stalkerInterval=3500;
+const STALKER_NICKNAMES = {
+  Nya:     'Naughty Nya',
+  Remi:    'Risky Remi',
+  Stella:  'Sweet Stella',
+  Allie:   'Angelic Allie',
+  Rileigh: 'Reckless Rileigh',
+  Macy:    'Mischievous Macy',
+};
+let stalkerTimer=null, stalkerIdx=0, stalkerPhotos=[], stalkerInterval=6000;
 function startStalkerMode() {
   if(!SECRET_PHOTOS.length){toast('Add photos to the vault first');return;}
   stalkerPhotos=shuffle(SECRET_PHOTOS);
@@ -1188,7 +1196,7 @@ function showStalkerPhoto() {
   const photo=stalkerPhotos[stalkerIdx%stalkerPhotos.length];
   const info=STALKER_LOCATIONS[photo.model]||{name:photo.model,addr:'📍 Tulsa, Oklahoma',phone:null,insta:null};
   $('stalkerImg').src=photo.src;
-  $('stalkerName').textContent=info.name;
+  $('stalkerName').textContent=STALKER_NICKNAMES[photo.model]||photo.model;
   const details=[info.addr, info.phone, info.insta].filter(Boolean).join('   ');
   $('stalkerModel').textContent=details;
   addDangerScore(photo.src,1);
