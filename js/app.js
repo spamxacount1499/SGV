@@ -1689,13 +1689,13 @@ const _likeObserver = new MutationObserver(() => {
 const _scEl = $('savedCount');
 if (_scEl) _likeObserver.observe(_scEl, { childList: true, characterData: true, subtree: true });
 
-// ─── IMAGE LOAD PROGRESS TINT ────────────────────────
+// ─── IMAGE LOAD FADE IN (no brightness tint) ─────────
 document.querySelectorAll('.card img').forEach(img => {
   if (!img.complete) {
-    img.style.filter = 'brightness(0.3) blur(4px)';
+    img.style.opacity = '0';
     img.addEventListener('load', () => {
-      img.style.transition = 'filter 0.5s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1)';
-      img.style.filter = 'brightness(0.85)';
+      img.style.transition = 'opacity 0.4s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+      img.style.opacity = '1';
     }, { once: true });
   }
 });
@@ -2075,3 +2075,816 @@ function showSecretSection(id) {
   if (id === 'srankfit') buildRankFit();
   if (id === 'ssmashpass') smpInit();
 }
+
+
+// ═══════════════════════════════════════════════════════════════
+//  PHASE 2: CAUGHT SLIPPING · LAST SEEN · SECRET NOTES
+//           PHOTO OF THE DAY · MATCH CALC · COMPARE · LIVE FEED
+// ═══════════════════════════════════════════════════════════════
+
+// ─── CAUGHT SLIPPING ────────────────────────────────────────────
+const CAUGHT_CAPTIONS = [
+  g => `caught ${DOSSIER[g]?.fullName||g} being way too fine for a Tuesday`,
+  g => `${DOSSIER[g]?.fullName||g} said don't post this. posted it anyway.`,
+  g => `she doesn't know this is saved`,
+  g => `${DOSSIER[g]?.nickname||g} doing what she does best`,
+  g => `this one lives rent free`,
+  g => `the reason you can't focus`,
+  g => `she looked up and this happened`,
+  g => `not supposed to exist but here we are`,
+  g => `${DOSSIER[g]?.fullName||g} slipping again 🔴`,
+  g => `the boys are not ready`,
+];
+const CAUGHT_TIMES = ['2m ago','5m ago','8m ago','12m ago','just now','4m ago','6m ago'];
+const CAUGHT_USERNAMES = {
+  Nya: 'nya.barn', Remi: 'remibarn', Stella: 'stella_thomas08',
+  Allie: 'allie__ok', Rileigh: 'rileigh_l_s', Macy: 'addison_and_macy',
+};
+
+function showCaughtSlipping() {
+  if (!$('secretWrap')?.classList.contains('open')) return;
+  if (!SECRET_PHOTOS.length) return;
+  const photo = rand(SECRET_PHOTOS);
+  const girl = photo.model;
+  const d = DOSSIER[girl] || {};
+  let overlay = $('caughtSlipping');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'caughtSlipping';
+    overlay.className = 'caught-slipping';
+    overlay.innerHTML = `
+      <div class="caught-phone-frame">
+        <div class="caught-status-bar">
+          <span id="caughtTime"></span>
+          <span>●●●●● 5G 🔋</span>
+        </div>
+        <div class="caught-story-bar"><div class="caught-story-progress" id="caughtProgress"></div></div>
+        <div class="caught-story-header">
+          <div class="caught-avatar"><img id="caughtAvatar" src="" alt=""></div>
+          <div>
+            <div class="caught-username" id="caughtUsername"></div>
+            <div class="caught-time-ago" id="caughtTimeAgo"></div>
+          </div>
+        </div>
+        <img class="caught-img" id="caughtImg" src="" alt="">
+        <div class="caught-caption" id="caughtCaption"></div>
+        <button class="caught-close" id="caughtClose">✕</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    $('caughtClose').addEventListener('click', () => overlay.classList.remove('show'));
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
+  }
+  // reset progress bar
+  const prog = $('caughtProgress');
+  prog.style.animation = 'none';
+  void prog.offsetWidth;
+  prog.style.animation = 'storyProgress 6s linear forwards';
+  // fill data
+  const now = new Date();
+  $('caughtTime').textContent = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  $('caughtUsername').textContent = CAUGHT_USERNAMES[girl] || girl.toLowerCase();
+  $('caughtTimeAgo').textContent = rand(CAUGHT_TIMES);
+  $('caughtImg').src = photo.src;
+  $('caughtAvatar').src = photo.src;
+  $('caughtCaption').textContent = rand(CAUGHT_CAPTIONS)(girl);
+  overlay.classList.add('show');
+  addDangerScore(photo.src, 3);
+  // auto-dismiss after 6s
+  setTimeout(() => overlay?.classList.remove('show'), 6000);
+}
+// trigger every 60-90 seconds while vault is open
+function scheduleCaughtSlipping() {
+  const delay = 60000 + Math.random() * 30000;
+  setTimeout(() => {
+    showCaughtSlipping();
+    scheduleCaughtSlipping();
+  }, delay);
+}
+scheduleCaughtSlipping();
+
+// ─── LAST SEEN ───────────────────────────────────────────────────
+const LAST_SEEN_DATA = {
+  Nya: [
+    { place: 'QuikTrip on S Memorial Dr', when: '14 min ago' },
+    { place: 'Brookside Starbucks', when: '32 min ago' },
+    { place: 'Gathering Place parking lot', when: '1h ago' },
+    { place: 'Utica Square', when: '2h ago' },
+    { place: 'Home — 1722 S Delaware Pl', when: 'last night, 11:48pm' },
+  ],
+  Remi: [
+    { place: 'Walmart on 71st', when: '8 min ago' },
+    { place: 'Panera on Yale Ave', when: '45 min ago' },
+    { place: 'OSU Tulsa campus', when: '2h ago' },
+    { place: 'McNellie\'s Pub', when: 'last night, 1:12am' },
+    { place: 'Home — 1722 S Delaware Pl', when: 'this morning, 9am' },
+  ],
+  Stella: [
+    { place: 'Florence Park', when: '22 min ago' },
+    { place: 'Cheesecake Factory on 71st', when: '1h ago' },
+    { place: 'Someone\'s place on S Sandusky', when: 'last night, 12:30am' },
+    { place: 'Reasor\'s on 61st', when: '3h ago' },
+    { place: 'Midtown bar crawl', when: 'Friday night — all of it' },
+  ],
+  Allie: [
+    { place: 'Tulsa Community College', when: '1h ago' },
+    { place: 'Target on 71st', when: '3h ago' },
+    { place: 'Route 66 area', when: 'yesterday afternoon' },
+  ],
+  Rileigh: [
+    { place: 'Dollar General, Sapulpa', when: '6 min ago' },
+    { place: 'Creek County Courthouse area', when: '1h ago' },
+    { place: 'BP station off Hwy 66, Sapulpa', when: '2h ago' },
+    { place: '320 N 14th St', when: 'this morning' },
+    { place: 'Tulsa — someone drove her', when: 'last night, late' },
+  ],
+  Macy: [
+    { place: 'Utica Square', when: '18 min ago' },
+    { place: 'Chick-fil-A on Peoria', when: '1h ago' },
+    { place: 'Her man\'s place', when: 'last night — all night' },
+    { place: 'Planet Fitness on 41st', when: 'this morning, 7am' },
+    { place: 'Woodland Hills Mall', when: 'yesterday' },
+  ],
+};
+
+function buildLastSeen() {
+  const el = $('lastSeenList'); if (!el) return;
+  const girls = Object.keys(LAST_SEEN_DATA);
+  el.innerHTML = girls.map(g => {
+    const locs = LAST_SEEN_DATA[g];
+    const current = rand(locs);
+    return `
+      <div class="lastseen-entry">
+        <div class="lastseen-dot"></div>
+        <div class="lastseen-detail">
+          <div class="lastseen-name">${DOSSIER[g]?.fullName||g}</div>
+          <div class="lastseen-location">📍 ${current.place}</div>
+          <div class="lastseen-when">${current.when}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ─── SECRET NOTES ────────────────────────────────────────────────
+let secretNotes = [];
+function buildSecretNotes() {
+  const container = $('notesContainer'); if (!container) return;
+  const wall = $('notesWall');
+  renderNotes();
+}
+function renderNotes() {
+  const wall = $('notesWall'); if (!wall) return;
+  if (!secretNotes.length) { wall.innerHTML = '<p style="color:#5a2020;font-style:italic;text-align:center;padding:20px">No notes yet. Write something.</p>'; return; }
+  wall.innerHTML = secretNotes.map((n, i) => `
+    <div class="note-card">
+      <button class="note-delete" onclick="deleteNote(${i})">✕</button>
+      <div class="note-girl">re: ${n.girl}</div>
+      <div class="note-text">${n.text}</div>
+      <div class="note-time">${n.time}</div>
+    </div>`).join('');
+}
+function deleteNote(i) { secretNotes.splice(i, 1); renderNotes(); }
+function submitNote() {
+  const sel = $('noteGirlSelect'); const inp = $('noteInput');
+  if (!sel || !inp || !inp.value.trim()) return;
+  secretNotes.unshift({ girl: sel.value, text: inp.value.trim(), time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) });
+  inp.value = '';
+  renderNotes();
+}
+// global so onclick works
+window.deleteNote = deleteNote;
+
+// ─── PHOTO OF THE DAY ────────────────────────────────────────────
+function buildPhotoOfTheDay() {
+  if (!PHOTOS.length) return;
+  const potd = rand(PHOTOS);
+  let banner = $('potdBanner');
+  if (!banner) return;
+  banner.innerHTML = `
+    <img class="potd-img" src="${potd.src}" alt="">
+    <div class="potd-overlay">
+      <div class="potd-label">✦ Photo of the Day</div>
+      <div class="potd-name">${potd.name}</div>
+      <div class="potd-model">${potd.model}</div>
+    </div>`;
+  banner.classList.add('show');
+}
+
+// ─── MATCH CALCULATOR ────────────────────────────────────────────
+const MATCH_QUESTIONS = [
+  {
+    q: "What gets your attention first?",
+    opts: [
+      { text: "Her eyes", scores: { Allie: 3, Rileigh: 2 } },
+      { text: "Her body", scores: { Stella: 3, Macy: 2, Nya: 1 } },
+      { text: "Her energy", scores: { Remi: 3, Rileigh: 2 } },
+      { text: "The way she carries herself", scores: { Nya: 3, Stella: 2 } },
+    ]
+  },
+  {
+    q: "What's your vibe on a Friday night?",
+    opts: [
+      { text: "Out somewhere loud", scores: { Stella: 3, Rileigh: 2, Macy: 1 } },
+      { text: "Someone's house, no strangers", scores: { Remi: 3, Nya: 2 } },
+      { text: "Drive around, no plan", scores: { Rileigh: 3, Allie: 2 } },
+      { text: "Staying in", scores: { Allie: 3, Macy: 2 } },
+    ]
+  },
+  {
+    q: "What would get you caught slipping?",
+    opts: [
+      { text: "A girl who knows she's hot and owns it", scores: { Stella: 3, Nya: 2 } },
+      { text: "A girl who's technically taken", scores: { Remi: 3, Macy: 2 } },
+      { text: "A girl from a small town", scores: { Rileigh: 3 } },
+      { text: "A girl who seems innocent", scores: { Allie: 3, Remi: 1 } },
+    ]
+  },
+  {
+    q: "Red flag that you'd ignore anyway:",
+    opts: [
+      { text: "She has a boyfriend", scores: { Remi: 3, Macy: 3 } },
+      { text: "She's been with half the city", scores: { Stella: 3, Rileigh: 2 } },
+      { text: "She's unpredictable", scores: { Rileigh: 3, Nya: 2 } },
+      { text: "She plays innocent but isn't", scores: { Allie: 3, Remi: 1 } },
+    ]
+  },
+  {
+    q: "She texts you at 1am. What do you want it to say?",
+    opts: [
+      { text: "\"come over\"", scores: { Stella: 3, Rileigh: 2 } },
+      { text: "\"I can't stop thinking about you\"", scores: { Nya: 3, Allie: 2 } },
+      { text: "\"don't tell anyone\"", scores: { Remi: 3, Macy: 3 } },
+      { text: "\"pick me up\"", scores: { Rileigh: 3, Macy: 1 } },
+    ]
+  },
+];
+
+const MATCH_RESULTS = {
+  Nya: "You want someone who's a little dangerous but acts sweet. You like knowing there's something underneath that no one else gets to see. Nya will have you checking your phone every 5 minutes and you'll do it gladly.",
+  Remi: "You like what you can't fully have. The thrill of the situation is the whole point for you. Risky Remi fits exactly that — she's flirty, she's fun, and technically off limits. You don't care.",
+  Stella: "No games, no excuses — you just want the real thing. Stella's the move for someone who knows exactly what they want and doesn't pretend otherwise. Town favorite for a reason.",
+  Allie: "You're patient. You don't want something handed to you — you want to earn it. Allie takes time but once she trusts you, she's a completely different girl. You'd be into every second of that.",
+  Rileigh: "You're drawn to chaos. Sapulpa's finest, unpredictable, unbothered — Rileigh is the kind of girl you drive 30 minutes for at midnight and somehow think it was a good idea every single time.",
+  Macy: "You want something you technically shouldn't have and you're fine with that. Macy loves attention even when she can't act on it. You'd be the reason she's smiling at her phone. Her man doesn't need to know.",
+};
+
+let matchAnswers = {};
+let matchCurrentQ = 0;
+
+function buildMatchCalc() {
+  const container = $('matchContainer'); if (!container) return;
+  matchAnswers = {};
+  matchCurrentQ = 0;
+  renderMatchQuestion();
+}
+function renderMatchQuestion() {
+  const container = $('matchContainer'); if (!container) return;
+  if (matchCurrentQ >= MATCH_QUESTIONS.length) { showMatchResult(); return; }
+  const q = MATCH_QUESTIONS[matchCurrentQ];
+  const progress = Math.round((matchCurrentQ / MATCH_QUESTIONS.length) * 100);
+  container.innerHTML = `
+    <div style="height:2px;background:rgba(244,167,185,0.1);margin-bottom:24px;border-radius:2px">
+      <div style="height:100%;width:${progress}%;background:linear-gradient(90deg,var(--pink),var(--gold));border-radius:2px;transition:width 0.4s ease"></div>
+    </div>
+    <div class="match-q">
+      <div class="match-q-text">${q.q}</div>
+      <div class="match-options">
+        ${q.opts.map((o, i) => `<button class="match-opt" onclick="pickMatchOpt(${i})">${o.text}</button>`).join('')}
+      </div>
+    </div>`;
+}
+function pickMatchOpt(i) {
+  const q = MATCH_QUESTIONS[matchCurrentQ];
+  const opt = q.opts[i];
+  Object.entries(opt.scores).forEach(([girl, pts]) => {
+    matchAnswers[girl] = (matchAnswers[girl] || 0) + pts;
+  });
+  matchCurrentQ++;
+  renderMatchQuestion();
+}
+function showMatchResult() {
+  const container = $('matchContainer'); if (!container) return;
+  const sorted = Object.entries(matchAnswers).sort((a, b) => b[1] - a[1]);
+  const [topGirl, topScore] = sorted[0] || ['Stella', 5];
+  const maxPossible = MATCH_QUESTIONS.reduce((sum, q) => sum + Math.max(...q.opts.map(o => o.scores[topGirl]||0)), 0) || 1;
+  const pct = Math.min(Math.round((topScore / maxPossible) * 100), 99);
+  const d = DOSSIER[topGirl] || {};
+  container.innerHTML = `
+    <div class="match-result show">
+      <div style="font-size:10px;letter-spacing:4px;color:var(--muted);margin-bottom:16px;text-transform:uppercase">Your match is</div>
+      <div class="match-result-name">${d.nickname || topGirl}</div>
+      <div class="match-result-pct">${pct}%</div>
+      <div class="match-result-why">${MATCH_RESULTS[topGirl] || 'She\'s your type. You already knew.'}</div>
+      <button class="game-btn primary" onclick="buildMatchCalc()">Retake →</button>
+    </div>`;
+}
+window.pickMatchOpt = pickMatchOpt;
+
+// ─── COMPARE TWO GIRLS ───────────────────────────────────────────
+const COMPARE_STATS = [
+  { label: 'Threat Level', key: 'threat', fmt: v => `${v}/10` },
+  { label: 'Status', key: 'status', fmt: v => v },
+  { label: 'Weakness', key: 'weakness', fmt: v => v },
+  { label: 'Location', key: 'addr', fmt: v => `📍 ${v}` },
+  { label: 'Instagram', key: 'insta', fmt: v => `📸 ${v}` },
+  { label: 'Phone', key: 'phone', fmt: v => `📞 ${v}` },
+  { label: 'Intel', key: 'notes', fmt: v => v },
+];
+function buildCompare() {
+  const wrap = $('compareWrap'); if (!wrap) return;
+  const girls = Object.keys(DOSSIER);
+  wrap.innerHTML = `
+    <div class="compare-selects">
+      <select class="compare-sel" id="compareA">${girls.map(g => `<option value="${g}">${g}</option>`).join('')}</select>
+      <span style="color:#8a3030;align-self:center;font-size:18px">vs</span>
+      <select class="compare-sel" id="compareB">${girls.map((g,i) => `<option value="${g}" ${i===1?'selected':''}>${g}</option>`).join('')}</select>
+      <button class="game-btn vault-btn" onclick="renderCompare()">Compare →</button>
+    </div>
+    <div id="compareTable"></div>`;
+}
+function renderCompare() {
+  const a = $('compareA')?.value; const b = $('compareB')?.value;
+  if (!a || !b || a === b) { toast('Pick two different girls'); return; }
+  const da = DOSSIER[a]; const db = DOSSIER[b];
+  const rows = COMPARE_STATS.map(s => {
+    const va = da[s.key]; const vb = db[s.key];
+    const aWins = s.key === 'threat' && va > vb;
+    const bWins = s.key === 'threat' && vb > va;
+    return `<tr>
+      <td>${s.label}</td>
+      <td class="${aWins?'compare-winner':''}">${va ? s.fmt(va) : '—'}</td>
+      <td class="${bWins?'compare-winner':''}">${vb ? s.fmt(vb) : '—'}</td>
+    </tr>`;
+  }).join('');
+  $('compareTable').innerHTML = `
+    <table class="compare-table">
+      <thead><tr><th></th><th>${DOSSIER[a].nickname||a}</th><th>${DOSSIER[b].nickname||b}</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+window.renderCompare = renderCompare;
+
+// ─── LIVE FEED NOTIFICATION (bottom-right) ───────────────────────
+let feedNotifEl = null;
+let feedNotifQueue = [];
+let feedNotifRunning = false;
+
+function initFeedNotif() {
+  feedNotifEl = document.createElement('div');
+  feedNotifEl.className = 'feed-notif';
+  feedNotifEl.id = 'feedNotif';
+  document.body.appendChild(feedNotifEl);
+  // seed queue with shuffled entries
+  feedNotifQueue = shuffle([...feedEntries]);
+  runFeedNotif();
+}
+
+function runFeedNotif() {
+  if (!feedNotifEl) return;
+  if (!$('secretWrap')?.classList.contains('open')) {
+    setTimeout(runFeedNotif, 3000); return;
+  }
+  // pick next entry
+  if (!feedNotifQueue.length) feedNotifQueue = shuffle(generateFeedBatch(40));
+  const entry = feedNotifQueue.shift();
+  feedNotifEl.innerHTML = `
+    <div class="feed-notif-user">${entry.user}</div>
+    <div class="feed-notif-action">${entry.action}</div>
+    <div class="feed-notif-time">just now</div>`;
+  feedNotifEl.classList.remove('hide');
+  feedNotifEl.classList.add('show');
+  // hide after 4s, wait 20s total between notifications
+  setTimeout(() => {
+    feedNotifEl.classList.add('hide');
+    feedNotifEl.classList.remove('show');
+    setTimeout(runFeedNotif, 16000);
+  }, 4000);
+}
+
+function generateFeedBatch(n) {
+  return Array.from({length: n}, () => {
+    const girl = rand(ONLINE_GIRLS);
+    return { user: rand(FEED_USERS), action: rand(FEED_ACTIONS)(girl), time: 'just now' };
+  });
+}
+
+// init feed notif after vault opens
+const _origOpenVault = openVault;
+function openVault() {
+  _origOpenVault();
+  if (!feedNotifEl) setTimeout(initFeedNotif, 2000);
+}
+
+// ─── WIRE UP NEW SECTIONS ────────────────────────────────────────
+// Override showSecretSection again to also init new sections
+const _origSSS2 = showSecretSection;
+function showSecretSection(id) {
+  _origSSS2(id);
+  if (id === 'slastseen') buildLastSeen();
+  if (id === 'snotes') buildSecretNotes();
+  if (id === 'scompare') buildCompare();
+  if (id === 'smatch') buildMatchCalc();
+}
+
+// build photo of the day on main site load
+buildPhotoOfTheDay();
+
+// ═══════════════════════════════════════════════════════════════
+//  SHE SAID · GROUP CHAT · POLL OF THE DAY
+//  STALKER SPEED SLIDER · STALKER FILTER · SHE'S WATCHING
+// ═══════════════════════════════════════════════════════════════
+
+// ─── SHE SAID (true/false) ───────────────────────────────────────
+const SHE_SAID_QUOTES = [
+  { quote: "I literally cannot stop thinking about him and it's actually pissing me off", girl: 'Remi', decoy: ['Nya','Stella','Macy'] },
+  { quote: "He can look. He just can't touch. Unless I say so.", girl: 'Stella', decoy: ['Rileigh','Allie','Nya'] },
+  { quote: "I'm not a slut I just have a very active social life and zero regrets", girl: 'Stella', decoy: ['Rileigh','Macy','Remi'] },
+  { quote: "My boyfriend thinks I'm at my cousin's house rn lmaooo", girl: 'Remi', decoy: ['Macy','Nya','Stella'] },
+  { quote: "He drove 40 minutes to see me and I made him wait outside for 20. It's called power.", girl: 'Rileigh', decoy: ['Stella','Nya','Allie'] },
+  { quote: "I'm in a relationship but I still want to feel wanted by everyone. Is that so bad?", girl: 'Macy', decoy: ['Remi','Allie','Nya'] },
+  { quote: "The problem is I'm everyone's type and that's genuinely not my fault", girl: 'Nya', decoy: ['Stella','Rileigh','Macy'] },
+  { quote: "I don't cheat. I just collect options.", girl: 'Stella', decoy: ['Rileigh','Remi','Nya'] },
+  { quote: "He's big. Like actually huge. And that's all I have to say about that.", girl: 'Macy', decoy: ['Stella','Remi','Allie'] },
+  { quote: "I like when guys are scared of me a little. It means they know what they're dealing with.", girl: 'Rileigh', decoy: ['Nya','Stella','Remi'] },
+  { quote: "I told him I was 'kind of' seeing someone. I have a whole boyfriend lmao.", girl: 'Remi', decoy: ['Macy','Allie','Nya'] },
+  { quote: "Being innocent-looking is literally a superpower. Nobody suspects me ever.", girl: 'Allie', decoy: ['Nya','Remi','Macy'] },
+  { quote: "I don't do drama. I just do whatever I want and let the drama find me.", girl: 'Nya', decoy: ['Rileigh','Stella','Remi'] },
+  { quote: "Sapulpa is boring and I will literally get in any car going to Tulsa after 10pm", girl: 'Rileigh', decoy: ['Allie','Macy','Nya'] },
+  { quote: "He thought we were exclusive. I thought we were having fun. Miscommunication I guess.", girl: 'Stella', decoy: ['Remi','Nya','Allie'] },
+  { quote: "My body count is nobody's business and also lower than you think and also higher than he thinks", girl: 'Stella', decoy: ['Rileigh','Macy','Remi'] },
+  { quote: "I feel bad but not bad enough to stop lol", girl: 'Remi', decoy: ['Macy','Nya','Allie'] },
+  { quote: "He's sweet. But boring. I need both and that's apparently too much to ask.", girl: 'Allie', decoy: ['Nya','Rileigh','Stella'] },
+  { quote: "My man is like 6'3 240 so yeah nobody really tries anything. Sad for them honestly.", girl: 'Macy', decoy: ['Rileigh','Stella','Nya'] },
+  { quote: "I don't lead guys on. I just don't correct their assumptions.", girl: 'Nya', decoy: ['Allie','Remi','Stella'] },
+  { quote: "I've kissed all of my boyfriend's friends. Not at the same time. Consecutively.", girl: 'Stella', decoy: ['Remi','Rileigh','Macy'] },
+  { quote: "The reserved thing is an act. I figured out it makes guys try harder.", girl: 'Allie', decoy: ['Nya','Remi','Macy'] },
+  { quote: "I answered at 2am. That's not an invitation. But also it kind of is.", girl: 'Rileigh', decoy: ['Stella','Nya','Allie'] },
+  { quote: "My location is always off. Not because I'm hiding. Because I'm always hiding.", girl: 'Remi', decoy: ['Nya','Macy','Stella'] },
+];
+
+let sheSaidIdx = 0;
+let sheSaidOrder = [];
+let sheSaidScore = { correct: 0, total: 0 };
+
+function buildSheSaid() {
+  if (!sheSaidOrder.length) sheSaidOrder = shuffle([...Array(SHE_SAID_QUOTES.length).keys()]);
+  const q = SHE_SAID_QUOTES[sheSaidOrder[sheSaidIdx % sheSaidOrder.length]];
+  const girls = Object.keys(DOSSIER);
+  const photo = rand(SECRET_PHOTOS.filter(p => p.model === q.girl) || SECRET_PHOTOS);
+  const el = $('sheSaidContainer'); if (!el) return;
+  el.innerHTML = `
+    <div style="font-size:10px;letter-spacing:3px;color:var(--red2);text-align:center;margin-bottom:16px;text-transform:uppercase">Who said it? · ${sheSaidScore.correct}/${sheSaidScore.total} correct</div>
+    ${photo ? `<img class="shesaid-photo" src="${photo.src}" alt="" style="display:none">` : ''}
+    <div class="shesaid-quote">"${q.quote}"</div>
+    <div class="shesaid-options">
+      ${girls.map(g => `<button class="shesaid-btn" onclick="sheSaidGuess('${g}','${q.girl}')">${DOSSIER[g].nickname||g}</button>`).join('')}
+    </div>
+    <div class="shesaid-result" id="sheSaidResult"></div>
+    <button class="game-btn vault-btn" id="sheSaidNext" style="display:none" onclick="nextSheSaid()">Next →</button>`;
+}
+function sheSaidGuess(guess, correct) {
+  sheSaidScore.total++;
+  const right = guess === correct;
+  if (right) sheSaidScore.correct++;
+  // reveal photo
+  const img = document.querySelector('.shesaid-photo'); if (img) img.style.display = 'block';
+  // mark buttons
+  document.querySelectorAll('.shesaid-btn').forEach(btn => {
+    const g = btn.textContent.trim();
+    const gName = Object.keys(DOSSIER).find(k => (DOSSIER[k].nickname||k) === g);
+    btn.disabled = true;
+    if (gName === correct) btn.classList.add('correct');
+    else if (gName === guess) btn.classList.add('wrong');
+  });
+  const reactions = {
+    true: ['Knew it.','Correct 🔴','You pay attention.','Yeah that tracks.','Nobody else could\'ve said that.'],
+    false: [`Nah that was ${DOSSIER[correct]?.nickname||correct}.`,'Wrong.','You\'d know if you paid closer attention.','Not even close lmao.'],
+  };
+  $('sheSaidResult').textContent = rand(reactions[String(right)]);
+  $('sheSaidNext').style.display = 'inline-block';
+  addDangerScore(correct, 2);
+}
+function nextSheSaid() { sheSaidIdx++; buildSheSaid(); }
+window.sheSaidGuess = sheSaidGuess;
+window.nextSheSaid = nextSheSaid;
+
+// ─── GROUP CHAT SIMULATOR ────────────────────────────────────────
+const GC_NAME = '🔥 No Bitches Allowed (Ironic)';
+const GC_MEMBERS = ['Jackson','Cruz','Jaquavion','Jack','You'];
+const GC_MEMBER_COLORS = { Jackson:'#ff6655', Cruz:'#ff9944', Jaquavion:'#ff5577', Jack:'#ffaa33' };
+
+const GC_SCRIPT = [
+  { from:'Jackson', msg:'bro I saw Stella at the chevron on 71st last night at like 1am' },
+  { from:'Cruz', msg:'by herself???' },
+  { from:'Jackson', msg:'nah some dude was dropping her off' },
+  { from:'Jaquavion', msg:'💀💀💀' },
+  { from:'Jack', msg:'who was it' },
+  { from:'Jackson', msg:'no idea never seen him. big white truck' },
+  { from:'Cruz', msg:'classic stella behavior honestly' },
+  { from:'Jaquavion', msg:'she texted me last week asking if I was free btw' },
+  { from:'Cruz', msg:'WHAT' },
+  { from:'Jack', msg:'bro you didn\'t say anything' },
+  { from:'Jaquavion', msg:'I said I was busy bc I was with remi lmao' },
+  { from:'Jackson', msg:'WAIT WHAT' },
+  { from:'Cruz', msg:'you were with remi?? her bf is literally 6\'2"' },
+  { from:'Jaquavion', msg:'she said they were "on a break"' },
+  { from:'Jack', msg:'they are NOT on a break I follow him on instagram' },
+  { from:'Jaquavion', msg:'not my problem bro she reached out' },
+  { from:'Jackson', msg:'💀 remi really said free real estate' },
+  { from:'Cruz', msg:'rileigh been posting stories at like 2am lately too' },
+  { from:'Jack', msg:'she lives in sapulpa what is she even doing up at 2am' },
+  { from:'Cruz', msg:'I drove out there once bro. she acts annoyed but she was waiting by the door' },
+  { from:'Jaquavion', msg:'LMAOOOO' },
+  { from:'Jackson', msg:'why are you driving to sapulpa for someone who "acts annoyed"' },
+  { from:'Cruz', msg:'because once she stops acting annoyed it\'s worth every mile' },
+  { from:'Jack', msg:'fair enough honestly' },
+  { from:'Jaquavion', msg:'what about nya somebody needs to talk about nya' },
+  { from:'Jackson', msg:'she has a boyfriend though' },
+  { from:'Cruz', msg:'so does remi apparently and that didn\'t stop jaquavion' },
+  { from:'Jaquavion', msg:'im not doing this' },
+  { from:'Jack', msg:'nya keeps liking my posts from like 3 weeks ago' },
+  { from:'Jackson', msg:'the casual scroll back is INTENTIONAL bro she wants you to notice' },
+  { from:'Cruz', msg:'100% that\'s a sign' },
+  { from:'Jack', msg:'or she was just bored' },
+  { from:'Jaquavion', msg:'no guy in this chat has ever been "just bored" scrolled back 3 weeks on a girls profile without reason' },
+  { from:'Jackson', msg:'he has a point' },
+  { from:'Cruz', msg:'what about allie though. she\'s quiet but I feel like' },
+  { from:'Jack', msg:'she\'s not as quiet as she looks trust me' },
+  { from:'Jaquavion', msg:'😳 say more' },
+  { from:'Jack', msg:'I\'m not saying more lmao' },
+  { from:'Cruz', msg:'bro you can\'t just drop that and leave' },
+  { from:'Jackson', msg:'JACK' },
+  { from:'Jack', msg:'she texted me at midnight saying she "couldn\'t sleep"' },
+  { from:'Jaquavion', msg:'🚨🚨🚨' },
+  { from:'Cruz', msg:'and what did YOU say' },
+  { from:'Jack', msg:'I went over there' },
+  { from:'Jackson', msg:'respectfully what the fuck jack' },
+  { from:'Cruz', msg:'legendary honestly' },
+  { from:'Jaquavion', msg:'allie of all people bro I didn\'t see that coming' },
+  { from:'Jackson', msg:'she always looks so innocent' },
+  { from:'Jack', msg:'THAT\'S WHAT I\'M SAYING' },
+  { from:'Cruz', msg:'I wonder if macy ever gets tired of her man' },
+  { from:'Jaquavion', msg:'bro her man is HUGE I am not in that conversation' },
+  { from:'Jackson', msg:'coward' },
+  { from:'Jaquavion', msg:'I am not dying for macy cox. I like her but I like being alive more.' },
+  { from:'Cruz', msg:'she does flirt a lot for someone who\'s "taken" though' },
+  { from:'Jack', msg:'she flirted with me at the panera on yale like two weeks ago' },
+  { from:'Jackson', msg:'she was probably bored in line' },
+  { from:'Jack', msg:'she followed me on instagram immediately after' },
+  { from:'Cruz', msg:'okay that\'s not bored that\'s intentional' },
+  { from:'Jaquavion', msg:'y\'all are gonna get someone hurt' },
+  { from:'Jackson', msg:'not me I stay away from taken women' },
+  { from:'Cruz', msg:'sir you literally just described sitting outside rileigh\'s house at 2am' },
+  { from:'Jackson', msg:'rileigh is single' },
+  { from:'Jaquavion', msg:'barely' },
+  { from:'Jack', msg:'💀💀' },
+  { from:'Jackson', msg:'okay on that note who\'s free this weekend' },
+  { from:'Cruz', msg:'I might hit rileigh up again ngl' },
+  { from:'Jaquavion', msg:'another sapulpa trip 😂' },
+  { from:'Cruz', msg:'it\'s only 25 minutes' },
+  { from:'Jack', msg:'you have a problem' },
+  { from:'Cruz', msg:'I have a destination' },
+];
+
+let gcIdx = 0;
+let gcTimer = null;
+let gcSpeed = 3000; // ms between messages
+let gcPaused = false;
+
+function buildGroupChat() {
+  const el = $('groupChatWrap'); if (!el) return;
+  el.innerHTML = `
+    <div class="groupchat-wrap" id="gcWrap">
+      <div class="groupchat-header">
+        <div>
+          <div class="groupchat-name">${GC_NAME}</div>
+          <div class="groupchat-members">${GC_MEMBERS.slice(0,-1).join(', ')} + You</div>
+        </div>
+        <div class="groupchat-controls">
+          <div class="gc-speed-wrap">
+            <span class="gc-ctrl-label">Speed</span>
+            <input type="range" class="gc-speed" id="gcSpeedSlider" min="500" max="6000" value="3000" step="500">
+          </div>
+          <button class="vault-btn game-btn" id="gcPauseBtn" style="padding:6px 12px;font-size:9px">⏸ Pause</button>
+          <button class="vault-btn game-btn" id="gcRestartBtn" style="padding:6px 12px;font-size:9px">↺ Restart</button>
+        </div>
+      </div>
+      <div class="groupchat-msgs" id="gcMsgs"></div>
+      <div class="groupchat-input-row">
+        <input class="gc-input" id="gcInput" placeholder="Say something...">
+        <button class="gc-send" id="gcSendBtn">Send</button>
+      </div>
+    </div>`;
+  gcIdx = 0;
+  gcPaused = false;
+  clearTimeout(gcTimer);
+  const msgs = $('gcMsgs');
+  // system open
+  appendGcMsg({ from:'system', msg:`${GC_NAME} · ${GC_MEMBERS.length} members` });
+  scheduleGcMsg();
+  // speed slider
+  $('gcSpeedSlider').addEventListener('input', e => { gcSpeed = parseInt(e.target.value); });
+  // pause
+  $('gcPauseBtn').addEventListener('click', () => {
+    gcPaused = !gcPaused;
+    $('gcPauseBtn').textContent = gcPaused ? '▶ Resume' : '⏸ Pause';
+    if (!gcPaused) scheduleGcMsg();
+    else clearTimeout(gcTimer);
+  });
+  // restart
+  $('gcRestartBtn').addEventListener('click', () => { clearTimeout(gcTimer); buildGroupChat(); });
+  // user send
+  $('gcSendBtn').addEventListener('click', sendGcMsg);
+  $('gcInput').addEventListener('keydown', e => { if(e.key==='Enter') sendGcMsg(); });
+}
+
+function appendGcMsg({ from, msg }) {
+  const msgs = $('gcMsgs'); if (!msgs) return;
+  const isSystem = from === 'system';
+  const isYou = from === 'You';
+  const div = document.createElement('div');
+  div.className = `gc-msg ${isSystem?'system':isYou?'right':'left'}`;
+  const now = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  if (isSystem) {
+    div.innerHTML = `<div class="gc-bubble">${msg}</div>`;
+  } else {
+    const color = GC_MEMBER_COLORS[from] || '#ff9999';
+    div.innerHTML = `
+      ${!isYou ? `<div class="gc-sender" style="color:${color}">${from}</div>` : ''}
+      <div class="gc-bubble">${msg}</div>
+      <div class="gc-time">${now}</div>`;
+  }
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showGcTyping(name) {
+  const msgs = $('gcMsgs'); if (!msgs) return null;
+  const div = document.createElement('div');
+  div.className = 'gc-msg left';
+  const color = GC_MEMBER_COLORS[name] || '#ff9999';
+  div.innerHTML = `<div class="gc-sender" style="color:${color}">${name}</div><div class="gc-bubble gc-typing"><span class="gc-typing-dots"><span></span><span></span><span></span></span></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function scheduleGcMsg() {
+  if (gcPaused || gcIdx >= GC_SCRIPT.length) return;
+  const next = GC_SCRIPT[gcIdx];
+  // show typing indicator
+  const typingEl = showGcTyping(next.from);
+  gcTimer = setTimeout(() => {
+    if (typingEl && typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
+    appendGcMsg(next);
+    gcIdx++;
+    if (gcIdx < GC_SCRIPT.length) gcTimer = setTimeout(scheduleGcMsg, gcSpeed * 0.3);
+  }, gcSpeed);
+}
+
+function sendGcMsg() {
+  const inp = $('gcInput'); if (!inp || !inp.value.trim()) return;
+  appendGcMsg({ from:'You', msg:inp.value.trim() });
+  inp.value = '';
+  // random auto-reply after delay
+  const replies = [
+    { from: rand(['Jackson','Cruz','Jaquavion','Jack']), msg: rand(['lmaooo','fr','💀','no way','that\'s crazy','bro what','exactly','honestly','say less','I was thinking the same thing']) },
+  ];
+  setTimeout(() => appendGcMsg(rand(replies)), gcSpeed * 0.5 + Math.random() * 1000);
+}
+
+// ─── POLL OF THE DAY ────────────────────────────────────────────
+const POLL_MATCHUPS = [
+  { q: 'Who are you actually calling at 2am?', a: 'Stella', b: 'Rileigh' },
+  { q: 'Who would you risk it for?', a: 'Remi', b: 'Macy' },
+  { q: 'Who\'s the better bad idea?', a: 'Nya', b: 'Stella' },
+  { q: 'Who\'s more dangerous?', a: 'Rileigh', b: 'Stella' },
+  { q: 'Who do you trust more? (slightly)', a: 'Allie', b: 'Remi' },
+  { q: 'One night, no consequences — who?', a: 'Stella', b: 'Nya' },
+  { q: 'Who would actually show up?', a: 'Rileigh', b: 'Macy' },
+  { q: 'Who ruins you worse?', a: 'Nya', b: 'Remi' },
+  { q: 'Who do you wife? (Hypothetically)', a: 'Allie', b: 'Macy' },
+  { q: 'Sapulpa or Tulsa?', a: 'Rileigh', b: 'Stella' },
+];
+
+let pollVotes = {};
+let currentPoll = null;
+let pollVoted = false;
+
+function buildPollOfDay() {
+  const el = $('pollContainer'); if (!el) return;
+  if (!currentPoll) currentPoll = rand(POLL_MATCHUPS);
+  const p = currentPoll;
+  if (!pollVotes[p.q]) pollVotes[p.q] = { a: Math.floor(Math.random()*40+10), b: Math.floor(Math.random()*40+10) };
+  const votes = pollVotes[p.q];
+  const total = votes.a + votes.b;
+  const pctA = Math.round(votes.a/total*100);
+  const pctB = 100-pctA;
+  const photoA = rand(SECRET_PHOTOS.filter(ph=>ph.model===p.a)||SECRET_PHOTOS);
+  const photoB = rand(SECRET_PHOTOS.filter(ph=>ph.model===p.b)||SECRET_PHOTOS);
+  el.innerHTML = `
+    <div class="poll-question">${p.q}</div>
+    <div class="poll-options">
+      <button class="poll-option ${pollVoted?'voted':''}" onclick="castVote('a')">
+        ${photoA?`<img src="${photoA.src}" alt="">`:''}
+        <div class="poll-option-name">${DOSSIER[p.a]?.nickname||p.a}</div>
+        ${pollVoted?`<div class="poll-bar-wrap"><div class="poll-bar" style="width:${pctA}%"></div></div><div class="poll-pct">${pctA}%</div>`:''}
+      </button>
+      <div class="poll-vs">VS</div>
+      <button class="poll-option ${pollVoted?'voted':''}" onclick="castVote('b')">
+        ${photoB?`<img src="${photoB.src}" alt="">`:''}
+        <div class="poll-option-name">${DOSSIER[p.b]?.nickname||p.b}</div>
+        ${pollVoted?`<div class="poll-bar-wrap"><div class="poll-bar" style="width:${pctB}%"></div></div><div class="poll-pct">${pctB}%</div>`:''}
+      </button>
+    </div>
+    ${pollVoted?`<div class="poll-result-label">${votes.a>votes.b?DOSSIER[p.a]?.nickname||p.a:DOSSIER[p.b]?.nickname||p.b} is winning</div>`:'<div style="font-size:10px;letter-spacing:2px;color:var(--red3);text-align:center">Tap to vote</div>'}
+    <button class="game-btn vault-btn" style="margin-top:20px" onclick="newPoll()">New Poll →</button>`;
+}
+function castVote(side) {
+  if (pollVoted) return;
+  pollVoted = true;
+  pollVotes[currentPoll.q][side]++;
+  buildPollOfDay();
+  addDangerScore(side==='a'?currentPoll.a:currentPoll.b, 2);
+}
+function newPoll() { currentPoll = rand(POLL_MATCHUPS); pollVoted = false; buildPollOfDay(); }
+window.castVote = castVote;
+window.newPoll = newPoll;
+
+// ─── STALKER SPEED SLIDER ────────────────────────────────────────
+// inject controls into stalker overlay
+function initStalkerControls() {
+  const overlay = $('stalkerOverlay'); if (!overlay) return;
+  // speed controls
+  if (!$('stalkerSpeedWrap')) {
+    const ctrl = document.createElement('div');
+    ctrl.className = 'stalker-controls';
+    ctrl.id = 'stalkerSpeedWrap';
+    ctrl.innerHTML = `<span class="stalker-ctrl-label">Speed</span><input type="range" class="stalker-speed-slider" id="stalkerSpeedSlider" min="2000" max="12000" value="6000" step="500">`;
+    overlay.appendChild(ctrl);
+    $('stalkerSpeedSlider').addEventListener('input', e => {
+      stalkerInterval = parseInt(e.target.value);
+    });
+  }
+  // girl filter buttons
+  if (!$('stalkerFilterWrap')) {
+    const filt = document.createElement('div');
+    filt.className = 'stalker-filter';
+    filt.id = 'stalkerFilterWrap';
+    const girls = ['All', ...Object.keys(DOSSIER)];
+    filt.innerHTML = girls.map(g => `<button class="stalker-filter-btn ${g==='All'?'on':''}" data-girl="${g}">${g}</button>`).join('');
+    overlay.appendChild(filt);
+    filt.querySelectorAll('.stalker-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        filt.querySelectorAll('.stalker-filter-btn').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        const girl = btn.dataset.girl;
+        stalkerPhotos = girl === 'All' ? shuffle(SECRET_PHOTOS) : shuffle(SECRET_PHOTOS.filter(p => p.model === girl));
+        if (!stalkerPhotos.length) { toast('No photos for that girl yet'); return; }
+        stalkerIdx = 0;
+        clearTimeout(stalkerTimer);
+        showStalkerPhoto();
+      });
+    });
+  }
+}
+
+// ─── SHE'S WATCHING BACK ────────────────────────────────────────
+function triggerShesWatching() {
+  if (!$('secretWrap')?.classList.contains('open')) return;
+  const el = document.createElement('div');
+  el.className = 'shes-watching';
+  el.innerHTML = '<div class="watching-eye">👁️</div>';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+  toast('she\'s watching back 👁️');
+}
+// random trigger every 3-8 minutes while in vault
+function scheduleShesWatching() {
+  const delay = 180000 + Math.random() * 300000;
+  setTimeout(() => {
+    triggerShesWatching();
+    scheduleShesWatching();
+  }, delay);
+}
+scheduleShesWatching();
+
+// ─── NEW SECTION INIT HOOKS ──────────────────────────────────────
+// Hook into sidebar button clicks to init new sections on first open
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-ssection]');
+  if (!btn) return;
+  const id = btn.dataset.ssection;
+  // small delay so showSecretSection runs first and section is visible
+  setTimeout(() => {
+    if (id === 'sshesaid') buildSheSaid();
+    if (id === 'sgroupchat') { if (!$('gcWrap')) buildGroupChat(); }
+    if (id === 'spollofday') buildPollOfDay();
+  }, 50);
+});
+
+// ─── STALK CONTROLS ON STALKER TRIGGER ──────────────────────────
+document.addEventListener('click', function(e) {
+  if (e.target.closest('#stalkerBtn')) {
+    setTimeout(initStalkerControls, 200);
+  }
+});
