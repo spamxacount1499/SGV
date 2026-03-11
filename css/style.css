@@ -4216,3 +4216,15 @@ body.vault-open {
     padding: 20px 14px 60px !important;
   }
 }
+
+/* ── STALKER INFO MULTI-LINE ── */
+.stalker-model {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px 16px !important;
+  font-size: 11px !important;
+  letter-spacing: 1.5px !important;
+  color: #aa5555 !important;
+  margin-top: 4px !important;
+  line-height: 1.8 !important;
+}
