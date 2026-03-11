@@ -4327,3 +4327,251 @@ body.vault-open {
 .stalker-info {
   padding: 80px 32px 32px !important;
 }
+
+/* ╔═══════════════════════════════════════════════════════╗
+   ║   NEW FEATURES: DOSSIER · ALIBI · RANKFIT · SMP       ║
+   ║   LEADERBOARD · WHO'S ONLINE · ACTIVITY FEED          ║
+   ╚═══════════════════════════════════════════════════════╝ */
+
+/* ── WHO'S ONLINE ── */
+.online-indicator {
+  padding: 10px 10px 6px;
+  font-size: 9px;
+  color: #ff4444;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-bottom: 1px solid rgba(255,34,34,0.1);
+  margin-bottom: 8px;
+}
+.online-dot {
+  width: 6px; height: 6px;
+  background: #44ff88;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #44ff88;
+  flex-shrink: 0;
+  animation: onlinePulse 2s ease-in-out infinite;
+}
+@keyframes onlinePulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.online-name { font-size: 9px; color: #cc4444; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── DOSSIER ── */
+.dossier-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.dossier-tab {
+  background: none;
+  border: 1px solid rgba(255,34,34,0.2);
+  color: #8a3030;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dossier-tab:hover { color: #ff4444; border-color: rgba(255,34,34,0.5); }
+.dossier-tab.on { background: rgba(255,34,34,0.1); color: #ff2222; border-color: #ff2222; }
+.dossier-card {
+  background: rgba(255,20,20,0.04);
+  border: 1px solid rgba(255,34,34,0.15);
+  padding: 28px 32px;
+  max-width: 680px;
+}
+.dossier-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255,34,34,0.15);
+  padding-bottom: 16px;
+}
+.dossier-nickname {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 3vw, 32px);
+  color: #ff2222;
+  font-style: italic;
+  margin-bottom: 4px;
+}
+.dossier-fullname {
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #8a3030;
+}
+.dossier-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,34,34,0.06);
+}
+.dossier-label {
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #5a2020;
+  min-width: 100px;
+  padding-top: 2px;
+}
+.dossier-val {
+  font-size: 13px;
+  color: #cc8888;
+  line-height: 1.5;
+  flex: 1;
+}
+.dossier-weakness { color: #ff6666 !important; font-style: italic; }
+.dossier-threat { font-family: monospace; color: #ff2222 !important; letter-spacing: 1px; }
+.dossier-notes {
+  margin-top: 20px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: #aa4444;
+  font-style: italic;
+  line-height: 1.7;
+  text-align: center;
+  padding: 16px;
+  border-top: 1px solid rgba(255,34,34,0.1);
+}
+
+/* ── ALIBI GAME ── */
+.alibi-scenario {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(18px, 2.5vw, 26px);
+  color: #ff4444;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 32px;
+  font-style: italic;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.alibi-arena {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto 20px;
+}
+.alibi-btn {
+  background: rgba(255,34,34,0.04);
+  border: 1px solid rgba(255,34,34,0.2);
+  color: #cc6666;
+  padding: 16px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Montserrat', sans-serif;
+  text-align: center;
+}
+.alibi-btn:hover { background: rgba(255,34,34,0.1); border-color: #ff4444; color: #ff4444; transform: translateY(-2px); }
+.alibi-btn.picked { background: rgba(255,34,34,0.18); border-color: #ff2222; color: #ff2222; box-shadow: 0 0 20px rgba(255,34,34,0.2); }
+.alibi-name { font-size: 13px; letter-spacing: 1px; margin-bottom: 4px; }
+.alibi-sub { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6; }
+.alibi-reaction {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  color: #ff6666;
+  font-style: italic;
+  text-align: center;
+  min-height: 28px;
+  margin-bottom: 20px;
+}
+
+/* ── RANK THE FIT ── */
+.rankfit-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 24px;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px dashed rgba(255,34,34,0.2);
+}
+.rankfit-item {
+  width: 100px;
+  cursor: grab;
+  text-align: center;
+}
+.rankfit-item.dragging { opacity: 0.4; transform: scale(0.95); }
+.rankfit-item img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
+.rankfit-label { font-size: 9px; letter-spacing: 2px; color: #8a3030; margin-top: 4px; text-transform: uppercase; }
+.rankfit-slots {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.rankfit-slot {
+  text-align: center;
+  min-width: 90px;
+}
+.rankfit-slot.over .rankfit-drop-area { border-color: #ff2222; background: rgba(255,34,34,0.1); }
+.rankfit-rank { font-size: 10px; letter-spacing: 2px; color: #ff4444; margin-bottom: 4px; }
+.rankfit-drop-area {
+  width: 90px; height: 120px;
+  border: 1px dashed rgba(255,34,34,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #5a2020;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+  overflow: hidden;
+}
+.rankfit-drop-area .rankfit-item { width: 88px; margin: 0; }
+
+/* ── SMASH OR PASS ── */
+.smp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,34,34,0.06);
+}
+.smp-name { min-width: 60px; font-size: 11px; color: #cc6666; letter-spacing: 1px; }
+.smp-bar-wrap { flex: 1; height: 4px; background: rgba(255,34,34,0.1); border-radius: 2px; }
+.smp-bar { height: 100%; background: linear-gradient(90deg, #ff2222, #d4af37); border-radius: 2px; transition: width 0.4s ease; }
+.smp-pct { font-size: 11px; color: #ff4444; min-width: 35px; text-align: right; }
+
+/* ── LEADERBOARD ── */
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,34,34,0.08);
+}
+.lb-medal { font-size: 20px; min-width: 28px; }
+.lb-name { min-width: 140px; font-family: 'Playfair Display', serif; font-size: 15px; color: #ff6666; font-style: italic; }
+.lb-bar-wrap { flex: 1; height: 4px; background: rgba(255,34,34,0.1); border-radius: 2px; }
+.lb-bar { height: 100%; background: linear-gradient(90deg, #ff2222, #d4af37); border-radius: 2px; min-width: 2px; transition: width 0.6s ease; }
+.lb-count { font-size: 11px; color: #8a3030; min-width: 60px; text-align: right; letter-spacing: 1px; }
+
+/* ── ACTIVITY FEED ── */
+.feed-wrap {
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.feed-entry {
+  display: grid;
+  grid-template-columns: 130px 1fr 70px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255,20,20,0.02);
+  border-left: 2px solid rgba(255,34,34,0.08);
+  transition: background 0.2s;
+  animation: feedIn 0.3s ease;
+}
+@keyframes feedIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:none} }
+.feed-entry:hover { background: rgba(255,34,34,0.05); border-left-color: rgba(255,34,34,0.3); }
+.feed-user { font-size: 10px; letter-spacing: 1px; color: #ff4444; font-family: 'Montserrat', sans-serif; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.feed-action { font-size: 12px; color: #aa6666; line-height: 1.4; }
+.feed-time { font-size: 9px; color: #5a2020; letter-spacing: 1px; text-align: right; white-space: nowrap; }
