@@ -1349,6 +1349,113 @@ $('stalkerBtn')&&$('stalkerBtn').addEventListener('click',startStalkerMode);
 $('stalkerStop')&&$('stalkerStop').addEventListener('click',stopStalkerMode);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('stalkerOverlay').classList.contains('show'))stopStalkerMode(); });
 
+// ─── JOI MODE ────────────────────────────────────────────────────────────────
+let joiTimer=null, joiIdx=0, joiPhotos=[], joiSpeed=3;
+let joiCucAnim=null, joiCucPos=0, joiCucDir=1;
+
+// speed → interval ms and BPM
+const JOI_SPEEDS = [
+  null,                              // idx 0 unused
+  {ms:8000, bpm:15,  label:'1'},    // 1 — glacial
+  {ms:6000, bpm:20,  label:'2'},
+  {ms:4500, bpm:30,  label:'3'},
+  {ms:3000, bpm:45,  label:'4'},
+  {ms:2200, bpm:60,  label:'5'},
+  {ms:1600, bpm:80,  label:'6'},
+  {ms:1100, bpm:100, label:'7'},
+  {ms:800,  bpm:130, label:'8'},
+  {ms:500,  bpm:160, label:'9'},
+  {ms:280,  bpm:220, label:'10 🔥'}, // 10 — unhinged
+];
+
+function startJoi() {
+  joiPhotos = shuffle([...PHOTOS]);
+  joiIdx = 0;
+  $('joiOverlay').classList.add('show');
+  document.body.classList.add('joi-open');
+  joiSpeed = parseInt($('joiSpeedSlider')?.value || 3);
+  updateJoiSpeed();
+  showJoiPhoto();
+  startCucumber();
+}
+
+function stopJoi() {
+  clearTimeout(joiTimer);
+  cancelAnimationFrame(joiCucAnim);
+  $('joiOverlay').classList.remove('show');
+  document.body.classList.remove('joi-open');
+}
+
+function showJoiPhoto() {
+  const photo = joiPhotos[joiIdx % joiPhotos.length];
+  const img = $('joiImg');
+  // quick fade
+  img.style.opacity = '0';
+  img.src = photo.src;
+  img.onload = () => { img.style.opacity = '1'; };
+  $('joiName').textContent = photo.name;
+  $('joiModel').textContent = photo.model;
+  // progress bar
+  const prog = $('joiProgress');
+  if (prog) {
+    prog.style.transition = 'none';
+    prog.style.width = '0%';
+    const spd = JOI_SPEEDS[joiSpeed];
+    setTimeout(() => {
+      prog.style.transition = `width ${spd.ms}ms linear`;
+      prog.style.width = '100%';
+    }, 30);
+  }
+  joiIdx++;
+  clearTimeout(joiTimer);
+  joiTimer = setTimeout(showJoiPhoto, JOI_SPEEDS[joiSpeed].ms);
+}
+
+function updateJoiSpeed() {
+  joiSpeed = parseInt($('joiSpeedSlider')?.value || 3);
+  const spd = JOI_SPEEDS[joiSpeed];
+  if ($('joiBpm')) $('joiBpm').textContent = `♩ ${spd.bpm} BPM`;
+  if ($('joiSpeedVal')) $('joiSpeedVal').textContent = spd.label;
+  // restart cucumber at new BPM
+  cancelAnimationFrame(joiCucAnim);
+  startCucumber();
+}
+
+function startCucumber() {
+  cancelAnimationFrame(joiCucAnim);
+  const cuc = $('joiCucumber');
+  if (!cuc) return;
+  const spd = JOI_SPEEDS[joiSpeed];
+  // ms per full stroke (up+down) synced to BPM
+  const strokeMs = (60000 / spd.bpm);
+  let start = null;
+  const TRAVEL = 120; // px travel distance
+
+  function animCuc(ts) {
+    if (!start) start = ts;
+    const elapsed = (ts - start) % strokeMs;
+    // sine wave: 0→1→0 over one stroke
+    const t = elapsed / strokeMs;
+    const y = Math.sin(t * Math.PI * 2) * TRAVEL * 0.5;
+    cuc.style.transform = `translateY(${y}px) rotate(${-15 + y * 0.15}deg)`;
+    joiCucAnim = requestAnimationFrame(animCuc);
+  }
+  joiCucAnim = requestAnimationFrame(animCuc);
+}
+
+// wire up
+$('joiBtn') && $('joiBtn').addEventListener('click', startJoi);
+$('joiStop') && $('joiStop').addEventListener('click', stopJoi);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('joiOverlay')?.classList.contains('show')) stopJoi();
+});
+$('joiSpeedSlider') && $('joiSpeedSlider').addEventListener('input', () => {
+  updateJoiSpeed();
+  // restart photo timer at new speed
+  clearTimeout(joiTimer);
+  joiTimer = setTimeout(showJoiPhoto, JOI_SPEEDS[joiSpeed].ms);
+});
+
 // ─── INIT ──────────────────────────────────────────────────────────────────────
 buildModelTabs();
 renderGrid();
