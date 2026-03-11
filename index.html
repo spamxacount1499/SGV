@@ -47,6 +47,7 @@
     <button class="fun-btn" id="surpriseBtn">🎲 Surprise Me</button>
     <button class="fun-btn" id="randomGirlBtn">🔀 Random Girl</button>
     <button class="fun-btn" id="hotTakeBtn">💬 Hot Take</button>
+    <button class="fun-btn" id="joiBtn">🥒 JOI Mode</button>
   </div>
   <div class="model-tabs" id="modelTabs"></div>
   <div class="grid" id="grid"></div>
@@ -679,6 +680,35 @@
       <div class="stalker-model" id="stalkerModel"></div>
     </div>
     <button class="stalker-stop" id="stalkerStop">✕ Exit</button>
+  </div>
+</div>
+
+<!-- JOI MODE -->
+<div class="joi-overlay" id="joiOverlay">
+  <div class="joi-progress" id="joiProgress" style="width:0%"></div>
+  <img class="joi-img" id="joiImg" src="" alt="">
+  <div class="joi-vignette"></div>
+
+  <!-- cucumber -->
+  <div class="joi-cucumber-wrap" id="joiCucumberWrap">
+    <div class="joi-cucumber" id="joiCucumber">🥒</div>
+  </div>
+
+  <!-- top controls -->
+  <div class="joi-controls" id="joiControls">
+    <div class="joi-speed-wrap">
+      <span class="joi-speed-label">SPEED</span>
+      <input type="range" class="joi-speed-slider" id="joiSpeedSlider" min="1" max="10" value="3" step="1">
+      <span class="joi-speed-val" id="joiSpeedVal">3</span>
+    </div>
+    <div class="joi-bpm-display" id="joiBpm">♩ 60 BPM</div>
+    <button class="joi-stop" id="joiStop">✕ STOP</button>
+  </div>
+
+  <!-- bottom info -->
+  <div class="joi-info">
+    <div class="joi-name" id="joiName"></div>
+    <div class="joi-model" id="joiModel"></div>
   </div>
 </div>
 
