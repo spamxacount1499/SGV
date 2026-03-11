@@ -138,6 +138,8 @@ function initVaultContent() {
   buildFmk(true);
   todNext();
   buildDraft();
+  initLastSeen();
+  initVaultGames();
 }
 $('secretExit').addEventListener('click', () => {
   $('secretWrap').classList.remove('open');
@@ -4780,3 +4782,624 @@ document.addEventListener('click', function(e) {
     if (id === 'sratemynight') buildRateMyNight();
   }, 50);
 });
+// ═══════════════════════════════════════════════════════
+// ADD THIS TO THE END OF app.js
+// ═══════════════════════════════════════════════════════
+
+// ─── THE ROSTER ──────────────────────────────────────────────────────────────
+const rosterState = {
+  face: null,
+  tits: null,
+  ass: null,
+  legs: null,
+  feet: null
+};
+
+function initRoster() {
+  // Click handlers for each slot
+  ['face', 'tits', 'ass', 'legs', 'feet'].forEach(part => {
+    const slot = $(`roster${part.charAt(0).toUpperCase() + part.slice(1)}`);
+    if (slot) {
+      slot.addEventListener('click', () => selectForRoster(part));
+    }
+  });
+
+  // Random build button
+  const randomBtn = $('rosterRandom');
+  if (randomBtn) {
+    randomBtn.addEventListener('click', () => {
+      ['face', 'tits', 'ass', 'legs', 'feet'].forEach(part => {
+        const randomPhoto = rand(PHOTOS);
+        rosterState[part] = randomPhoto;
+        updateRosterSlot(part, randomPhoto);
+      });
+      toast('Random build complete! 🔥');
+    });
+  }
+
+  // Clear button
+  const clearBtn = $('rosterClear');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      ['face', 'tits', 'ass', 'legs', 'feet'].forEach(part => {
+        rosterState[part] = null;
+        const slot = $(`roster${part.charAt(0).toUpperCase() + part.slice(1)}`);
+        if (slot) {
+          slot.style.backgroundImage = '';
+          slot.innerHTML = 'Click to select';
+          slot.classList.remove('filled');
+        }
+      });
+      toast('Roster cleared');
+    });
+  }
+}
+
+function selectForRoster(part) {
+  // Show modal to pick a photo from gallery
+  const photos = PHOTOS;
+  if (!photos.length) return;
+
+  // Create selection overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.background = 'rgba(0,0,0,0.95)';
+  
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
+  grid.style.gap = '8px';
+  grid.style.maxWidth = '90%';
+  grid.style.maxHeight = '80vh';
+  grid.style.overflow = 'auto';
+  grid.style.padding = '20px';
+
+  photos.forEach(photo => {
+    const img = document.createElement('img');
+    img.src = photo.src;
+    img.style.width = '100%';
+    img.style.height = '150px';
+    img.style.objectFit = 'cover';
+    img.style.cursor = 'pointer';
+    img.style.border = '2px solid var(--border)';
+    img.style.transition = 'all 0.3s';
+    
+    img.addEventListener('mouseenter', () => {
+      img.style.borderColor = 'var(--pink)';
+      img.style.transform = 'scale(1.05)';
+    });
+    img.addEventListener('mouseleave', () => {
+      img.style.borderColor = 'var(--border)';
+      img.style.transform = 'scale(1)';
+    });
+    
+    img.addEventListener('click', () => {
+      rosterState[part] = photo;
+      updateRosterSlot(part, photo);
+      document.body.removeChild(overlay);
+      toast(`${part.toUpperCase()} selected: ${photo.model}`);
+    });
+    
+    grid.appendChild(img);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.position = 'fixed';
+  closeBtn.style.top = '20px';
+  closeBtn.style.right = '20px';
+  closeBtn.style.background = 'var(--bg)';
+  closeBtn.style.border = '1px solid var(--pink)';
+  closeBtn.style.color = 'var(--pink)';
+  closeBtn.style.padding = '10px 20px';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.fontSize = '20px';
+  closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+  overlay.appendChild(grid);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+}
+
+function updateRosterSlot(part, photo) {
+  const slot = $(`roster${part.charAt(0).toUpperCase() + part.slice(1)}`);
+  if (!slot) return;
+  
+  slot.style.backgroundImage = `url(${photo.src})`;
+  slot.innerHTML = `<div class="roster-model-name">${photo.model}</div>`;
+  slot.classList.add('filled');
+}
+
+// Initialize roster when game tab is opened
+document.querySelector('[data-pane="paneRoster"]')?.addEventListener('click', () => {
+  setTimeout(initRoster, 100);
+});
+
+// ─── BINGO ───────────────────────────────────────────────────────────────────
+const BINGO_OBJECTIVES = [
+  'Mirror Selfie', 'Red Bikini', 'White Dress', 'Feet Pic', 'Pool/Beach',
+  'Bedroom Shot', 'Black Outfit', 'Lingerie', 'Outdoor', 'Tight Dress',
+  'Bikini Top', 'Shorts', 'Night Out', 'Casual Fit', 'Gym/Athletic',
+  'Heels', 'Sunglasses', 'Car Selfie', 'Bathroom Mirror', 'Group Pic',
+  'Close-Up Face', 'Full Body', 'Side Pose', 'Back View', 'Selfie Angle'
+];
+
+let bingoCard = [];
+let bingoMarked = new Set();
+
+function initBingo() {
+  bingoMarked.clear();
+  createBingoCard();
+  renderBingoBoard();
+}
+
+function createBingoCard() {
+  const shuffled = shuffle([...BINGO_OBJECTIVES]);
+  bingoCard = shuffled.slice(0, 25);
+  // Make center square "FREE"
+  bingoCard[12] = 'FREE';
+  bingoMarked.add(12);
+}
+
+function renderBingoBoard() {
+  const board = $('bingoBoard');
+  if (!board) return;
+  
+  board.innerHTML = '';
+  bingoCard.forEach((obj, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'bingo-cell';
+    if (obj === 'FREE') cell.classList.add('free');
+    if (bingoMarked.has(idx)) cell.classList.add('marked');
+    cell.textContent = obj;
+    cell.style.position = 'relative';
+    
+    if (obj !== 'FREE') {
+      cell.addEventListener('click', () => {
+        if (bingoMarked.has(idx)) {
+          bingoMarked.delete(idx);
+          cell.classList.remove('marked');
+        } else {
+          bingoMarked.add(idx);
+          cell.classList.add('marked');
+        }
+        checkBingo();
+      });
+    }
+    
+    board.appendChild(cell);
+  });
+}
+
+function checkBingo() {
+  const status = $('bingoStatus');
+  if (!status) return;
+  
+  // Check rows
+  for (let row = 0; row < 5; row++) {
+    let win = true;
+    for (let col = 0; col < 5; col++) {
+      if (!bingoMarked.has(row * 5 + col)) {
+        win = false;
+        break;
+      }
+    }
+    if (win) {
+      status.textContent = '🎉 BINGO! ROW ' + (row + 1) + '! 🎉';
+      status.classList.add('bingo-win');
+      return;
+    }
+  }
+  
+  // Check columns
+  for (let col = 0; col < 5; col++) {
+    let win = true;
+    for (let row = 0; row < 5; row++) {
+      if (!bingoMarked.has(row * 5 + col)) {
+        win = false;
+        break;
+      }
+    }
+    if (win) {
+      status.textContent = '🎉 BINGO! COLUMN ' + (col + 1) + '! 🎉';
+      status.classList.add('bingo-win');
+      return;
+    }
+  }
+  
+  // Check diagonals
+  let diag1 = true, diag2 = true;
+  for (let i = 0; i < 5; i++) {
+    if (!bingoMarked.has(i * 5 + i)) diag1 = false;
+    if (!bingoMarked.has(i * 5 + (4 - i))) diag2 = false;
+  }
+  if (diag1) {
+    status.textContent = '🎉 BINGO! DIAGONAL! 🎉';
+    status.classList.add('bingo-win');
+    return;
+  }
+  if (diag2) {
+    status.textContent = '🎉 BINGO! DIAGONAL! 🎉';
+    status.classList.add('bingo-win');
+    return;
+  }
+  
+  // No bingo
+  status.textContent = `${bingoMarked.size - 1} / 24 marked`;
+  status.classList.remove('bingo-win');
+}
+
+// New card button
+$('bingoNew')?.addEventListener('click', initBingo);
+
+// Initialize when tab opened
+document.querySelector('[data-pane="paneBingo"]')?.addEventListener('click', () => {
+  if (bingoCard.length === 0) initBingo();
+});
+
+// ─── LAST SEEN ───────────────────────────────────────────────────────────────
+const LAST_SEEN_MODELS = ['Nya', 'Remi', 'Stella', 'Allie', 'Rileigh', 'Macy'];
+
+const SIGHTING_TEMPLATES = [
+  '{model} spotted at Utica Square, wearing {outfit}. 2:47 PM.',
+  'Confirmed sighting: {model} at Brookside. {outfit}. Just now.',
+  '{model} seen leaving Whole Foods. {outfit}. 30 mins ago.',
+  'URGENT: {model} downtown on Cherry Street. {outfit}.',
+  '{model} at Starbucks 71st & Yale. {outfit}. She looked back.',
+  'Eyes on {model} - TU campus area. {outfit}. Moving north.',
+  '{model} confirmed at Gathering Place. {outfit}. Still there.',
+  '{model} spotted at Target. {outfit}. Aisle 7. Go now.',
+  'Update: {model} seen at Woodland Hills Mall. {outfit}.',
+  '{model} leaving LA Fitness. {outfit}. Heading to parking lot.',
+];
+
+const OUTFIT_DESC = [
+  'tight black dress',
+  'white crop top and jeans',
+  'red bikini top visible under tank',
+  'oversized hoodie, leggings',
+  'sundress, looks incredible',
+  'all black everything',
+  'gym fit, sports bra showing',
+  'barely-there shorts',
+  'designer bag, heels',
+  'casual but dangerous',
+];
+
+const INSTA_STATUSES = [
+  'Active now',
+  'Active 3m ago',
+  'Active 15m ago',
+  'Active 1h ago',
+  'Last seen today at 2:47 AM',
+  'Last seen yesterday at 11:32 PM',
+  'Active 2h ago',
+];
+
+function updateLastSeen() {
+  const instaEl = $('lastSeenInsta');
+  if (!instaEl) return;
+  
+  instaEl.innerHTML = LAST_SEEN_MODELS.map(model => {
+    const isOnline = Math.random() > 0.7;
+    const status = isOnline ? 'Active now' : rand(INSTA_STATUSES);
+    
+    return `
+      <div class="insta-girl">
+        <div class="insta-avatar ${isOnline ? 'online' : ''}"></div>
+        <div class="insta-info">
+          <div class="insta-name">@${model.toLowerCase()}</div>
+          <div class="insta-status ${isOnline ? 'online' : ''}">${status}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function addSighting() {
+  const board = $('sightingBoard');
+  if (!board) return;
+  
+  const model = rand(LAST_SEEN_MODELS);
+  const outfit = rand(OUTFIT_DESC);
+  const template = rand(SIGHTING_TEMPLATES);
+  const text = template.replace('{model}', model).replace('{outfit}', outfit);
+  const time = Math.floor(Math.random() * 60) + ' mins ago';
+  
+  const pin = document.createElement('div');
+  pin.className = 'sighting-pin';
+  pin.style.animation = 'fadeInUp 0.4s ease';
+  pin.innerHTML = `
+    <div class="sighting-header">
+      <div class="sighting-model">${model}</div>
+      <div class="sighting-time">${time}</div>
+    </div>
+    <div class="sighting-text">"${text}"</div>
+    <div class="sighting-location">📍 Tulsa, OK</div>
+  `;
+  
+  board.insertBefore(pin, board.firstChild);
+  
+  // Keep only last 20 sightings
+  while (board.children.length > 20) {
+    board.removeChild(board.lastChild);
+  }
+}
+
+// Initialize Last Seen when vault opens
+function initLastSeen() {
+  updateLastSeen();
+  
+  // Add initial sightings
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => addSighting(), i * 200);
+  }
+  
+  // Update Instagram statuses every 30 seconds
+  setInterval(updateLastSeen, 30000);
+  
+  // Add new sighting every 20-40 seconds
+  setInterval(() => {
+    if (Math.random() > 0.3) { // 70% chance
+      addSighting();
+    }
+  }, 20000 + Math.random() * 20000);
+}
+
+// Call this when vault content is initialized
+// Add to your existing initVaultContent() function:
+// initLastSeen();
+
+// ═══════════════════════════════════════════════════════
+// ADD THIS LINE TO YOUR EXISTING initVaultContent() FUNCTION
+// (around line 141 in your original app.js)
+// ═══════════════════════════════════════════════════════
+// initLastSeen();
+
+// ─── VAULT ROSTER ────────────────────────────────────────────────────────────
+const vaultRosterState = {
+  face: null,
+  tits: null,
+  ass: null,
+  legs: null,
+  feet: null
+};
+
+function initVaultRoster() {
+  // Click handlers for each vault slot
+  ['face', 'tits', 'ass', 'legs', 'feet'].forEach(part => {
+    const slot = $(`vaultRoster${part.charAt(0).toUpperCase() + part.slice(1)}`);
+    if (slot) {
+      slot.addEventListener('click', () => selectForVaultRoster(part));
+    }
+  });
+
+  // Random build button
+  const randomBtn = $('vaultRosterRandom');
+  if (randomBtn) {
+    randomBtn.addEventListener('click', () => {
+      ['face', 'tits', 'ass', 'legs', 'feet'].forEach(part => {
+        const randomPhoto = rand(SECRET_PHOTOS);
+        vaultRosterState[part] = randomPhoto;
+        updateVaultRosterSlot(part, randomPhoto);
+      });
+      toast('Perfect build complete! 💀');
+    });
+  }
+
+  // Clear button
+  const clearBtn = $('vaultRosterClear');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      ['face', 'tits', 'ass', 'legs', 'feet'].forEach(part => {
+        vaultRosterState[part] = null;
+        const slot = $(`vaultRoster${part.charAt(0).toUpperCase() + part.slice(1)}`);
+        if (slot) {
+          slot.style.backgroundImage = '';
+          slot.innerHTML = 'Click to select';
+          slot.classList.remove('filled');
+        }
+      });
+      toast('Roster cleared');
+    });
+  }
+}
+
+function selectForVaultRoster(part) {
+  const photos = SECRET_PHOTOS;
+  if (!photos.length) return;
+
+  // Create selection overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.background = 'rgba(0,0,0,0.95)';
+  
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
+  grid.style.gap = '8px';
+  grid.style.maxWidth = '90%';
+  grid.style.maxHeight = '80vh';
+  grid.style.overflow = 'auto';
+  grid.style.padding = '20px';
+
+  photos.forEach(photo => {
+    const img = document.createElement('img');
+    img.src = photo.src;
+    img.style.width = '100%';
+    img.style.height = '150px';
+    img.style.objectFit = 'cover';
+    img.style.cursor = 'pointer';
+    img.style.border = '2px solid var(--red2)';
+    img.style.transition = 'all 0.3s';
+    
+    img.addEventListener('mouseenter', () => {
+      img.style.borderColor = 'var(--red)';
+      img.style.transform = 'scale(1.05)';
+      img.style.boxShadow = '0 0 20px rgba(255, 34, 34, 0.5)';
+    });
+    img.addEventListener('mouseleave', () => {
+      img.style.borderColor = 'var(--red2)';
+      img.style.transform = 'scale(1)';
+      img.style.boxShadow = 'none';
+    });
+    
+    img.addEventListener('click', () => {
+      vaultRosterState[part] = photo;
+      updateVaultRosterSlot(part, photo);
+      document.body.removeChild(overlay);
+      toast(`${part.toUpperCase()} selected: ${photo.model}`);
+    });
+    
+    grid.appendChild(img);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.position = 'fixed';
+  closeBtn.style.top = '20px';
+  closeBtn.style.right = '20px';
+  closeBtn.style.background = 'var(--bg)';
+  closeBtn.style.border = '1px solid var(--red)';
+  closeBtn.style.color = 'var(--red)';
+  closeBtn.style.padding = '10px 20px';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.fontSize = '20px';
+  closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+  overlay.appendChild(grid);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+}
+
+function updateVaultRosterSlot(part, photo) {
+  const slot = $(`vaultRoster${part.charAt(0).toUpperCase() + part.slice(1)}`);
+  if (!slot) return;
+  
+  slot.style.backgroundImage = `url(${photo.src})`;
+  slot.innerHTML = `<div class="roster-model-name">${photo.model}</div>`;
+  slot.classList.add('filled');
+}
+
+// ─── VAULT BINGO ─────────────────────────────────────────────────────────────
+const VAULT_BINGO_OBJECTIVES = [
+  'Feet Focus', 'Lace Lingerie', 'Bedroom Eyes', 'Upskirt Angle', 'Shower Shot',
+  'Cleavage Close-Up', 'Thigh Highs', 'Wet Look', 'See-Through', 'Bent Over',
+  'Back Arch', 'Legs Spread', 'Hands Covered', 'Oil/Lotion', 'In Bed',
+  'POV Angle', 'Side Boob', 'Underboob', 'Biting Lip', 'Touching Self',
+  'Mirror Tease', 'Stockings', 'Straps Down', 'Ass Focus', 'Secret Revealed'
+];
+
+let vaultBingoCard = [];
+let vaultBingoMarked = new Set();
+
+function initVaultBingo() {
+  vaultBingoMarked.clear();
+  createVaultBingoCard();
+  renderVaultBingoBoard();
+}
+
+function createVaultBingoCard() {
+  const shuffled = shuffle([...VAULT_BINGO_OBJECTIVES]);
+  vaultBingoCard = shuffled.slice(0, 25);
+  vaultBingoCard[12] = 'FREE';
+  vaultBingoMarked.add(12);
+}
+
+function renderVaultBingoBoard() {
+  const board = $('vaultBingoBoard');
+  if (!board) return;
+  
+  board.innerHTML = '';
+  vaultBingoCard.forEach((obj, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'bingo-cell';
+    if (obj === 'FREE') cell.classList.add('free');
+    if (vaultBingoMarked.has(idx)) cell.classList.add('marked');
+    cell.textContent = obj;
+    cell.style.position = 'relative';
+    
+    if (obj !== 'FREE') {
+      cell.addEventListener('click', () => {
+        if (vaultBingoMarked.has(idx)) {
+          vaultBingoMarked.delete(idx);
+          cell.classList.remove('marked');
+        } else {
+          vaultBingoMarked.add(idx);
+          cell.classList.add('marked');
+        }
+        checkVaultBingo();
+      });
+    }
+    
+    board.appendChild(cell);
+  });
+}
+
+function checkVaultBingo() {
+  const status = $('vaultBingoStatus');
+  if (!status) return;
+  
+  // Check rows
+  for (let row = 0; row < 5; row++) {
+    let win = true;
+    for (let col = 0; col < 5; col++) {
+      if (!vaultBingoMarked.has(row * 5 + col)) {
+        win = false;
+        break;
+      }
+    }
+    if (win) {
+      status.textContent = '🔥 BINGO! You\'ve seen it all. 🔥';
+      status.classList.add('bingo-win');
+      return;
+    }
+  }
+  
+  // Check columns
+  for (let col = 0; col < 5; col++) {
+    let win = true;
+    for (let row = 0; row < 5; row++) {
+      if (!vaultBingoMarked.has(row * 5 + col)) {
+        win = false;
+        break;
+      }
+    }
+    if (win) {
+      status.textContent = '🔥 BINGO! You\'ve seen it all. 🔥';
+      status.classList.add('bingo-win');
+      return;
+    }
+  }
+  
+  // Check diagonals
+  let diag1 = true, diag2 = true;
+  for (let i = 0; i < 5; i++) {
+    if (!vaultBingoMarked.has(i * 5 + i)) diag1 = false;
+    if (!vaultBingoMarked.has(i * 5 + (4 - i))) diag2 = false;
+  }
+  if (diag1 || diag2) {
+    status.textContent = '🔥 BINGO! You\'ve seen it all. 🔥';
+    status.classList.add('bingo-win');
+    return;
+  }
+  
+  // No bingo
+  status.textContent = `${vaultBingoMarked.size - 1} / 24 marked`;
+  status.classList.remove('bingo-win');
+}
+
+// New card button
+$('vaultBingoNew')?.addEventListener('click', initVaultBingo);
+
+// Initialize vault roster and bingo when needed
+function initVaultGames() {
+  initVaultRoster();
+  initVaultBingo();
+}
