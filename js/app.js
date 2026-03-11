@@ -3863,3 +3863,962 @@ document.addEventListener('click', function(e) {
     setTimeout(initStalkerControls, 200);
   }
 });
+
+// ═══════════════════════════════════════════════════════════════════
+// ─── SESSION TRACKER (Rate My Night) ────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+const sessionLog = {
+  girlTime: { Nya:0, Remi:0, Stella:0, Allie:0, Rileigh:0, Macy:0 },
+  girlClicks: { Nya:0, Remi:0, Stella:0, Allie:0, Rileigh:0, Macy:0 },
+  gamesPlayed: 0,
+  stalkerSessions: 0,
+  addressChecks: 0,
+  phoneChecks: 0,
+  photosLiked: 0,
+  alibiRuns: 0,
+  smashVotes: 0,
+  startTime: Date.now(),
+};
+function logGirl(girl) {
+  if (sessionLog.girlClicks[girl] !== undefined) sessionLog.girlClicks[girl]++;
+}
+function logEvent(type) {
+  if (type === 'game') sessionLog.gamesPlayed++;
+  if (type === 'stalker') sessionLog.stalkerSessions++;
+  if (type === 'address') sessionLog.addressChecks++;
+  if (type === 'phone') sessionLog.phoneChecks++;
+  if (type === 'like') sessionLog.photosLiked++;
+  if (type === 'alibi') sessionLog.alibiRuns++;
+  if (type === 'smash') sessionLog.smashVotes++;
+}
+// hook into existing events passively
+const _origToggleLikeRMN = toggleLike;
+window.toggleLike = function(photo) { logEvent('like'); _origToggleLikeRMN(photo); };
+
+// ═══════════════════════════════════════════════════════════════════
+// ─── PHONE HACK ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+const PHONE_DATA = {
+  Nya: {
+    contacts: { bf: 'Tyler ❤️', dad: 'Dad 👨' },
+    threads: {
+      bf: [
+        { from: 'bf', msg: 'hey you up?' },
+        { from: 'me', msg: 'yeah just got home' },
+        { from: 'bf', msg: 'can i come over' },
+        { from: 'me', msg: 'my parents are home lol' },
+        { from: 'bf', msg: 'so? sneak me in like last time' },
+        { from: 'me', msg: 'last time was a nightmare omg' },
+        { from: 'bf', msg: 'worth it though 😈' },
+        { from: 'me', msg: 'okay fine. 20 mins. come to the back door' },
+        { from: 'bf', msg: 'already in the car' },
+        { from: 'me', msg: 'you were already coming weren\'t you' },
+        { from: 'bf', msg: 'obviously lmao' },
+        { from: 'me', msg: 'bring food at least' },
+        { from: 'bf', msg: 'always do. miss you' },
+        { from: 'me', msg: 'i missed you more than i should have' },
+        { from: 'bf', msg: '❤️' },
+        { from: 'me', msg: 'don\'t make it weird' },
+        { from: 'bf', msg: 'too late 😂' },
+        { from: 'me', msg: 'hurry up' },
+        { from: 'bf', msg: 'two minutes. don\'t lock the back door' },
+        { from: 'me', msg: 'it\'s open. my shirt is already off so be quiet coming in' },
+        { from: 'bf', msg: '...' },
+        { from: 'bf', msg: 'running' },
+      ],
+      dad: [
+        { from: 'dad', msg: 'Where are you? It\'s 11pm' },
+        { from: 'me', msg: 'at home dad im in my room' },
+        { from: 'dad', msg: 'Lights are on in your room but you weren\'t at dinner' },
+        { from: 'me', msg: 'i ate earlier' },
+        { from: 'dad', msg: 'You have someone over?' },
+        { from: 'me', msg: 'NO dad oh my god' },
+        { from: 'dad', msg: 'Nya.' },
+        { from: 'me', msg: 'what' },
+        { from: 'dad', msg: 'I can hear voices.' },
+        { from: 'me', msg: 'it\'s my phone. i\'m watching a video' },
+        { from: 'dad', msg: 'Alright. Keep your door open.' },
+        { from: 'me', msg: 'okay 🙄' },
+        { from: 'dad', msg: 'Don\'t roll your eyes at me.' },
+        { from: 'me', msg: 'how did you even—' },
+        { from: 'dad', msg: 'I know everything. Door open.' },
+        { from: 'me', msg: 'fine it\'s open' },
+      ],
+    }
+  },
+  Remi: {
+    contacts: { bf: 'Jake 💙', dad: 'Daddy 🏠' },
+    threads: {
+      bf: [
+        { from: 'me', msg: 'ok so i have to tell you something and you can\'t get mad' },
+        { from: 'bf', msg: 'that\'s never a good opening text' },
+        { from: 'me', msg: 'i let Austin hug me goodbye and it went on too long' },
+        { from: 'bf', msg: 'what does too long mean' },
+        { from: 'me', msg: 'like. longer than a regular hug.' },
+        { from: 'bf', msg: 'remi.' },
+        { from: 'me', msg: 'it wasn\'t anything!! i just felt guilty and didn\'t want you to find out from someone else' },
+        { from: 'bf', msg: 'how long was the hug' },
+        { from: 'me', msg: 'like 8 seconds maybe' },
+        { from: 'bf', msg: 'eight seconds.' },
+        { from: 'me', msg: 'i\'m sorry okay? it didn\'t mean anything. he smelled good and i panicked' },
+        { from: 'bf', msg: 'he SMELLED good??' },
+        { from: 'me', msg: 'jake PLEASE' },
+        { from: 'bf', msg: 'i\'m not mad i\'m just' },
+        { from: 'bf', msg: 'why are you telling me this' },
+        { from: 'me', msg: 'because i\'m an honest person??? and i felt something and i hate that i did' },
+        { from: 'bf', msg: 'you felt something from a hug' },
+        { from: 'me', msg: 'i feel things easily okay i hate it' },
+        { from: 'bf', msg: 'are you into him' },
+        { from: 'me', msg: 'i\'m into YOU. i just... he was there and you weren\'t and it was a hug' },
+        { from: 'bf', msg: 'come over tonight' },
+        { from: 'me', msg: 'yeah?' },
+        { from: 'bf', msg: 'yeah. and bring that dress you wore saturday' },
+        { from: 'me', msg: 'okay 🫦' },
+        { from: 'bf', msg: 'you\'re lucky you\'re hot' },
+        { from: 'me', msg: 'you love me' },
+        { from: 'bf', msg: 'unfortunately' },
+      ],
+      dad: [
+        { from: 'dad', msg: 'Remi are you coming home tonight' },
+        { from: 'me', msg: 'probably not, staying at Jake\'s' },
+        { from: 'dad', msg: 'You were just there two nights ago' },
+        { from: 'me', msg: 'dad we\'ve been dating for a year' },
+        { from: 'dad', msg: 'I know how long you\'ve been dating' },
+        { from: 'me', msg: 'then why are you like this' },
+        { from: 'dad', msg: 'Because you\'re my daughter and I don\'t like it' },
+        { from: 'me', msg: 'we\'re literally just sleeping' },
+        { from: 'dad', msg: 'Remi.' },
+        { from: 'me', msg: 'we\'re literally just sleeping DAD' },
+        { from: 'dad', msg: 'Be home by 10am tomorrow. That\'s the rule.' },
+        { from: 'me', msg: 'fine' },
+        { from: 'dad', msg: 'I mean it.' },
+        { from: 'me', msg: 'i know you do 🙄' },
+        { from: 'dad', msg: 'Love you. Be safe.' },
+        { from: 'me', msg: 'love you too. don\'t wait up' },
+        { from: 'dad', msg: 'Already am.' },
+      ],
+    }
+  },
+  Stella: {
+    contacts: { bf: 'Marcus 🖤', dad: 'Pop ⭐' },
+    threads: {
+      bf: [
+        { from: 'me', msg: 'are we good' },
+        { from: 'bf', msg: 'why wouldn\'t we be' },
+        { from: 'me', msg: 'you\'ve been weird all week' },
+        { from: 'bf', msg: 'i\'m not weird i\'ve just been busy' },
+        { from: 'me', msg: 'you didn\'t text me back for 6 hours yesterday' },
+        { from: 'bf', msg: 'i was at practice' },
+        { from: 'me', msg: 'practice ended at 4. it was 10pm' },
+        { from: 'bf', msg: 'stella.' },
+        { from: 'me', msg: 'i\'m not trying to fight i just want to know if something\'s wrong' },
+        { from: 'bf', msg: 'nothing\'s wrong. i promise.' },
+        { from: 'me', msg: 'okay' },
+        { from: 'bf', msg: 'stop overthinking' },
+        { from: 'me', msg: 'i will when you stop being weird' },
+        { from: 'bf', msg: 'can i come over friday' },
+        { from: 'me', msg: 'depends' },
+        { from: 'bf', msg: 'on what' },
+        { from: 'me', msg: 'on whether you\'re still being weird on friday' },
+        { from: 'bf', msg: '😂 i\'ll be normal friday' },
+        { from: 'me', msg: 'then yes. and bring wine' },
+        { from: 'bf', msg: 'you\'re 20' },
+        { from: 'me', msg: 'your point' },
+        { from: 'bf', msg: 'see you friday 😏' },
+        { from: 'me', msg: 'don\'t come before 9. i\'m doing my thing' },
+        { from: 'bf', msg: 'your "thing" takes 3 hours?' },
+        { from: 'me', msg: 'i look this good for a reason' },
+        { from: 'bf', msg: 'okay fair' },
+      ],
+      dad: [
+        { from: 'dad', msg: 'Hey baby, you eaten today?' },
+        { from: 'me', msg: 'yes pop i\'m fine' },
+        { from: 'dad', msg: 'You looked skinny at church' },
+        { from: 'me', msg: 'I\'m the same size i\'ve always been 😭' },
+        { from: 'dad', msg: 'Mhmm. Who was that boy you were talking to after service' },
+        { from: 'me', msg: 'just a friend dad' },
+        { from: 'dad', msg: 'He was looking at you like more than a friend' },
+        { from: 'me', msg: 'you can\'t prove that' },
+        { from: 'dad', msg: 'Stella Thomas.' },
+        { from: 'me', msg: 'pop RELAX' },
+        { from: 'dad', msg: 'Are you seeing someone?' },
+        { from: 'me', msg: 'casually maybe' },
+        { from: 'dad', msg: 'Casually.' },
+        { from: 'me', msg: 'it\'s not serious' },
+        { from: 'dad', msg: 'Make sure it stays that way until you\'re done with school' },
+        { from: 'me', msg: 'yes sir 🙄' },
+        { from: 'dad', msg: 'Don\'t roll your eyes' },
+        { from: 'me', msg: 'how do you always know' },
+        { from: 'dad', msg: 'Because you\'ve been doing it since you were 4. Come eat dinner Sunday.' },
+        { from: 'me', msg: 'i\'ll be there ❤️' },
+      ],
+    }
+  },
+  Allie: {
+    contacts: { bf: 'Connor', dad: 'Dad 🏡' },
+    threads: {
+      bf: [
+        { from: 'bf', msg: 'hey' },
+        { from: 'me', msg: 'hi' },
+        { from: 'bf', msg: 'you free tonight' },
+        { from: 'me', msg: 'depends what for' },
+        { from: 'bf', msg: 'was gonna drive around. maybe go to the lake' },
+        { from: 'me', msg: 'it\'s 11pm' },
+        { from: 'bf', msg: 'yeah so' },
+        { from: 'me', msg: 'so it\'s late and the lake is dark' },
+        { from: 'bf', msg: 'that\'s the point' },
+        { from: 'me', msg: 'connor.' },
+        { from: 'bf', msg: 'just come hang out. i miss you' },
+        { from: 'me', msg: 'we hung out yesterday' },
+        { from: 'bf', msg: 'so' },
+        { from: 'me', msg: 'so you\'re so annoying' },
+        { from: 'bf', msg: 'is that a yes' },
+        { from: 'me', msg: 'give me 20 minutes' },
+        { from: 'bf', msg: 'dress warm' },
+        { from: 'me', msg: 'or i could not dress at all' },
+        { from: 'bf', msg: 'i\'m pulling up now' },
+        { from: 'me', msg: 'connor i was JOKING' },
+        { from: 'bf', msg: 'i know :)' },
+        { from: 'me', msg: 'you\'re the worst' },
+        { from: 'bf', msg: 'outside' },
+      ],
+      dad: [
+        { from: 'me', msg: 'dad can i borrow the car saturday' },
+        { from: 'dad', msg: 'What for?' },
+        { from: 'me', msg: 'going out with friends' },
+        { from: 'dad', msg: 'Which friends' },
+        { from: 'me', msg: 'just some people from school' },
+        { from: 'dad', msg: 'Connor going to be there?' },
+        { from: 'me', msg: 'maybe' },
+        { from: 'dad', msg: 'Allie.' },
+        { from: 'me', msg: 'it\'s not a big deal he\'s just a guy' },
+        { from: 'dad', msg: 'You\'ve said that about three different guys this month' },
+        { from: 'me', msg: 'I\'m in college dad it\'s normal' },
+        { from: 'dad', msg: 'Be back by midnight.' },
+        { from: 'me', msg: '1am' },
+        { from: 'dad', msg: '12:30' },
+        { from: 'me', msg: 'deal ❤️' },
+        { from: 'dad', msg: 'Full tank when you bring it back.' },
+        { from: 'me', msg: 'always' },
+      ],
+    }
+  },
+  Rileigh: {
+    contacts: { bf: 'Devin 🏹', dad: 'Pop 🤠' },
+    threads: {
+      bf: [
+        { from: 'me', msg: 'you need to stop texting me when you\'re drunk' },
+        { from: 'bf', msg: 'i wasn\'t that drunk' },
+        { from: 'me', msg: 'you sent me 14 voice memos of you singing' },
+        { from: 'bf', msg: 'okay i was a little drunk' },
+        { from: 'me', msg: 'the last one was just breathing' },
+        { from: 'bf', msg: '😂😂 okay that\'s bad' },
+        { from: 'me', msg: 'who were you even with' },
+        { from: 'bf', msg: 'just the boys. i was thinking about you' },
+        { from: 'me', msg: 'clearly lmao' },
+        { from: 'bf', msg: 'i miss you tho for real' },
+        { from: 'me', msg: 'you see me literally every day' },
+        { from: 'bf', msg: 'not enough' },
+        { from: 'me', msg: 'okay that was actually sweet' },
+        { from: 'bf', msg: 'i have my moments' },
+        { from: 'me', msg: 'the bar is on the ground but okay' },
+        { from: 'bf', msg: 'come over tonight' },
+        { from: 'me', msg: 'it\'s a tuesday' },
+        { from: 'bf', msg: 'best nights are tuesdays' },
+        { from: 'me', msg: 'i\'m wearing sweats and my hair is a mess' },
+        { from: 'bf', msg: 'even better' },
+        { from: 'me', msg: 'you\'re so embarrassing' },
+        { from: 'bf', msg: 'is that a yes' },
+        { from: 'me', msg: 'yeah give me an hour' },
+        { from: 'bf', msg: 'driving to sapulpa rn' },
+        { from: 'me', msg: 'you don\'t have to drive all the way here—' },
+        { from: 'bf', msg: 'already on 44' },
+        { from: 'me', msg: 'oh my god you\'re insane' },
+        { from: 'bf', msg: '❤️' },
+      ],
+      dad: [
+        { from: 'dad', msg: 'You coming to thanksgiving or what' },
+        { from: 'me', msg: 'of course i am pop why would you even ask' },
+        { from: 'dad', msg: 'You said that last year and showed up 2 hours late' },
+        { from: 'me', msg: 'that was ONE TIME' },
+        { from: 'dad', msg: 'With that boy.' },
+        { from: 'me', msg: 'devin wanted to meet the family' },
+        { from: 'dad', msg: 'He can meet the family at a normal hour' },
+        { from: 'me', msg: 'pop you liked him' },
+        { from: 'dad', msg: 'I tolerated him' },
+        { from: 'me', msg: 'same thing with you' },
+        { from: 'dad', msg: '😒' },
+        { from: 'me', msg: 'i\'ll be there at noon. i promise. no devin.' },
+        { from: 'dad', msg: 'Bring that potato salad your mom used to make' },
+        { from: 'me', msg: 'on it. love you pop' },
+        { from: 'dad', msg: 'Love you baby girl. Drive safe.' },
+      ],
+    }
+  },
+  Macy: {
+    contacts: { bf: 'Dre 🖤👑', dad: 'Daddy 🏠' },
+    threads: {
+      bf: [
+        { from: 'bf', msg: 'where you at' },
+        { from: 'me', msg: 'target. why' },
+        { from: 'bf', msg: 'some dude liked your photo from 2022' },
+        { from: 'me', msg: 'dre.' },
+        { from: 'bf', msg: 'who is it' },
+        { from: 'me', msg: 'i don\'t know i don\'t know every person who likes my photos' },
+        { from: 'bf', msg: 'he went back 2 years macy' },
+        { from: 'me', msg: 'that\'s a him problem not a me problem' },
+        { from: 'bf', msg: 'it\'s gonna be both our problems if i find out who he is' },
+        { from: 'me', msg: 'omg relax please i\'m buying dish soap' },
+        { from: 'bf', msg: 'i\'m just saying' },
+        { from: 'me', msg: 'you say that every week about different people' },
+        { from: 'bf', msg: 'because every week different people are being weird about my girl' },
+        { from: 'me', msg: 'your girl is fine. your girl is buying dish soap. calm down.' },
+        { from: 'bf', msg: 'bring me a snack' },
+        { from: 'me', msg: 'only if you stop being psycho' },
+        { from: 'bf', msg: 'deal 😂' },
+        { from: 'me', msg: 'hot cheetos or takis' },
+        { from: 'bf', msg: 'both' },
+        { from: 'me', msg: 'you\'re lucky you\'re cute' },
+        { from: 'bf', msg: '😈 come home soon' },
+        { from: 'me', msg: 'omw. don\'t check instagram while i\'m gone' },
+        { from: 'bf', msg: 'no promises' },
+      ],
+      dad: [
+        { from: 'me', msg: 'daddy can i borrow like $200' },
+        { from: 'dad', msg: 'For what' },
+        { from: 'me', msg: 'my registration is due' },
+        { from: 'dad', msg: 'I thought Dre was handling that' },
+        { from: 'me', msg: 'he\'s busy' },
+        { from: 'dad', msg: 'Macy.' },
+        { from: 'me', msg: 'daddy PLEASE don\'t start' },
+        { from: 'dad', msg: 'I\'m not starting anything. Zelling you now.' },
+        { from: 'me', msg: 'thank you ❤️❤️' },
+        { from: 'dad', msg: 'Pay me back when you can.' },
+        { from: 'me', msg: 'i always do' },
+        { from: 'dad', msg: 'You come first in this family. You know that right?' },
+        { from: 'me', msg: 'i know daddy' },
+        { from: 'dad', msg: 'That boy treats you right?' },
+        { from: 'me', msg: 'he does. he\'s just protective' },
+        { from: 'dad', msg: 'There\'s protective and there\'s something else.' },
+        { from: 'me', msg: 'we\'re fine. i love you' },
+        { from: 'dad', msg: 'Love you more. Call me this week.' },
+        { from: 'me', msg: 'will do 🫶' },
+      ],
+    }
+  }
+};
+
+let phoneHackGirl = null;
+let phoneHackThread = null;
+
+function buildPhoneHack() {
+  const wrap = $('phoneHackWrap'); if (!wrap) return;
+  logEvent('phone');
+  wrap.innerHTML = `
+    <div class="phone-hack-girls">
+      ${Object.keys(PHONE_DATA).map(g => `
+        <button class="phone-girl-btn ${phoneHackGirl===g?'on':''}" onclick="selectPhoneGirl('${g}')">${g}</button>
+      `).join('')}
+    </div>
+    <div class="phone-device" id="phoneDevice">
+      <div class="phone-notch"></div>
+      <div class="phone-statusbar"><span>9:41</span><span>📶 🔋</span></div>
+      <div class="phone-screen" id="phoneScreen">
+        <div class="phone-locked">
+          <div class="phone-lock-icon">🔓</div>
+          <div class="phone-lock-text">Select a target above</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+window.selectPhoneGirl = function(girl) {
+  phoneHackGirl = girl;
+  phoneHackThread = 'bf';
+  logGirl(girl);
+  logEvent('address');
+  renderPhoneDevice();
+  buildPhoneHack(); // re-render to update active button
+  renderPhoneDevice();
+};
+
+function renderPhoneDevice() {
+  const screen = $('phoneScreen'); if (!screen || !phoneHackGirl) return;
+  const data = PHONE_DATA[phoneHackGirl];
+  const thread = data.threads[phoneHackThread];
+  const contactName = data.contacts[phoneHackThread];
+  screen.innerHTML = `
+    <div class="phone-header">
+      <button class="phone-back" onclick="renderPhoneContactList()">‹</button>
+      <div class="phone-contact-name">${contactName}</div>
+      <div class="phone-contact-dot">●</div>
+    </div>
+    <div class="phone-messages" id="phoneMessages">
+      ${thread.map(m => `
+        <div class="phone-msg ${m.from==='me'?'out':'in'}">
+          <div class="phone-bubble">${m.msg}</div>
+        </div>`).join('')}
+    </div>`;
+  // scroll to bottom
+  setTimeout(() => {
+    const msgs = $('phoneMessages');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  }, 50);
+}
+
+function renderPhoneContactList() {
+  const screen = $('phoneScreen'); if (!screen || !phoneHackGirl) return;
+  const data = PHONE_DATA[phoneHackGirl];
+  screen.innerHTML = `
+    <div class="phone-contacts-header">Messages</div>
+    <div class="phone-contacts-list">
+      ${Object.entries(data.contacts).map(([key, name]) => `
+        <div class="phone-contact-row" onclick="selectThread('${key}')">
+          <div class="phone-contact-avatar">${name[0]}</div>
+          <div class="phone-contact-info">
+            <div class="phone-contact-nm">${name}</div>
+            <div class="phone-contact-preview">${data.threads[key].slice(-1)[0].msg.slice(0,40)}...</div>
+          </div>
+          <div class="phone-contact-time">now</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+window.selectThread = function(thread) {
+  phoneHackThread = thread;
+  renderPhoneDevice();
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// ─── FAKE VOICEMAIL ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+const VOICEMAILS = {
+  Nya: [
+    { from: 'nya.barn', label: 'Nya', duration: '0:38', time: 'Today 2:17 AM', transcript: "Hey. It's me. I know it's late, I just... I couldn't sleep and I kept thinking about what you said earlier and I don't know I just needed to say something. You don't have to call back. Actually don't call back. I'll be weird about it. Just. I don't know. Good night." },
+    { from: 'nya.barn', label: 'Nya', duration: '0:12', time: 'Yesterday 11:44 PM', transcript: "Can you not tell anyone what I told you? Like about Tyler. I just need that to stay between us. Okay. Bye." },
+    { from: 'nya.barn', label: 'Nya', duration: '1:02', time: 'Last week', transcript: "Okay so I know this is unhinged but I saw you looking at me at the thing Saturday and I've been overthinking it ever since and I just need to know if I'm making it up because if I am I'll literally die. Don't text me back just like... let me know in person or something. Actually no. Text me back. I'm not brave enough for in person. Okay. Bye. Sorry for this message." },
+    { from: 'Unknown', label: 'Unknown #', duration: '0:04', time: '3 days ago', transcript: "...hey." },
+  ],
+  Remi: [
+    { from: 'remibarn', label: 'Remi', duration: '0:22', time: 'Today 1:03 AM', transcript: "Hey it's Remi. I just wanted to say sorry for earlier, I was being dramatic and I know that. You don't even have to respond to this. I just hate leaving things weird. Okay. Bye." },
+    { from: 'remibarn', label: 'Remi', duration: '0:47', time: 'Yesterday 10:30 PM', transcript: "Okay hear me out. Jake doesn't have to know. And I'm not saying anything is going to happen I'm just saying hypothetically if you wanted to get food sometime or whatever, I would be interested in that. Hypothetically. Don't make it a thing. Actually delete this when you hear it. Can you delete voicemails from other people? Whatever. Call me." },
+    { from: 'remibarn', label: 'Remi', duration: '0:09', time: '2 days ago', transcript: "I saw you at Walmart. I pretended I didn't. Just wanted you to know." },
+    { from: 'remibarn', label: 'Remi', duration: '0:33', time: 'Last week', transcript: "Hey so my boyfriend is being a nightmare and I just needed to vent to someone and you were the first person I thought of which is probably a problem but here we are. Call me back if you want. I'll be up." },
+  ],
+  Stella: [
+    { from: 'stella_thomas08', label: 'Stella', duration: '0:19', time: 'Tonight 12:58 AM', transcript: "I know you're awake. You always have your read receipts off when you're awake. I just want to talk. That's it. No drama. Just call me back." },
+    { from: 'stella_thomas08', label: 'Stella', duration: '0:41', time: 'Yesterday 9:15 PM', transcript: "Okay so I'm going to say something and you're not allowed to freak out. I think I like you more than I should given the situation and I've been trying to talk myself out of it for like three weeks and it's not working. So. There you go. Do with that information what you will. I'm going to go be embarrassed now." },
+    { from: 'stella_thomas08', label: 'Stella', duration: '0:08', time: '4 days ago', transcript: "Your car was outside my street. I wasn't going to say anything but I noticed." },
+    { from: 'stella_thomas08', label: 'Stella', duration: '0:55', time: 'Last week', transcript: "Before you say anything — yes I know Marcus exists. Yes I know this is complicated. I'm not asking you to do anything about it. I just needed to say it out loud to someone and you're the only person I trust enough to not make it weird. Please make it a little weird. Just not too weird." },
+  ],
+  Allie: [
+    { from: 'Unknown', label: 'Allie', duration: '0:14', time: 'Today 11:22 PM', transcript: "Hey it's Allie. I think you have the wrong number but I've gotten three calls this week from this phone so I just wanted to say something. Who is this?" },
+    { from: 'Unknown', label: 'Allie', duration: '0:29', time: '2 days ago', transcript: "Okay I did some digging and I think I know who this is. And I'm not even mad I'm just... confused? Like why wouldn't you just say something instead of calling and hanging up? You can text me if you want. I don't bite. Usually." },
+    { from: 'Unknown', label: 'Allie', duration: '0:06', time: 'Last week', transcript: "I left my jacket at that party. If you have it can you let me know. Thanks." },
+  ],
+  Rileigh: [
+    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:31', time: 'Tonight 2:44 AM', transcript: "Hi. I know it's late, I just got home from that thing and I had a really good time and I just wanted to say that before I went to sleep because I knew I'd be weird about it in the morning. So. Yeah. Good night. Text me tomorrow or whatever. No pressure." },
+    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:17', time: 'Yesterday 8:00 PM', transcript: "Are you actually from Sapulpa or did you just say that? Because I've never met anyone who actually claims Sapulpa voluntarily and I have questions." },
+    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:52', time: '3 days ago', transcript: "Okay so real talk. I like you. Like genuinely. And I don't really do this — the calling and leaving a message thing — but I couldn't text this because texting it would make it too easy to screenshot and send to the boys and I know how that goes. So yeah. That's it. That's the message. I'm going to go cringe for the next 48 hours. Call me back." },
+    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:11', time: 'Last week', transcript: "I drove past your place. Not on purpose. I mean it was a little on purpose." },
+  ],
+  Macy: [
+    { from: 'addison_and_macy', label: 'Macy', duration: '0:24', time: 'Today 11:01 PM', transcript: "Hey I just wanted to say you need to stop looking at me like that in public because Dre notices everything and it's going to cause a problem that neither of us wants. Not saying I mind it. Just saying be more careful." },
+    { from: 'addison_and_macy', label: 'Macy', duration: '0:38', time: '2 days ago', transcript: "I don't know why I'm calling you. I literally don't know why. I think I was just bored and Dre's asleep and I started thinking and then I picked up the phone and now here we are. Don't tell anyone I called. Actually you can't because you don't know who I am. Never mind. Bye." },
+    { from: 'addison_and_macy', label: 'Macy', duration: '0:15', time: '5 days ago', transcript: "If Dre asks — and he won't because he doesn't know about you — but if he does, you don't know me. We're clear? Okay. Good. You're cute btw." },
+    { from: 'addison_and_macy', label: 'Macy', duration: '0:44', time: 'Last week', transcript: "So here's the thing. I'm taken. That's real. And I'm not trying to blow anything up. But there's something about you that I can't stop thinking about and I've never been good at just letting things go. So I guess I'm calling to see if you feel it too or if I've just been in my head for three weeks for no reason. Message me back if you feel it. If you don't, forget I called." },
+  ],
+};
+
+let vmGirl = null;
+let vmPlaying = null;
+
+function buildVoicemail() {
+  const wrap = $('voicemailWrap'); if (!wrap) return;
+  wrap.innerHTML = `
+    <div class="vm-girl-select">
+      ${Object.keys(VOICEMAILS).map(g => `
+        <button class="vm-girl-btn ${vmGirl===g?'on':''}" onclick="selectVMGirl('${g}')">${g}</button>
+      `).join('')}
+    </div>
+    <div id="vmListWrap">
+      ${!vmGirl ? '<div class="vm-empty">Select a girl to access her voicemails.</div>' : renderVMList(vmGirl)}
+    </div>`;
+}
+
+function renderVMList(girl) {
+  const vms = VOICEMAILS[girl];
+  return vms.map((vm, i) => `
+    <div class="vm-item ${vmPlaying===`${girl}-${i}`?'playing':''}" id="vm-${girl}-${i}">
+      <div class="vm-avatar">${vm.label[0]}</div>
+      <div class="vm-meta">
+        <div class="vm-from">${vm.label} — <span class="vm-number">${vm.from}</span></div>
+        <div class="vm-time">${vm.time}</div>
+      </div>
+      <div class="vm-duration">${vm.duration}</div>
+      <button class="vm-play-btn" onclick="playVoicemail('${girl}',${i})">
+        ${vmPlaying===`${girl}-${i}` ? '⏸' : '▶'}
+      </button>
+    </div>
+    <div class="vm-transcript-wrap ${vmPlaying===`${girl}-${i}`?'open':''}" id="vmtr-${girl}-${i}">
+      <div class="vm-scrubber-wrap">
+        <div class="vm-scrubber-bg"><div class="vm-scrubber-fill" id="vmfill-${girl}-${i}"></div></div>
+      </div>
+      <div class="vm-transcript" id="vmt-${girl}-${i}"></div>
+    </div>`).join('');
+}
+
+let vmTimers = [];
+window.selectVMGirl = function(girl) {
+  vmGirl = girl;
+  vmPlaying = null;
+  vmTimers.forEach(clearTimeout);
+  buildVoicemail();
+};
+
+window.playVoicemail = function(girl, idx) {
+  const key = `${girl}-${idx}`;
+  vmTimers.forEach(clearTimeout);
+  vmTimers = [];
+  // if already playing, stop
+  if (vmPlaying === key) {
+    vmPlaying = null;
+    buildVoicemail();
+    return;
+  }
+  vmPlaying = key;
+  buildVoicemail();
+  // animate scrubber
+  const fill = $(`vmfill-${girl}-${idx}`);
+  if (fill) { fill.style.transition='none'; fill.style.width='0%'; setTimeout(()=>{fill.style.transition='width 6s linear'; fill.style.width='100%';},50); }
+  // type out transcript
+  const vm = VOICEMAILS[girl][idx];
+  const tEl = $(`vmt-${girl}-${idx}`);
+  if (tEl) {
+    tEl.textContent = '';
+    const chars = vm.transcript.split('');
+    chars.forEach((ch, i) => {
+      vmTimers.push(setTimeout(() => { tEl.textContent += ch; }, i * 28));
+    });
+    // stop after full duration
+    vmTimers.push(setTimeout(() => {
+      vmPlaying = null;
+      buildVoicemail();
+    }, chars.length * 28 + 1000));
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// ─── WANTED POSTER ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+const WANTED_CHARGES = {
+  Nya:     ['Extreme attractiveness in a public area','Known to be armed with a smile that ends relationships','Last seen breaking hearts on S Delaware Pl','Considered emotionally dangerous','Approach only if you accept the consequences'],
+  Remi:    ['Unlawful possession of a boyfriend while being this fine','Flirting in the first degree','Known associate of bad decisions','Fled the scene of multiple situationships','Last seen at 1722 S Delaware — consider yourself warned'],
+  Stella:  ['Aggravated hotness — premeditated','Known to make men drive to Sandusky Ave uninvited','Operating as the town favorite without a license','Charges pending: being single while looking like that','Last seen making poor decisions on purpose'],
+  Allie:   ['Conspiracy to be suspiciously hot','Identity unknown — considered extremely dangerous','Operating in the Tulsa area under the radar','Charges: reserved exterior, unhinged interior','Whereabouts often unconfirmed'],
+  Rileigh: ['Fleeing the scene of multiple Sapulpa incidents','Unlawful operation as a small-town heartbreaker','Known to receive calls at 2am — accepts collect','Last known address: 320 N 14th St, Sapulpa','Approach only if you have a full tank of gas'],
+  Macy:    ['Reckless endangerment of a taken woman','Known to call strangers from blocked numbers','Operating outside approved relationship boundaries','Fugitive from the 918-805-3623 jurisdiction','Last seen dating someone much larger than you'],
+};
+
+function buildWanted() {
+  const wrap = $('wantedWrap'); if (!wrap) return;
+  const girls = Object.keys(DOSSIER);
+  wrap.innerHTML = `
+    <div class="wanted-select">
+      ${girls.map(g=>`<button class="wanted-girl-btn" onclick="generateWanted('${g}')">${g}</button>`).join('')}
+    </div>
+    <canvas id="wantedCanvas" class="wanted-canvas"></canvas>
+    <button class="wanted-dl" id="wantedDL" style="display:none" onclick="downloadWanted()">⬇ Save Poster</button>`;
+}
+
+window.generateWanted = function(girl) {
+  const photos = SECRET_PHOTOS.filter(p=>p.model===girl);
+  if (!photos.length) { toast('No photos for ' + girl + ' yet'); return; }
+  const photo = rand(photos);
+  const canvas = $('wantedCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 500; canvas.height = 750;
+  canvas.style.display = 'block';
+  // load image then draw
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => drawWantedPoster(ctx, canvas, img, girl);
+  img.onerror = () => drawWantedPoster(ctx, canvas, null, girl);
+  img.src = photo.src;
+};
+
+function drawWantedPoster(ctx, canvas, img, girl) {
+  const W = canvas.width, H = canvas.height;
+  const d = DOSSIER[girl];
+  const charges = WANTED_CHARGES[girl] || [];
+  // aged paper bg
+  ctx.fillStyle = '#c9a96e';
+  ctx.fillRect(0,0,W,H);
+  // texture — horizontal lines
+  ctx.strokeStyle = 'rgba(100,60,10,0.08)';
+  for(let y=0;y<H;y+=3){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // border double
+  ctx.strokeStyle = '#5a2d00'; ctx.lineWidth = 8;
+  ctx.strokeRect(12,12,W-24,H-24);
+  ctx.strokeStyle = '#5a2d00'; ctx.lineWidth = 2;
+  ctx.strokeRect(20,20,W-40,H-40);
+  // WANTED text
+  ctx.fillStyle = '#1a0000';
+  ctx.font = 'bold 72px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('WANTED', W/2, 80);
+  // dead or alive
+  ctx.font = 'italic 22px serif';
+  ctx.fillText('Dead or Alive', W/2, 108);
+  // divider
+  ctx.fillStyle = '#5a2d00'; ctx.fillRect(40,118,W-80,2);
+  // photo
+  if (img) {
+    const ph=260,pw=200,px=(W-pw)/2,py=126;
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,0.4)'; ctx.shadowBlur=10;
+    ctx.drawImage(img,px,py,pw,ph);
+    ctx.restore();
+    // photo border
+    ctx.strokeStyle='#5a2d00';ctx.lineWidth=3;ctx.strokeRect(px,py,pw,ph);
+  }
+  // name banner
+  ctx.fillStyle='#1a0000';
+  ctx.font='bold 32px serif'; ctx.textAlign='center';
+  ctx.fillText(d?.fullName||girl, W/2, 420);
+  ctx.font='italic 15px serif';
+  ctx.fillStyle='#3a1500';
+  ctx.fillText(d?.nickname||'', W/2, 442);
+  // divider
+  ctx.fillStyle='#5a2d00'; ctx.fillRect(40,452,W-80,2);
+  // charges
+  ctx.font='bold 13px serif'; ctx.fillStyle='#1a0000'; ctx.textAlign='center';
+  ctx.fillText('KNOWN CRIMES & VIOLATIONS:', W/2, 474);
+  ctx.font='12px serif'; ctx.fillStyle='#2a0d00';
+  charges.forEach((c,i)=>{
+    ctx.fillText(`• ${c}`, W/2, 494+i*20);
+  });
+  // reward
+  ctx.fillStyle='#5a2d00'; ctx.fillRect(40,600,W-80,2);
+  ctx.font='bold 16px serif'; ctx.fillStyle='#1a0000'; ctx.textAlign='center';
+  ctx.fillText('REWARD: YOUR ENTIRE WELLBEING', W/2, 625);
+  ctx.font='11px serif'; ctx.fillStyle='#4a2000';
+  ctx.fillText(`Last seen: ${d?.addr||'Tulsa, OK'} · ${d?.insta||''}`, W/2, 648);
+  ctx.font='bold 10px serif'; ctx.fillStyle='#8a5020';
+  ctx.fillText('TULSA COUNTY SHERIFF\'S DEPARTMENT — SGG DIVISION', W/2, 680);
+  ctx.fillText('IF SEEN: DO NOT APPROACH ALONE', W/2, 698);
+  // show DL button
+  const dl = $('wantedDL'); if(dl) dl.style.display='inline-block';
+}
+
+window.downloadWanted = function() {
+  const canvas = $('wantedCanvas'); if(!canvas) return;
+  const a = document.createElement('a');
+  a.download = 'wanted-poster.png';
+  a.href = canvas.toDataURL();
+  a.click();
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// ─── THE DROP ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+let dropTimer = null;
+let dropUnlocked = false;
+let dropEndTime = null;
+
+function buildDrop() {
+  const wrap = $('dropWrap'); if (!wrap) return;
+  if (!dropEndTime) {
+    // random 8–18 min from now
+    dropEndTime = Date.now() + (8 + Math.random()*10) * 60000;
+  }
+  if (dropUnlocked) {
+    renderDropUnlocked();
+    return;
+  }
+  wrap.innerHTML = `
+    <div class="drop-container">
+      <div class="drop-eye">👁️</div>
+      <div class="drop-title">SOMETHING'S COMING</div>
+      <div class="drop-sub">Classified content drops when the timer hits zero.</div>
+      <div class="drop-timer" id="dropTimer">--:--</div>
+      <div class="drop-hint">Be here when it drops.</div>
+      <div class="drop-bars">
+        <div class="drop-bar"></div><div class="drop-bar"></div><div class="drop-bar"></div>
+        <div class="drop-bar"></div><div class="drop-bar"></div>
+      </div>
+    </div>`;
+  tickDrop();
+}
+
+function tickDrop() {
+  clearTimeout(dropTimer);
+  const el = $('dropTimer'); if (!el) return;
+  const remaining = Math.max(0, dropEndTime - Date.now());
+  if (remaining <= 0) {
+    triggerDrop();
+    return;
+  }
+  const m = Math.floor(remaining/60000);
+  const s = Math.floor((remaining%60000)/1000);
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  dropTimer = setTimeout(tickDrop, 1000);
+}
+
+function triggerDrop() {
+  dropUnlocked = true;
+  // dramatic flash
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;inset:0;background:#ff0000;z-index:99998;pointer-events:none;animation:dropFlash .8s ease forwards';
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(), 800);
+  // alert sound via oscillator if available
+  try {
+    const ac = new AudioContext();
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.frequency.setValueAtTime(880, ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(110, ac.currentTime+0.5);
+    gain.gain.setValueAtTime(0.3, ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.5);
+    osc.start(); osc.stop(ac.currentTime+0.5);
+  } catch(e){}
+  setTimeout(renderDropUnlocked, 900);
+}
+
+function renderDropUnlocked() {
+  const wrap = $('dropWrap'); if (!wrap) return;
+  const exclusivePhotos = shuffle([...SECRET_PHOTOS]).slice(0,6);
+  wrap.innerHTML = `
+    <div class="drop-unlocked">
+      <div class="drop-unlocked-header">
+        <div class="drop-unlocked-title">🔴 LIVE — THE DROP</div>
+        <div class="drop-unlocked-sub">You were here. Others weren't.</div>
+      </div>
+      <div class="drop-tabs">
+        <button class="drop-tab on" onclick="showDropTab('photos',this)">📸 Exclusive Gallery</button>
+        <button class="drop-tab" onclick="showDropTab('chat',this)">💬 Leaked Chat</button>
+        <button class="drop-tab" onclick="showDropTab('intel',this)">📁 Intel Drop</button>
+      </div>
+      <div id="dropTabContent">
+        ${renderDropPhotos(exclusivePhotos)}
+      </div>
+    </div>`;
+}
+
+function renderDropPhotos(photos) {
+  return `<div class="drop-gallery">${photos.map(p=>`
+    <div class="drop-photo-card">
+      <img src="${p.src}" alt="" onclick="openModal(${JSON.stringify(p).replace(/"/g,'&quot;')},true)">
+      <div class="drop-photo-label">${p.model} — EXCLUSIVE</div>
+    </div>`).join('')}</div>`;
+}
+
+window.showDropTab = function(tab, btn) {
+  document.querySelectorAll('.drop-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const cont = $('dropTabContent'); if (!cont) return;
+  if (tab === 'photos') {
+    cont.innerHTML = renderDropPhotos(shuffle([...SECRET_PHOTOS]).slice(0,6));
+  } else if (tab === 'chat') {
+    const leaked = [
+      { from: 'Jaquavion', msg: 'bro did you see she posted that at 2am' },
+      { from: 'Cruz', msg: 'which one' },
+      { from: 'Jaquavion', msg: 'the one from sandusky. she was outside at night bro' },
+      { from: 'Jackson', msg: 'she does that every week' },
+      { from: 'Cruz', msg: 'how do you know that' },
+      { from: 'Jackson', msg: '...' },
+      { from: 'Jaquavion', msg: '💀💀💀 bro how long have you been watching her page' },
+      { from: 'Jackson', msg: 'that\'s not what this is' },
+      { from: 'Cruz', msg: 'it\'s literally exactly what this is' },
+      { from: 'Jack', msg: 'she texted me last thursday btw' },
+      { from: 'Jaquavion', msg: 'WHO DID' },
+      { from: 'Jack', msg: 'won\'t say' },
+      { from: 'Cruz', msg: 'jack i will drive to your house' },
+      { from: 'Jackson', msg: 'this is the drop content. this is what we waited for.' },
+      { from: 'Jaquavion', msg: 'JACK SAY THE NAME' },
+    ];
+    cont.innerHTML = `<div class="drop-chat">${leaked.map(m=>`
+      <div class="gc-msg">
+        <span class="gc-sender" style="color:${GC_MEMBER_COLORS[m.from]||'#ff9944'}">${m.from}</span>
+        <span class="gc-text">${m.msg}</span>
+      </div>`).join('')}</div>`;
+  } else if (tab === 'intel') {
+    const girl = rand(Object.keys(DOSSIER));
+    const d = DOSSIER[girl];
+    cont.innerHTML = `
+      <div class="drop-intel">
+        <div class="drop-intel-banner">🔴 LEAKED — ${girl.toUpperCase()} DOSSIER</div>
+        <div class="drop-intel-field"><span>Full Name</span>${d.fullName||girl}</div>
+        <div class="drop-intel-field"><span>Address</span>${d.addr||'Unknown'}</div>
+        <div class="drop-intel-field"><span>Phone</span>${d.phone||'Unknown'}</div>
+        <div class="drop-intel-field"><span>Instagram</span>${d.insta||'Unknown'}</div>
+        <div class="drop-intel-field"><span>Status</span>${d.status||'Unknown'}</div>
+        <div class="drop-intel-field"><span>Threat Level</span>${d.threat||'?'}/10</div>
+        <div class="drop-intel-field"><span>Weakness</span>${d.weakness||'Unknown'}</div>
+        <div class="drop-intel-field"><span>Intel</span>${d.intel||d.notes||'Classified'}</div>
+      </div>`;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// ─── RATE MY NIGHT ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+const DIAGNOSES = [
+  { min:0,  max:15,  title:'Casual Observer',       color:'#7a9a7a', desc:'You barely committed. You were here for like 10 minutes. Respectable. Healthy even.' },
+  { min:16, max:30,  title:'Interested Party',       color:'#a0a07a', desc:'You engaged. You looked. You didn\'t go too deep. Mostly fine.' },
+  { min:31, max:50,  title:'Dedicated Viewer',       color:'#c0946a', desc:'You were here a while. You played games, you lingered. This is the beginning of a pattern.' },
+  { min:51, max:70,  title:'Certified Lurker',       color:'#c06a3a', desc:'Multiple girls. Multiple sections. You checked the phone numbers section. You know what you are.' },
+  { min:71, max:90,  title:'Menace to Society',      color:'#c04444', desc:'You\'ve done things tonight that would concern people who care about you. They\'d be right to be concerned.' },
+  { min:91, max:120, title:'Unhinged. Full Send.',   color:'#ff2222', desc:'There is no coming back from this session. You ran stalker mode, you looked up addresses, you called numbers in the alibi game. You\'re different now.' },
+];
+
+function buildRateMyNight() {
+  const wrap = $('rateNightWrap'); if (!wrap) return;
+  const mins = Math.floor((Date.now() - sessionLog.startTime)/60000);
+  const topGirl = Object.entries(sessionLog.girlClicks).sort((a,b)=>b[1]-a[1])[0];
+  const score = Math.min(
+    mins * 0.5 +
+    sessionLog.gamesPlayed * 3 +
+    sessionLog.stalkerSessions * 8 +
+    sessionLog.addressChecks * 5 +
+    sessionLog.phoneChecks * 4 +
+    sessionLog.photosLiked * 1 +
+    sessionLog.alibiRuns * 4 +
+    sessionLog.smashVotes * 2 +
+    (topGirl[1] * 2),
+    120
+  );
+  const diag = DIAGNOSES.find(d=>score>=d.min&&score<=d.max) || DIAGNOSES[DIAGNOSES.length-1];
+  const topGirlName = topGirl[1] > 0 ? topGirl[0] : null;
+  wrap.innerHTML = `
+    <div class="rmn-container">
+      <div class="rmn-score-ring" style="border-color:${diag.color}">
+        <div class="rmn-score-num" style="color:${diag.color}">${Math.round(score)}</div>
+        <div class="rmn-score-label">/ 120</div>
+      </div>
+      <div class="rmn-title" style="color:${diag.color}">${diag.title}</div>
+      <div class="rmn-desc">${diag.desc}</div>
+      <div class="rmn-stats">
+        <div class="rmn-stat"><span>${mins}m</span>Time In Vault</div>
+        <div class="rmn-stat"><span>${sessionLog.gamesPlayed}</span>Games Played</div>
+        <div class="rmn-stat"><span>${sessionLog.photosLiked}</span>Photos Liked</div>
+        <div class="rmn-stat"><span>${sessionLog.stalkerSessions}</span>Stalker Sessions</div>
+        <div class="rmn-stat"><span>${sessionLog.addressChecks}</span>Address Checks</div>
+        <div class="rmn-stat"><span>${sessionLog.alibiRuns}</span>Alibi Runs</div>
+      </div>
+      ${topGirlName ? `<div class="rmn-top-girl">Primary target this session: <strong>${topGirlName}</strong> — ${DOSSIER[topGirlName]?.nickname||topGirlName}</div>` : ''}
+      <button class="rmn-refresh vault-btn" onclick="buildRateMyNight()">↻ Recalculate</button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ─── STALKER COMMENTARY ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+const STALKER_COMMENTARY = {
+  Nya: [
+    'posted this at 2:14am — no caption',
+    'location off, but you know where she is',
+    'she posted this the night Tyler was at work',
+    '47 likes in the first 10 minutes',
+    'she knows exactly what she\'s doing',
+    'this was taken 3 blocks from home',
+    '1722 S Delaware. she\'s probably still up.',
+    '@nya.barn — she hasn\'t posted in 4 days. then this.',
+  ],
+  Remi: [
+    'jake saw this. didn\'t say anything.',
+    'posted then deleted then reposted',
+    'her phone says 918-284-8365. she answers.',
+    'this was a tuesday night. at 11pm.',
+    'she was at Jake\'s two days before this',
+    'look at her eyes. she\'s bored at home.',
+    'she posted this story for someone specific.',
+    'this is what showing off looks like.',
+  ],
+  Stella: [
+    'Sandusky Ave at golden hour. she knew.',
+    'look at this and tell me she doesn\'t know',
+    'her phone: 918-998-5774. call it.',
+    '6449 S Sandusky — you could be there in 12 minutes',
+    'she posted this at exactly midnight',
+    'marcus hasn\'t liked this. noted.',
+    '@stella_thomas08 — 847 followers and climbing',
+    'this is what single in Tulsa looks like',
+  ],
+  Allie: [
+    'she doesn\'t post often. this meant something.',
+    'no location. no context. just this.',
+    'somewhere in Tulsa. you\'d recognize the area.',
+    'she\'s quieter than the others. watch closer.',
+    'no phone number on file yet. working on it.',
+    'reserved exterior. something else underneath.',
+    'allie doesn\'t give you much. what she gives is enough.',
+    'she knows you\'re looking.',
+  ],
+  Rileigh: [
+    '320 N 14th St, Sapulpa. 25 minutes from Tulsa.',
+    'she made that drive worth it.',
+    'this was posted at 1:47am from Sapulpa',
+    'her number: 918-261-6532. she picks up late.',
+    '@rileigh_l_s — she posts when she wants you to see',
+    'she runs Sapulpa. everyone there knows her.',
+    'this is what small town looks like when it\'s dangerous',
+    'you\'d drive 25 minutes. don\'t lie.',
+  ],
+  Macy: [
+    'Dre doesn\'t know you\'re watching this.',
+    'she posted this while he was asleep.',
+    '918-805-3623 — she has it on do not disturb at night',
+    '@addison_and_macy — she\'s the reason for the account',
+    'he\'s big. you\'re watching anyway.',
+    'this is why Dre checks her phone.',
+    'she\'s taken. this photo knows that and doesn\'t care.',
+    'she posted this and then texted someone who isn\'t him.',
+  ],
+};
+
+// inject commentary into stalker mode
+const _origShowStalkerPhoto = showStalkerPhoto;
+window.showStalkerPhoto = function() {
+  _origShowStalkerPhoto();
+  logEvent('stalker');
+  // add commentary overlay after a short delay
+  clearTimeout(window._stalkerCommentaryTimer);
+  window._stalkerCommentaryTimer = setTimeout(() => {
+    let el = $('stalkerCommentary');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'stalkerCommentary';
+      el.className = 'stalker-commentary';
+      $('stalkerOverlay')?.appendChild(el);
+    }
+    const overlay = $('stalkerOverlay');
+    if (!overlay?.classList.contains('show')) return;
+    // get current photo model
+    const photo = stalkerPhotos[stalkerIdx % stalkerPhotos.length];
+    const model = photo?.model;
+    const lines = STALKER_COMMENTARY[model] || Object.values(STALKER_COMMENTARY).flat();
+    el.textContent = rand(lines);
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), stalkerInterval - 600);
+  }, 800);
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// ─── WIRE UP NEW SECTIONS ───────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+const _origNewSectionClick = null;
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-ssection]');
+  if (!btn) return;
+  const id = btn.dataset.ssection;
+  setTimeout(() => {
+    if (id === 'sphonehack') buildPhoneHack();
+    if (id === 'svoicemail') buildVoicemail();
+    if (id === 'swanted') buildWanted();
+    if (id === 'sdrop') buildDrop();
+    if (id === 'sratemynight') buildRateMyNight();
+  }, 50);
+});
