@@ -3864,7 +3864,15 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ═══════════════════════════════════════════════════════════════════
+// ─── SIDEBAR DROPDOWN GROUPS ────────────────────────────────────
+window.toggleSbGroup = function(id) {
+  const grp = document.getElementById(id); if (!grp) return;
+  const isOpen = grp.classList.contains('open');
+  grp.classList.toggle('open', !isOpen);
+  const arrow = grp.querySelector('.sb-arrow');
+  if (arrow) arrow.textContent = !isOpen ? '▾' : '▸';
+};
+
 // ─── SESSION TRACKER (Rate My Night) ────────────────────────────
 // ═══════════════════════════════════════════════════════════════════
 const sessionLog = {
@@ -3900,31 +3908,32 @@ window.toggleLike = function(photo) { logEvent('like'); _origToggleLikeRMN(photo
 // ═══════════════════════════════════════════════════════════════════
 const PHONE_DATA = {
   Nya: {
-    contacts: { bf: 'Tyler ❤️', dad: 'Dad 👨' },
+    contacts: { bf: 'Tyler ❤️🔥', dad: 'Dad 👨' },
     threads: {
       bf: [
-        { from: 'bf', msg: 'hey you up?' },
-        { from: 'me', msg: 'yeah just got home' },
-        { from: 'bf', msg: 'can i come over' },
-        { from: 'me', msg: 'my parents are home lol' },
-        { from: 'bf', msg: 'so? sneak me in like last time' },
-        { from: 'me', msg: 'last time was a nightmare omg' },
-        { from: 'bf', msg: 'worth it though 😈' },
-        { from: 'me', msg: 'okay fine. 20 mins. come to the back door' },
-        { from: 'bf', msg: 'already in the car' },
-        { from: 'me', msg: 'you were already coming weren\'t you' },
-        { from: 'bf', msg: 'obviously lmao' },
-        { from: 'me', msg: 'bring food at least' },
-        { from: 'bf', msg: 'always do. miss you' },
-        { from: 'me', msg: 'i missed you more than i should have' },
-        { from: 'bf', msg: '❤️' },
-        { from: 'me', msg: 'don\'t make it weird' },
-        { from: 'bf', msg: 'too late 😂' },
-        { from: 'me', msg: 'hurry up' },
-        { from: 'bf', msg: 'two minutes. don\'t lock the back door' },
-        { from: 'me', msg: 'it\'s open. my shirt is already off so be quiet coming in' },
-        { from: 'bf', msg: '...' },
-        { from: 'bf', msg: 'running' },
+        { from: 'bf', msg: 'you free tonight' },
+        { from: 'me', msg: 'my parents are literally home' },
+        { from: 'bf', msg: 'sneak me in. back door.' },
+        { from: 'me', msg: 'last time you were so loud omg' },
+        { from: 'bf', msg: 'that was YOUR fault' },
+        { from: 'me', msg: 'how was that MY fault' },
+        { from: 'bf', msg: 'you know exactly why' },
+        { from: 'me', msg: 'okay fine. come at 11. park down the street' },
+        { from: 'bf', msg: 'what are you wearing rn' },
+        { from: 'me', msg: 'literally nothing i just got out of the shower 😭' },
+        { from: 'bf', msg: 'stay like that' },
+        { from: 'me', msg: 'tyler 😭😭' },
+        { from: 'bf', msg: 'i\'m serious. door unlocked?' },
+        { from: 'me', msg: 'yes. be quiet on the stairs. second door on the left.' },
+        { from: 'bf', msg: 'send a pic so i have something to look at on the drive' },
+        { from: 'me', msg: '📷 [Photo]', isPhoto: true, photoGirl: 'Nya' },
+        { from: 'bf', msg: 'i\'m gonna crash this car' },
+        { from: 'me', msg: 'drive SAFE omg' },
+        { from: 'bf', msg: 'you can\'t send me something like that and expect me to drive normal' },
+        { from: 'me', msg: 'just get here. i\'ll make it worth the drive 😇' },
+        { from: 'bf', msg: 'omw. 8 minutes.' },
+        { from: 'me', msg: 'i\'m already in bed' },
+        { from: 'bf', msg: '💀 don\'t move' },
       ],
       dad: [
         { from: 'dad', msg: 'Where are you? It\'s 11pm' },
@@ -3935,14 +3944,12 @@ const PHONE_DATA = {
         { from: 'me', msg: 'NO dad oh my god' },
         { from: 'dad', msg: 'Nya.' },
         { from: 'me', msg: 'what' },
-        { from: 'dad', msg: 'I can hear voices.' },
+        { from: 'dad', msg: 'I can hear voices. Keep your door open.' },
         { from: 'me', msg: 'it\'s my phone. i\'m watching a video' },
-        { from: 'dad', msg: 'Alright. Keep your door open.' },
-        { from: 'me', msg: 'okay 🙄' },
-        { from: 'dad', msg: 'Don\'t roll your eyes at me.' },
-        { from: 'me', msg: 'how did you even—' },
-        { from: 'dad', msg: 'I know everything. Door open.' },
-        { from: 'me', msg: 'fine it\'s open' },
+        { from: 'dad', msg: 'Door. Open. Now.' },
+        { from: 'me', msg: 'fine it\'s open god' },
+        { from: 'dad', msg: 'Good. Night.' },
+        { from: 'me', msg: 'night 🙄' },
       ],
     }
   },
@@ -3950,52 +3957,41 @@ const PHONE_DATA = {
     contacts: { bf: 'Jake 💙', dad: 'Daddy 🏠' },
     threads: {
       bf: [
-        { from: 'me', msg: 'ok so i have to tell you something and you can\'t get mad' },
-        { from: 'bf', msg: 'that\'s never a good opening text' },
-        { from: 'me', msg: 'i let Austin hug me goodbye and it went on too long' },
-        { from: 'bf', msg: 'what does too long mean' },
-        { from: 'me', msg: 'like. longer than a regular hug.' },
-        { from: 'bf', msg: 'remi.' },
-        { from: 'me', msg: 'it wasn\'t anything!! i just felt guilty and didn\'t want you to find out from someone else' },
-        { from: 'bf', msg: 'how long was the hug' },
-        { from: 'me', msg: 'like 8 seconds maybe' },
-        { from: 'bf', msg: 'eight seconds.' },
-        { from: 'me', msg: 'i\'m sorry okay? it didn\'t mean anything. he smelled good and i panicked' },
-        { from: 'bf', msg: 'he SMELLED good??' },
-        { from: 'me', msg: 'jake PLEASE' },
-        { from: 'bf', msg: 'i\'m not mad i\'m just' },
-        { from: 'bf', msg: 'why are you telling me this' },
-        { from: 'me', msg: 'because i\'m an honest person??? and i felt something and i hate that i did' },
-        { from: 'bf', msg: 'you felt something from a hug' },
-        { from: 'me', msg: 'i feel things easily okay i hate it' },
-        { from: 'bf', msg: 'are you into him' },
-        { from: 'me', msg: 'i\'m into YOU. i just... he was there and you weren\'t and it was a hug' },
-        { from: 'bf', msg: 'come over tonight' },
-        { from: 'me', msg: 'yeah?' },
-        { from: 'bf', msg: 'yeah. and bring that dress you wore saturday' },
-        { from: 'me', msg: 'okay 🫦' },
-        { from: 'bf', msg: 'you\'re lucky you\'re hot' },
-        { from: 'me', msg: 'you love me' },
-        { from: 'bf', msg: 'unfortunately' },
+        { from: 'me', msg: 'are you awake' },
+        { from: 'bf', msg: 'now i am. it\'s 1am remi' },
+        { from: 'me', msg: 'i know i know i\'m sorry. i can\'t sleep.' },
+        { from: 'bf', msg: 'thinking about what' },
+        { from: 'me', msg: 'you. mostly.' },
+        { from: 'bf', msg: 'yeah?' },
+        { from: 'me', msg: 'i keep thinking about last weekend' },
+        { from: 'bf', msg: 'which part' },
+        { from: 'me', msg: 'you know which part' },
+        { from: 'bf', msg: 'say it' },
+        { from: 'me', msg: 'jake 😭' },
+        { from: 'bf', msg: 'say it or i\'m going back to sleep' },
+        { from: 'me', msg: 'i can\'t stop thinking about when you had me against the wall' },
+        { from: 'bf', msg: 'there it is' },
+        { from: 'me', msg: 'shut up 😭 come over' },
+        { from: 'bf', msg: 'send me something first' },
+        { from: 'me', msg: '📷 [Photo]', isPhoto: true, photoGirl: 'Remi' },
+        { from: 'bf', msg: 'getting in the car' },
+        { from: 'me', msg: 'door\'s unlocked. wear the cologne.' },
+        { from: 'bf', msg: 'you have a problem' },
+        { from: 'me', msg: 'i know. hurry up.' },
       ],
       dad: [
         { from: 'dad', msg: 'Remi are you coming home tonight' },
         { from: 'me', msg: 'probably not, staying at Jake\'s' },
-        { from: 'dad', msg: 'You were just there two nights ago' },
-        { from: 'me', msg: 'dad we\'ve been dating for a year' },
-        { from: 'dad', msg: 'I know how long you\'ve been dating' },
-        { from: 'me', msg: 'then why are you like this' },
-        { from: 'dad', msg: 'Because you\'re my daughter and I don\'t like it' },
-        { from: 'me', msg: 'we\'re literally just sleeping' },
-        { from: 'dad', msg: 'Remi.' },
-        { from: 'me', msg: 'we\'re literally just sleeping DAD' },
-        { from: 'dad', msg: 'Be home by 10am tomorrow. That\'s the rule.' },
+        { from: 'dad', msg: 'This is the third time this week' },
+        { from: 'me', msg: 'dad we\'ve been together for a year he\'s not a stranger' },
+        { from: 'dad', msg: 'You were supposed to be home by 10' },
+        { from: 'me', msg: 'we lost track of time' },
+        { from: 'dad', msg: 'Doing what exactly' },
+        { from: 'me', msg: 'oh my god dad WATCHING MOVIES' },
+        { from: 'dad', msg: 'Be home by 9am.' },
         { from: 'me', msg: 'fine' },
-        { from: 'dad', msg: 'I mean it.' },
-        { from: 'me', msg: 'i know you do 🙄' },
         { from: 'dad', msg: 'Love you. Be safe.' },
-        { from: 'me', msg: 'love you too. don\'t wait up' },
-        { from: 'dad', msg: 'Already am.' },
+        { from: 'me', msg: 'love you too 🙄' },
       ],
     }
   },
@@ -4003,103 +3999,73 @@ const PHONE_DATA = {
     contacts: { bf: 'Marcus 🖤', dad: 'Pop ⭐' },
     threads: {
       bf: [
-        { from: 'me', msg: 'are we good' },
-        { from: 'bf', msg: 'why wouldn\'t we be' },
-        { from: 'me', msg: 'you\'ve been weird all week' },
-        { from: 'bf', msg: 'i\'m not weird i\'ve just been busy' },
-        { from: 'me', msg: 'you didn\'t text me back for 6 hours yesterday' },
-        { from: 'bf', msg: 'i was at practice' },
-        { from: 'me', msg: 'practice ended at 4. it was 10pm' },
-        { from: 'bf', msg: 'stella.' },
-        { from: 'me', msg: 'i\'m not trying to fight i just want to know if something\'s wrong' },
-        { from: 'bf', msg: 'nothing\'s wrong. i promise.' },
-        { from: 'me', msg: 'okay' },
-        { from: 'bf', msg: 'stop overthinking' },
-        { from: 'me', msg: 'i will when you stop being weird' },
-        { from: 'bf', msg: 'can i come over friday' },
-        { from: 'me', msg: 'depends' },
-        { from: 'bf', msg: 'on what' },
-        { from: 'me', msg: 'on whether you\'re still being weird on friday' },
-        { from: 'bf', msg: '😂 i\'ll be normal friday' },
-        { from: 'me', msg: 'then yes. and bring wine' },
-        { from: 'bf', msg: 'you\'re 20' },
-        { from: 'me', msg: 'your point' },
-        { from: 'bf', msg: 'see you friday 😏' },
-        { from: 'me', msg: 'don\'t come before 9. i\'m doing my thing' },
-        { from: 'bf', msg: 'your "thing" takes 3 hours?' },
-        { from: 'me', msg: 'i look this good for a reason' },
-        { from: 'bf', msg: 'okay fair' },
+        { from: 'me', msg: 'when are you getting here' },
+        { from: 'bf', msg: '20 mins. why' },
+        { from: 'me', msg: 'because i\'ve been getting ready for two hours and i want you to see it' },
+        { from: 'bf', msg: 'send a preview' },
+        { from: 'me', msg: '📷 [Photo]', isPhoto: true, photoGirl: 'Stella' },
+        { from: 'bf', msg: 'okay i\'m running' },
+        { from: 'me', msg: '😂 don\'t get a ticket' },
+        { from: 'bf', msg: 'too late. worth it.' },
+        { from: 'me', msg: 'you\'re insane' },
+        { from: 'bf', msg: 'you look incredible.' },
+        { from: 'me', msg: 'i know 💅' },
+        { from: 'bf', msg: 'leave the lights low when i get there' },
+        { from: 'me', msg: 'already did 😇' },
+        { from: 'bf', msg: 'doing 80 rn' },
+        { from: 'me', msg: 'MARCUS' },
+        { from: 'bf', msg: 'worth it' },
       ],
       dad: [
         { from: 'dad', msg: 'Hey baby, you eaten today?' },
-        { from: 'me', msg: 'yes pop i\'m fine' },
-        { from: 'dad', msg: 'You looked skinny at church' },
-        { from: 'me', msg: 'I\'m the same size i\'ve always been 😭' },
-        { from: 'dad', msg: 'Mhmm. Who was that boy you were talking to after service' },
+        { from: 'me', msg: 'yes pop stop worrying' },
+        { from: 'dad', msg: 'Who was that boy picking you up last night' },
         { from: 'me', msg: 'just a friend dad' },
-        { from: 'dad', msg: 'He was looking at you like more than a friend' },
-        { from: 'me', msg: 'you can\'t prove that' },
-        { from: 'dad', msg: 'Stella Thomas.' },
-        { from: 'me', msg: 'pop RELAX' },
-        { from: 'dad', msg: 'Are you seeing someone?' },
-        { from: 'me', msg: 'casually maybe' },
-        { from: 'dad', msg: 'Casually.' },
-        { from: 'me', msg: 'it\'s not serious' },
-        { from: 'dad', msg: 'Make sure it stays that way until you\'re done with school' },
-        { from: 'me', msg: 'yes sir 🙄' },
-        { from: 'dad', msg: 'Don\'t roll your eyes' },
-        { from: 'me', msg: 'how do you always know' },
-        { from: 'dad', msg: 'Because you\'ve been doing it since you were 4. Come eat dinner Sunday.' },
-        { from: 'me', msg: 'i\'ll be there ❤️' },
+        { from: 'dad', msg: 'He was out front until 2am Stella.' },
+        { from: 'me', msg: 'we were just talking' },
+        { from: 'dad', msg: 'Is this Marcus?' },
+        { from: 'me', msg: 'maybe' },
+        { from: 'dad', msg: 'Sunday dinner. Bring him.' },
+        { from: 'me', msg: 'i hate you sometimes ❤️' },
+        { from: 'dad', msg: '6pm Sunday. No excuses.' },
       ],
     }
   },
   Allie: {
-    contacts: { bf: 'Connor', dad: 'Dad 🏡' },
+    contacts: { bf: 'Connor 🤍', dad: 'Dad 🏡' },
     threads: {
       bf: [
-        { from: 'bf', msg: 'hey' },
-        { from: 'me', msg: 'hi' },
-        { from: 'bf', msg: 'you free tonight' },
-        { from: 'me', msg: 'depends what for' },
-        { from: 'bf', msg: 'was gonna drive around. maybe go to the lake' },
-        { from: 'me', msg: 'it\'s 11pm' },
-        { from: 'bf', msg: 'yeah so' },
-        { from: 'me', msg: 'so it\'s late and the lake is dark' },
-        { from: 'bf', msg: 'that\'s the point' },
-        { from: 'me', msg: 'connor.' },
-        { from: 'bf', msg: 'just come hang out. i miss you' },
-        { from: 'me', msg: 'we hung out yesterday' },
-        { from: 'bf', msg: 'so' },
-        { from: 'me', msg: 'so you\'re so annoying' },
-        { from: 'bf', msg: 'is that a yes' },
-        { from: 'me', msg: 'give me 20 minutes' },
-        { from: 'bf', msg: 'dress warm' },
-        { from: 'me', msg: 'or i could not dress at all' },
-        { from: 'bf', msg: 'i\'m pulling up now' },
-        { from: 'me', msg: 'connor i was JOKING' },
-        { from: 'bf', msg: 'i know :)' },
-        { from: 'me', msg: 'you\'re the worst' },
-        { from: 'bf', msg: 'outside' },
+        { from: 'bf', msg: 'i can\'t stop thinking about last night' },
+        { from: 'me', msg: 'me neither honestly' },
+        { from: 'bf', msg: 'you were so different' },
+        { from: 'me', msg: 'good different or bad different' },
+        { from: 'bf', msg: 'allie. good. obviously.' },
+        { from: 'me', msg: 'okay good because i was nervous' },
+        { from: 'bf', msg: 'you didn\'t seem nervous' },
+        { from: 'me', msg: 'i was hiding it' },
+        { from: 'bf', msg: 'can we do that again tonight' },
+        { from: 'me', msg: 'send me something to think about and i\'ll think about tonight' },
+        { from: 'bf', msg: 'you first' },
+        { from: 'me', msg: '📷 [Photo]', isPhoto: true, photoGirl: 'Allie' },
+        { from: 'bf', msg: 'i am literally leaving work right now' },
+        { from: 'me', msg: 'you have three hours left' },
+        { from: 'bf', msg: 'i don\'t care' },
+        { from: 'me', msg: 'stay. i\'ll be worth the wait.' },
+        { from: 'bf', msg: 'you\'re going to be the death of me' },
+        { from: 'me', msg: 'good 😇' },
       ],
       dad: [
         { from: 'me', msg: 'dad can i borrow the car saturday' },
-        { from: 'dad', msg: 'What for?' },
-        { from: 'me', msg: 'going out with friends' },
-        { from: 'dad', msg: 'Which friends' },
-        { from: 'me', msg: 'just some people from school' },
-        { from: 'dad', msg: 'Connor going to be there?' },
-        { from: 'me', msg: 'maybe' },
-        { from: 'dad', msg: 'Allie.' },
-        { from: 'me', msg: 'it\'s not a big deal he\'s just a guy' },
-        { from: 'dad', msg: 'You\'ve said that about three different guys this month' },
-        { from: 'me', msg: 'I\'m in college dad it\'s normal' },
-        { from: 'dad', msg: 'Be back by midnight.' },
-        { from: 'me', msg: '1am' },
-        { from: 'dad', msg: '12:30' },
+        { from: 'dad', msg: 'Connor going?' },
+        { from: 'me', msg: 'he\'s my boyfriend dad' },
+        { from: 'dad', msg: 'Since when?!' },
+        { from: 'me', msg: 'since like a month ago? i thought i told you' },
+        { from: 'dad', msg: 'You did NOT tell me that.' },
+        { from: 'me', msg: 'i\'m sorry omg' },
+        { from: 'dad', msg: 'Bring him for dinner.' },
+        { from: 'me', msg: 'don\'t make it weird' },
+        { from: 'dad', msg: 'Car keys are on the hook. 12:30 curfew.' },
         { from: 'me', msg: 'deal ❤️' },
-        { from: 'dad', msg: 'Full tank when you bring it back.' },
-        { from: 'me', msg: 'always' },
       ],
     }
   },
@@ -4107,51 +4073,36 @@ const PHONE_DATA = {
     contacts: { bf: 'Devin 🏹', dad: 'Pop 🤠' },
     threads: {
       bf: [
-        { from: 'me', msg: 'you need to stop texting me when you\'re drunk' },
-        { from: 'bf', msg: 'i wasn\'t that drunk' },
-        { from: 'me', msg: 'you sent me 14 voice memos of you singing' },
-        { from: 'bf', msg: 'okay i was a little drunk' },
-        { from: 'me', msg: 'the last one was just breathing' },
-        { from: 'bf', msg: '😂😂 okay that\'s bad' },
-        { from: 'me', msg: 'who were you even with' },
-        { from: 'bf', msg: 'just the boys. i was thinking about you' },
-        { from: 'me', msg: 'clearly lmao' },
-        { from: 'bf', msg: 'i miss you tho for real' },
-        { from: 'me', msg: 'you see me literally every day' },
-        { from: 'bf', msg: 'not enough' },
-        { from: 'me', msg: 'okay that was actually sweet' },
-        { from: 'bf', msg: 'i have my moments' },
-        { from: 'me', msg: 'the bar is on the ground but okay' },
-        { from: 'bf', msg: 'come over tonight' },
-        { from: 'me', msg: 'it\'s a tuesday' },
-        { from: 'bf', msg: 'best nights are tuesdays' },
-        { from: 'me', msg: 'i\'m wearing sweats and my hair is a mess' },
-        { from: 'bf', msg: 'even better' },
-        { from: 'me', msg: 'you\'re so embarrassing' },
-        { from: 'bf', msg: 'is that a yes' },
-        { from: 'me', msg: 'yeah give me an hour' },
-        { from: 'bf', msg: 'driving to sapulpa rn' },
-        { from: 'me', msg: 'you don\'t have to drive all the way here—' },
+        { from: 'bf', msg: 'i\'m still thinking about this morning' },
+        { from: 'me', msg: 'lmaooo you\'re obsessed with me' },
+        { from: 'bf', msg: 'obviously. you don\'t even try and you still—' },
+        { from: 'me', msg: 'still what 👀' },
+        { from: 'bf', msg: 'you drive me absolutely insane in the best way' },
+        { from: 'me', msg: 'that\'s sweet. come pick me up after work' },
+        { from: 'bf', msg: 'and then?' },
+        { from: 'me', msg: '📷 [Photo]', isPhoto: true, photoGirl: 'Rileigh' },
+        { from: 'bf', msg: 'you cannot just send me that while i\'m at work' },
+        { from: 'me', msg: 'then work faster 😇' },
+        { from: 'bf', msg: 'i\'m clocking out at 5 sharp' },
+        { from: 'me', msg: 'i\'ll be ready 💋' },
         { from: 'bf', msg: 'already on 44' },
-        { from: 'me', msg: 'oh my god you\'re insane' },
+        { from: 'me', msg: 'it\'s 3pm devin' },
+        { from: 'bf', msg: 'i know. i\'ll wait outside.' },
+        { from: 'me', msg: 'you\'re insane' },
         { from: 'bf', msg: '❤️' },
       ],
       dad: [
         { from: 'dad', msg: 'You coming to thanksgiving or what' },
-        { from: 'me', msg: 'of course i am pop why would you even ask' },
-        { from: 'dad', msg: 'You said that last year and showed up 2 hours late' },
-        { from: 'me', msg: 'that was ONE TIME' },
-        { from: 'dad', msg: 'With that boy.' },
-        { from: 'me', msg: 'devin wanted to meet the family' },
-        { from: 'dad', msg: 'He can meet the family at a normal hour' },
-        { from: 'me', msg: 'pop you liked him' },
-        { from: 'dad', msg: 'I tolerated him' },
-        { from: 'me', msg: 'same thing with you' },
-        { from: 'dad', msg: '😒' },
-        { from: 'me', msg: 'i\'ll be there at noon. i promise. no devin.' },
-        { from: 'dad', msg: 'Bring that potato salad your mom used to make' },
-        { from: 'me', msg: 'on it. love you pop' },
-        { from: 'dad', msg: 'Love you baby girl. Drive safe.' },
+        { from: 'me', msg: 'of course pop' },
+        { from: 'dad', msg: 'Is Devin coming?' },
+        { from: 'me', msg: 'he doesn\'t have family here so yeah probably' },
+        { from: 'dad', msg: 'As long as he\'s on time and respectful.' },
+        { from: 'me', msg: 'he\'s very respectful pop you\'ll like him' },
+        { from: 'dad', msg: 'Mhmm. We\'ll see.' },
+        { from: 'me', msg: 'bring that potato salad. noon.' },
+        { from: 'dad', msg: 'That\'s my line.' },
+        { from: 'me', msg: 'love you 🤠' },
+        { from: 'dad', msg: 'Love you baby girl.' },
       ],
     }
   },
@@ -4160,49 +4111,33 @@ const PHONE_DATA = {
     threads: {
       bf: [
         { from: 'bf', msg: 'where you at' },
-        { from: 'me', msg: 'target. why' },
-        { from: 'bf', msg: 'some dude liked your photo from 2022' },
-        { from: 'me', msg: 'dre.' },
-        { from: 'bf', msg: 'who is it' },
-        { from: 'me', msg: 'i don\'t know i don\'t know every person who likes my photos' },
-        { from: 'bf', msg: 'he went back 2 years macy' },
-        { from: 'me', msg: 'that\'s a him problem not a me problem' },
-        { from: 'bf', msg: 'it\'s gonna be both our problems if i find out who he is' },
-        { from: 'me', msg: 'omg relax please i\'m buying dish soap' },
-        { from: 'bf', msg: 'i\'m just saying' },
-        { from: 'me', msg: 'you say that every week about different people' },
-        { from: 'bf', msg: 'because every week different people are being weird about my girl' },
-        { from: 'me', msg: 'your girl is fine. your girl is buying dish soap. calm down.' },
-        { from: 'bf', msg: 'bring me a snack' },
-        { from: 'me', msg: 'only if you stop being psycho' },
-        { from: 'bf', msg: 'deal 😂' },
-        { from: 'me', msg: 'hot cheetos or takis' },
-        { from: 'bf', msg: 'both' },
-        { from: 'me', msg: 'you\'re lucky you\'re cute' },
-        { from: 'bf', msg: '😈 come home soon' },
-        { from: 'me', msg: 'omw. don\'t check instagram while i\'m gone' },
-        { from: 'bf', msg: 'no promises' },
+        { from: 'me', msg: 'taking a bath. why' },
+        { from: 'bf', msg: 'send a pic' },
+        { from: 'me', msg: 'dre 😭 i\'m literally in the bath' },
+        { from: 'bf', msg: 'i know' },
+        { from: 'me', msg: '📷 [Photo]', isPhoto: true, photoGirl: 'Macy' },
+        { from: 'bf', msg: 'i\'m coming home right now' },
+        { from: 'me', msg: 'you have a meeting in 20 minutes' },
+        { from: 'bf', msg: 'rescheduled' },
+        { from: 'me', msg: 'stay in the bath. i\'ll be there in 10.' },
+        { from: 'bf', msg: 'you have responsibilities dre' },
+        { from: 'me', msg: 'you\'re my responsibility' },
+        { from: 'bf', msg: 'okay that was smooth. come home.' },
+        { from: 'me', msg: '🏃' },
       ],
       dad: [
         { from: 'me', msg: 'daddy can i borrow like $200' },
         { from: 'dad', msg: 'For what' },
-        { from: 'me', msg: 'my registration is due' },
-        { from: 'dad', msg: 'I thought Dre was handling that' },
-        { from: 'me', msg: 'he\'s busy' },
+        { from: 'me', msg: 'registration. Dre\'s been weird about money lately' },
+        { from: 'dad', msg: 'What does weird about money mean' },
+        { from: 'me', msg: 'just controlling. it\'s fine.' },
         { from: 'dad', msg: 'Macy.' },
-        { from: 'me', msg: 'daddy PLEASE don\'t start' },
-        { from: 'dad', msg: 'I\'m not starting anything. Zelling you now.' },
-        { from: 'me', msg: 'thank you ❤️❤️' },
-        { from: 'dad', msg: 'Pay me back when you can.' },
-        { from: 'me', msg: 'i always do' },
-        { from: 'dad', msg: 'You come first in this family. You know that right?' },
-        { from: 'me', msg: 'i know daddy' },
-        { from: 'dad', msg: 'That boy treats you right?' },
-        { from: 'me', msg: 'he does. he\'s just protective' },
-        { from: 'dad', msg: 'There\'s protective and there\'s something else.' },
-        { from: 'me', msg: 'we\'re fine. i love you' },
-        { from: 'dad', msg: 'Love you more. Call me this week.' },
-        { from: 'me', msg: 'will do 🫶' },
+        { from: 'me', msg: 'daddy it\'s fine please just the $200' },
+        { from: 'dad', msg: 'Sending it now. He treats you right?' },
+        { from: 'me', msg: 'yes. he just gets possessive sometimes.' },
+        { from: 'dad', msg: 'Call me if that becomes more than sometimes.' },
+        { from: 'me', msg: 'i will. love you 🫶' },
+        { from: 'dad', msg: 'Love you more. You come first. Always.' },
       ],
     }
   }
@@ -4254,12 +4189,21 @@ function renderPhoneDevice() {
       <div class="phone-contact-dot">●</div>
     </div>
     <div class="phone-messages" id="phoneMessages">
-      ${thread.map(m => `
-        <div class="phone-msg ${m.from==='me'?'out':'in'}">
+      ${thread.map(m => {
+        if (m.isPhoto) {
+          const girl = m.photoGirl;
+          const photos = SECRET_PHOTOS.filter(p=>p.model===girl);
+          const photo = photos.length ? rand(photos) : null;
+          const bubble = photo
+            ? `<img src="${photo.src}" class="phone-photo-bubble" onclick="openModal(${JSON.stringify(photo).replace(/"/g,'&quot;')},true)" alt="">`
+            : `<div class="phone-bubble phone-bubble-photo">📷 [Photo]</div>`;
+          return `<div class="phone-msg ${m.from==='me'?'out':'in'}">${bubble}</div>`;
+        }
+        return `<div class="phone-msg ${m.from==='me'?'out':'in'}">
           <div class="phone-bubble">${m.msg}</div>
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     </div>`;
-  // scroll to bottom
   setTimeout(() => {
     const msgs = $('phoneMessages');
     if (msgs) msgs.scrollTop = msgs.scrollHeight;
@@ -4294,39 +4238,42 @@ window.selectThread = function(thread) {
 // ═══════════════════════════════════════════════════════════════════
 const VOICEMAILS = {
   Nya: [
-    { from: 'nya.barn', label: 'Nya', duration: '0:38', time: 'Today 2:17 AM', transcript: "Hey. It's me. I know it's late, I just... I couldn't sleep and I kept thinking about what you said earlier and I don't know I just needed to say something. You don't have to call back. Actually don't call back. I'll be weird about it. Just. I don't know. Good night." },
-    { from: 'nya.barn', label: 'Nya', duration: '0:12', time: 'Yesterday 11:44 PM', transcript: "Can you not tell anyone what I told you? Like about Tyler. I just need that to stay between us. Okay. Bye." },
-    { from: 'nya.barn', label: 'Nya', duration: '1:02', time: 'Last week', transcript: "Okay so I know this is unhinged but I saw you looking at me at the thing Saturday and I've been overthinking it ever since and I just need to know if I'm making it up because if I am I'll literally die. Don't text me back just like... let me know in person or something. Actually no. Text me back. I'm not brave enough for in person. Okay. Bye. Sorry for this message." },
-    { from: 'Unknown', label: 'Unknown #', duration: '0:04', time: '3 days ago', transcript: "...hey." },
+    { from: 'nya.barn', label: 'Nya', duration: '1:04', time: 'Today 2:17 AM', transcript: "Hey. It's me. Nya. Obviously. Okay so I've had a little bit to drink and I've been thinking about you for like three hours and I can't make it stop so I'm just calling. Don't read into it. Or do. I don't care. I keep thinking about what it would be like if Tyler wasn't a thing. Like genuinely. You'd be in so much trouble. I'd make sure of it. Okay I need to stop talking. Call me back if you want. Or come over. My parents are asleep. I'm not wearing much. Okay. Bye." },
+    { from: 'nya.barn', label: 'Nya', duration: '0:42', time: 'Yesterday 11:44 PM', transcript: "I need you to delete the photo I sent earlier. Not because I regret it. I definitely don't regret it. I regret sending it to you specifically because now you have it and I have no control over that and it's driving me crazy. Don't show anyone. Actually I know you won't. That's why I sent it to you. God. Call me." },
+    { from: 'nya.barn', label: 'Nya', duration: '1:18', time: 'Last week', transcript: "Okay I'm just going to say it. That night at the party when we were alone for like 20 minutes and nothing happened — I've been thinking about that for two weeks. Nothing happened and I still can't stop thinking about it. What does that mean. Don't answer that. Actually answer it. I want to know what would have happened if you had just kissed me. I was waiting for it. I'm just going to go ahead and say I was waiting for it. Tyler would lose his mind. Which is part of the appeal honestly. I'm a terrible person. Okay. Call me back. Or don't. Either way I'm thinking about you." },
+    { from: 'nya.barn', label: 'Nya', duration: '0:22', time: '3 days ago', transcript: "You were outside my street tonight. I saw the car. I'm not mad. I want you to know I'm not mad. I'm the opposite of mad. Come back." },
+    { from: 'Unknown', label: 'Unknown #', duration: '0:06', time: '5 days ago', transcript: "...I can still smell your cologne in my room. I don't hate it." },
   ],
   Remi: [
-    { from: 'remibarn', label: 'Remi', duration: '0:22', time: 'Today 1:03 AM', transcript: "Hey it's Remi. I just wanted to say sorry for earlier, I was being dramatic and I know that. You don't even have to respond to this. I just hate leaving things weird. Okay. Bye." },
-    { from: 'remibarn', label: 'Remi', duration: '0:47', time: 'Yesterday 10:30 PM', transcript: "Okay hear me out. Jake doesn't have to know. And I'm not saying anything is going to happen I'm just saying hypothetically if you wanted to get food sometime or whatever, I would be interested in that. Hypothetically. Don't make it a thing. Actually delete this when you hear it. Can you delete voicemails from other people? Whatever. Call me." },
-    { from: 'remibarn', label: 'Remi', duration: '0:09', time: '2 days ago', transcript: "I saw you at Walmart. I pretended I didn't. Just wanted you to know." },
-    { from: 'remibarn', label: 'Remi', duration: '0:33', time: 'Last week', transcript: "Hey so my boyfriend is being a nightmare and I just needed to vent to someone and you were the first person I thought of which is probably a problem but here we are. Call me back if you want. I'll be up." },
+    { from: 'remibarn', label: 'Remi', duration: '1:10', time: 'Today 1:03 AM', transcript: "Jake is asleep. He's literally right next to me and I'm in the bathroom calling you and I don't even know what that says about me but here we are. I've been thinking about you since Tuesday and it's Friday and it hasn't stopped. I don't know what to do with that. I know what I want to do with it. I just can't. Or I won't. There's a difference. If things were different — if Jake wasn't here — I would have been at your place so fast. Like embarrassingly fast. You'd have to pretend not to notice how fast. Okay. I'm going back to bed. Delete this. Don't delete this." },
+    { from: 'remibarn', label: 'Remi', duration: '0:55', time: 'Yesterday 10:30 PM', transcript: "I don't know if you know this but when you look at me the way you do in public I can feel it. Like physically. And then I have to go home to Jake and pretend I'm fully present and I'm not. I'm still thinking about the way you looked at me. That's on you. That is entirely on you. I want to see you. I know I shouldn't. I want to anyway. Text me back if you're up." },
+    { from: 'remibarn', label: 'Remi', duration: '0:18', time: '2 days ago', transcript: "I sent you something. It was an accident. It was not an accident. Okay it was not an accident. Don't bring it up in front of Jake. Do bring it up when we're alone." },
+    { from: 'remibarn', label: 'Remi', duration: '0:48', time: 'Last week', transcript: "The thing about you is that you make me want to be stupid and I'm not stupid. I've never been stupid. And then you exist and I'm suddenly willing to blow up everything I have for one night and that's insane. I know that's insane. Call me back so I can make the insane decision." },
+    { from: 'remibarn', label: 'Remi', duration: '0:10', time: '10 days ago', transcript: "If you ever tell anyone I called you this many times I will deny it to my grave." },
   ],
   Stella: [
-    { from: 'stella_thomas08', label: 'Stella', duration: '0:19', time: 'Tonight 12:58 AM', transcript: "I know you're awake. You always have your read receipts off when you're awake. I just want to talk. That's it. No drama. Just call me back." },
-    { from: 'stella_thomas08', label: 'Stella', duration: '0:41', time: 'Yesterday 9:15 PM', transcript: "Okay so I'm going to say something and you're not allowed to freak out. I think I like you more than I should given the situation and I've been trying to talk myself out of it for like three weeks and it's not working. So. There you go. Do with that information what you will. I'm going to go be embarrassed now." },
-    { from: 'stella_thomas08', label: 'Stella', duration: '0:08', time: '4 days ago', transcript: "Your car was outside my street. I wasn't going to say anything but I noticed." },
-    { from: 'stella_thomas08', label: 'Stella', duration: '0:55', time: 'Last week', transcript: "Before you say anything — yes I know Marcus exists. Yes I know this is complicated. I'm not asking you to do anything about it. I just needed to say it out loud to someone and you're the only person I trust enough to not make it weird. Please make it a little weird. Just not too weird." },
+    { from: 'stella_thomas08', label: 'Stella', duration: '1:05', time: 'Tonight 12:58 AM', transcript: "Okay so Marcus and I got into it again and I'm in my car outside on Sandusky and I'm calling you because you're the person I want to talk to right now. Not him. You. Make of that what you will. I've been thinking about what it would be like to just let something happen between us and stop pretending like I don't want it to. I want it to. I've wanted it to for months. I'm single in every way that matters and I know that sounds like something a messy girl would say but I don't think I'm that messy. I just want you. Is that okay to say? Call me back." },
+    { from: 'stella_thomas08', label: 'Stella', duration: '0:44', time: 'Yesterday 9:15 PM', transcript: "I just got out of the shower and I'm lying in bed thinking about you and I figured I'd just call and say that out loud. You make me feel things I haven't felt in a while. Like since before Marcus. That dangerous feeling. Like something could actually happen. I miss that feeling. I think you give me that feeling. Come over if you want. I'm alone. I'll leave the light on." },
+    { from: 'stella_thomas08', label: 'Stella', duration: '0:09', time: '4 days ago', transcript: "Your car was on my street. I noticed. I didn't mind." },
+    { from: 'stella_thomas08', label: 'Stella', duration: '1:00', time: 'Last week', transcript: "I'm going to be honest with you because I think you can handle it. I think about you when I'm with Marcus. Not always. But enough that I feel guilty about it. And the guilt means something, right? Like you don't feel guilty about people you don't actually want. I actually want you. There. Said it. If you want to come to 6449 Sandusky tonight I'll make sure Marcus isn't around. It's your call." },
   ],
   Allie: [
-    { from: 'Unknown', label: 'Allie', duration: '0:14', time: 'Today 11:22 PM', transcript: "Hey it's Allie. I think you have the wrong number but I've gotten three calls this week from this phone so I just wanted to say something. Who is this?" },
-    { from: 'Unknown', label: 'Allie', duration: '0:29', time: '2 days ago', transcript: "Okay I did some digging and I think I know who this is. And I'm not even mad I'm just... confused? Like why wouldn't you just say something instead of calling and hanging up? You can text me if you want. I don't bite. Usually." },
-    { from: 'Unknown', label: 'Allie', duration: '0:06', time: 'Last week', transcript: "I left my jacket at that party. If you have it can you let me know. Thanks." },
+    { from: 'Unknown', label: 'Allie', duration: '0:52', time: 'Today 11:22 PM', transcript: "I know this is going to sound weird but I've been getting calls from this number and I finally just want to know who it is. I'm not scared, I'm honestly a little curious. I don't know. There's something about the fact that you keep calling and not saying anything that's kind of — this is embarrassing — kind of exciting? I don't know what that says about me. Text me. Or just say something next time you call. I'll pick up." },
+    { from: 'Unknown', label: 'Allie', duration: '1:02', time: '2 days ago', transcript: "Okay so I asked around and I think I know who this is. And if I'm right — hi. I've noticed you too. I just don't make the first move. Clearly you do, even if it's in the weirdest possible way. I'm in Tulsa. You can figure out the rest. If you actually want to talk to me, say something. I'm more interesting than you'd expect." },
+    { from: 'Unknown', label: 'Allie', duration: '0:30', time: '5 days ago', transcript: "I had a dream about you last night. I know that's unhinged to say on a voicemail to someone I've never officially met. I'm saying it anyway. Call me back. Or come find me. Either one." },
+    { from: 'Unknown', label: 'Allie', duration: '0:14', time: 'Last week', transcript: "I'm not wearing anything I'd want my dad to see me in right now and I thought about calling you. So I did. Bye." },
   ],
   Rileigh: [
-    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:31', time: 'Tonight 2:44 AM', transcript: "Hi. I know it's late, I just got home from that thing and I had a really good time and I just wanted to say that before I went to sleep because I knew I'd be weird about it in the morning. So. Yeah. Good night. Text me tomorrow or whatever. No pressure." },
-    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:17', time: 'Yesterday 8:00 PM', transcript: "Are you actually from Sapulpa or did you just say that? Because I've never met anyone who actually claims Sapulpa voluntarily and I have questions." },
-    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:52', time: '3 days ago', transcript: "Okay so real talk. I like you. Like genuinely. And I don't really do this — the calling and leaving a message thing — but I couldn't text this because texting it would make it too easy to screenshot and send to the boys and I know how that goes. So yeah. That's it. That's the message. I'm going to go cringe for the next 48 hours. Call me back." },
-    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:11', time: 'Last week', transcript: "I drove past your place. Not on purpose. I mean it was a little on purpose." },
+    { from: 'rileigh_l_s', label: 'Rileigh', duration: '1:08', time: 'Tonight 2:44 AM', transcript: "I just got home and I'm still kind of keyed up and I had such a good time tonight and I don't want it to be over. I keep replaying the part where you had your hand on my waist when we were walking and you probably didn't even think about it and I haven't stopped thinking about it. Come back to Sapulpa. I know it's a drive. I know it's late. I am worth the drive and we both know that. My address is 320 N 14th. I'll leave the porch light on. If you get here I'll make sure you don't regret it." },
+    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:50', time: 'Yesterday 8:00 PM', transcript: "You know what's funny? Guys drive from Tulsa for me all the time and I never really feel anything. And then there's you. And I feel everything. That's annoying. I didn't ask to feel everything. I'd like to feel it a little more though. Come over. Bring food. Stay late. My number is 918-261-6532 if you somehow lost it." },
+    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:58', time: '3 days ago', transcript: "Okay real talk. I want you to come here and I want to do things that are not appropriate to leave in a voicemail and I figure if I just say that plainly then we can stop dancing around it. I've been thinking about it for a while. I want to do all of it. You know where I live. Make the drive." },
+    { from: 'rileigh_l_s', label: 'Rileigh', duration: '0:11', time: 'Last week', transcript: "I drove past your place. Not on purpose. Three times." },
   ],
   Macy: [
-    { from: 'addison_and_macy', label: 'Macy', duration: '0:24', time: 'Today 11:01 PM', transcript: "Hey I just wanted to say you need to stop looking at me like that in public because Dre notices everything and it's going to cause a problem that neither of us wants. Not saying I mind it. Just saying be more careful." },
-    { from: 'addison_and_macy', label: 'Macy', duration: '0:38', time: '2 days ago', transcript: "I don't know why I'm calling you. I literally don't know why. I think I was just bored and Dre's asleep and I started thinking and then I picked up the phone and now here we are. Don't tell anyone I called. Actually you can't because you don't know who I am. Never mind. Bye." },
-    { from: 'addison_and_macy', label: 'Macy', duration: '0:15', time: '5 days ago', transcript: "If Dre asks — and he won't because he doesn't know about you — but if he does, you don't know me. We're clear? Okay. Good. You're cute btw." },
-    { from: 'addison_and_macy', label: 'Macy', duration: '0:44', time: 'Last week', transcript: "So here's the thing. I'm taken. That's real. And I'm not trying to blow anything up. But there's something about you that I can't stop thinking about and I've never been good at just letting things go. So I guess I'm calling to see if you feel it too or if I've just been in my head for three weeks for no reason. Message me back if you feel it. If you don't, forget I called." },
+    { from: 'addison_and_macy', label: 'Macy', duration: '1:02', time: 'Today 11:01 PM', transcript: "Dre's out. He's going to be gone until at least 1. I'm just going to say that and let you do whatever you want with that information. I've been thinking about you more than I should be. Way more. Like it's a problem. I get why girls go stupid for guys like you. I'm going stupid for you and I'm not usually stupid. I know what I'm doing. I'm choosing to do it anyway. My number is 918-805-3623. Text me if you want to come over. I'll make it very worth your time." },
+    { from: 'addison_and_macy', label: 'Macy', duration: '0:48', time: '2 days ago', transcript: "I sent you something earlier and I've been nervous about it ever since and Dre is sitting right next to me and has no idea and that should bother me more than it does. You make me want to be reckless. I'm not usually reckless. I'm being reckless. Text me back. Don't save my name in your phone." },
+    { from: 'addison_and_macy', label: 'Macy', duration: '0:20', time: '5 days ago', transcript: "If Dre ever saw these messages I'd have a real problem. He's big. You know he's big. I'm still calling you. That should tell you something about how bad I want to." },
+    { from: 'addison_and_macy', label: 'Macy', duration: '0:55', time: 'Last week', transcript: "I'm in the bath right now and I'm calling you because I'm bored and Dre's asleep and I have your number and I've been saying I wouldn't use it for two months. Guess I'm using it. I'm not going to pretend I don't know exactly what I'm doing. I know exactly what I'm doing. Come get me before I talk myself out of it. 918-805-3623. I'll pick up." },
   ],
 };
 
@@ -4380,31 +4327,42 @@ window.playVoicemail = function(girl, idx) {
   const key = `${girl}-${idx}`;
   vmTimers.forEach(clearTimeout);
   vmTimers = [];
-  // if already playing, stop
+  // if already playing, stop (but keep transcript open)
   if (vmPlaying === key) {
     vmPlaying = null;
-    buildVoicemail();
+    // just re-render play button state, keep transcript visible
+    const playBtn = document.querySelector(`#vm-${girl}-${idx} .vm-play-btn`);
+    if (playBtn) playBtn.textContent = '▶';
+    const fill = $(`vmfill-${girl}-${idx}`);
+    if (fill) { fill.style.transition='none'; fill.style.width='0%'; }
     return;
   }
   vmPlaying = key;
-  buildVoicemail();
+  // update all play buttons
+  document.querySelectorAll('.vm-play-btn').forEach(b => b.textContent = '▶');
+  const playBtn = document.querySelector(`#vm-${girl}-${idx} .vm-play-btn`);
+  if (playBtn) playBtn.textContent = '⏸';
+  // open transcript panel
+  document.querySelectorAll('.vm-transcript-wrap').forEach(el => el.classList.remove('open'));
+  const trWrap = $(`vmtr-${girl}-${idx}`);
+  if (trWrap) trWrap.classList.add('open');
   // animate scrubber
   const fill = $(`vmfill-${girl}-${idx}`);
-  if (fill) { fill.style.transition='none'; fill.style.width='0%'; setTimeout(()=>{fill.style.transition='width 6s linear'; fill.style.width='100%';},50); }
-  // type out transcript
+  if (fill) { fill.style.transition='none'; fill.style.width='0%'; setTimeout(()=>{ fill.style.transition='width 8s linear'; fill.style.width='100%'; },50); }
+  // type out transcript — stays on screen when done, no auto-close
   const vm = VOICEMAILS[girl][idx];
   const tEl = $(`vmt-${girl}-${idx}`);
   if (tEl) {
     tEl.textContent = '';
     const chars = vm.transcript.split('');
     chars.forEach((ch, i) => {
-      vmTimers.push(setTimeout(() => { tEl.textContent += ch; }, i * 28));
+      vmTimers.push(setTimeout(() => { tEl.textContent += ch; }, i * 22));
     });
-    // stop after full duration
+    // when done typing, just change play button back — transcript stays
     vmTimers.push(setTimeout(() => {
       vmPlaying = null;
-      buildVoicemail();
-    }, chars.length * 28 + 1000));
+      if (playBtn) playBtn.textContent = '▶';
+    }, chars.length * 22 + 200));
   }
 };
 
