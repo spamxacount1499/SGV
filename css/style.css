@@ -960,3 +960,431 @@ body.joi-open{overflow:hidden}
 .phone-photo-bubble{width:160px;max-height:220px;object-fit:cover;border-radius:14px;cursor:pointer;display:block;transition:opacity .2s}
 .phone-photo-bubble:hover{opacity:.9}
 .phone-bubble-photo{background:#e5e5ea;color:#555;font-size:12px;padding:8px 12px;border-radius:18px}
+/* ═══════════════════════════════════════════════════════
+   NEW CSS - ADD TO END OF style.css
+══════════════════════════════════════════════════════ */
+
+/* ── ENHANCED VAULT COLORS ── */
+:root {
+  --neon-pink: #ff006e;
+  --neon-purple: #b967ff;
+  --neon-blue: #05d9e8;
+  --hot-pink: #ff1744;
+}
+
+.vault-open {
+  --pink: var(--neon-pink);
+  --hot: var(--hot-pink);
+}
+
+.vault-title {
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple), var(--red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(255, 0, 110, 0.3);
+}
+
+.vault-div {
+  background: linear-gradient(90deg, transparent, var(--neon-pink), var(--neon-purple), var(--neon-pink), transparent);
+  box-shadow: 0 0 10px rgba(255, 0, 110, 0.4);
+}
+
+/* ── THE ROSTER ── */
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.roster-slot {
+  background: rgba(244, 167, 185, 0.03);
+  border: 1px solid var(--border);
+  padding: 12px;
+  transition: all 0.3s;
+}
+
+.roster-slot:hover {
+  border-color: var(--pink);
+  background: rgba(244, 167, 185, 0.06);
+}
+
+.roster-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.roster-drop {
+  min-height: 200px;
+  background: var(--bg2);
+  border: 2px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.3s;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.roster-drop:hover {
+  border-color: var(--pink);
+  background-color: rgba(244, 167, 185, 0.05);
+}
+
+.roster-drop.filled {
+  border-style: solid;
+  border-color: var(--pink);
+}
+
+.roster-drop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+.roster-drop .roster-model-name {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(13, 5, 8, 0.9);
+  padding: 4px 8px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--pink);
+  border: 1px solid var(--pink);
+  z-index: 2;
+}
+
+/* ── BINGO BOARD ── */
+.bingo-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  max-width: 500px;
+  margin: 0 auto 20px;
+}
+
+.bingo-cell {
+  aspect-ratio: 1;
+  background: rgba(244, 167, 185, 0.03);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  text-align: center;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.bingo-cell:hover {
+  border-color: var(--pink);
+  background: rgba(244, 167, 185, 0.08);
+}
+
+.bingo-cell.free {
+  background: linear-gradient(135deg, var(--gold), var(--pink));
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 12px;
+  border-color: var(--gold);
+}
+
+.bingo-cell.marked {
+  background: var(--pink);
+  color: var(--bg);
+  border-color: var(--pink);
+  font-weight: 600;
+  transform: scale(0.95);
+}
+
+.bingo-cell.marked::after {
+  content: '✓';
+  position: absolute;
+  font-size: 24px;
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.bingo-status {
+  text-align: center;
+  margin-top: 20px;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: var(--pink);
+  min-height: 30px;
+  font-style: italic;
+}
+
+.bingo-win {
+  animation: bingoWin 0.5s ease;
+}
+
+@keyframes bingoWin {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* ── LAST SEEN - INSTAGRAM ACTIVITY ── */
+.lastseen-instagram {
+  background: rgba(255, 34, 34, 0.03);
+  border: 1px solid rgba(255, 34, 34, 0.2);
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.insta-girl {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: rgba(255, 34, 34, 0.02);
+  border-bottom: 1px solid rgba(255, 34, 34, 0.1);
+  transition: all 0.3s;
+}
+
+.insta-girl:last-child {
+  border-bottom: none;
+}
+
+.insta-girl:hover {
+  background: rgba(255, 34, 34, 0.05);
+}
+
+.insta-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 2px solid var(--red2);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.insta-avatar.online::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: #00ff00;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 10px #00ff00;
+}
+
+.insta-info {
+  flex: 1;
+}
+
+.insta-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: var(--red);
+  margin-bottom: 4px;
+}
+
+.insta-status {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--red2);
+}
+
+.insta-status.online {
+  color: #00ff00;
+  text-shadow: 0 0 5px #00ff00;
+}
+
+/* ── SIGHTING BOARD ── */
+.sighting-board-wrap {
+  background: rgba(255, 34, 34, 0.03);
+  border: 1px solid rgba(255, 34, 34, 0.2);
+  padding: 20px;
+}
+
+.sighting-board-header {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 16px;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 34, 34, 0.2);
+}
+
+.sighting-board {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.sighting-pin {
+  background: rgba(255, 34, 34, 0.05);
+  border-left: 3px solid var(--red2);
+  padding: 12px 16px;
+  transition: all 0.3s;
+}
+
+.sighting-pin:hover {
+  background: rgba(255, 34, 34, 0.08);
+  border-left-color: var(--red);
+}
+
+.sighting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sighting-model {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.sighting-time {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--red3);
+}
+
+.sighting-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cc8888;
+  font-style: italic;
+}
+
+.sighting-location {
+  font-size: 11px;
+  color: var(--red2);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+/* ── ENHANCED VAULT EFFECTS ── */
+.secret-section {
+  position: relative;
+}
+
+.secret-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top, rgba(255, 0, 110, 0.05), transparent 50%);
+  pointer-events: none;
+}
+
+.vault-btn:hover {
+  box-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
+}
+
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 768px) {
+  .roster-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .bingo-board {
+    gap: 4px;
+  }
+  
+  .bingo-cell {
+    font-size: 8px;
+    padding: 4px;
+  }
+  
+  .sighting-board {
+    max-height: 300px;
+  }
+}
+
+/* ── VAULT ROSTER ── */
+.vault-roster .vault-slot {
+  background: rgba(255, 34, 34, 0.03);
+  border-color: rgba(255, 34, 34, 0.3);
+}
+
+.vault-roster .vault-slot:hover {
+  border-color: var(--red);
+  background: rgba(255, 34, 34, 0.08);
+}
+
+.vault-roster .vault-label {
+  color: var(--red);
+}
+
+.vault-roster .vault-drop {
+  border-color: rgba(255, 34, 34, 0.3);
+  background: rgba(255, 34, 34, 0.02);
+  color: var(--red2);
+}
+
+.vault-roster .vault-drop:hover {
+  border-color: var(--red);
+  background: rgba(255, 34, 34, 0.06);
+}
+
+.vault-roster .vault-drop.filled {
+  border-color: var(--red);
+  box-shadow: 0 0 20px rgba(255, 34, 34, 0.3);
+}
+
+.vault-roster .roster-model-name {
+  background: rgba(13, 5, 8, 0.95);
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* ── VAULT BINGO ── */
+.vault-bingo-board .bingo-cell {
+  background: rgba(255, 34, 34, 0.03);
+  border-color: rgba(255, 34, 34, 0.3);
+  color: var(--red2);
+}
+
+.vault-bingo-board .bingo-cell:hover {
+  border-color: var(--red);
+  background: rgba(255, 34, 34, 0.08);
+}
+
+.vault-bingo-board .bingo-cell.free {
+  background: linear-gradient(135deg, var(--red), var(--hot));
+  color: var(--bg);
+  border-color: var(--red);
+}
+
+.vault-bingo-board .bingo-cell.marked {
+  background: var(--red);
+  color: var(--bg);
+  border-color: var(--red);
+  box-shadow: 0 0 15px rgba(255, 34, 34, 0.5);
+}
+
+.vault-bingo-status {
+  color: var(--red);
+}
