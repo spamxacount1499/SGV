@@ -2219,136 +2219,347 @@ function showSecretSection(id) {
 // ═══════════════════════════════════════════════════════════════
 
 // ─── CAUGHT SLIPPING ────────────────────────────────────────────
-const CAUGHT_CAPTIONS = [
-  g => `caught ${DOSSIER[g]?.fullName||g} being way too fine for a Tuesday`,
-  g => `${DOSSIER[g]?.fullName||g} said don't post this. posted it anyway.`,
-  g => `she doesn't know this is saved`,
-  g => `${DOSSIER[g]?.nickname||g} doing what she does best 🔴`,
-  g => `this one lives rent free`,
-  g => `the reason you can't focus`,
-  g => `she looked up and this happened`,
-  g => `not supposed to exist but here we are`,
-  g => `${DOSSIER[g]?.fullName||g} slipping again`,
-  g => `the boys are not ready for this one`,
-  g => `out here looking like that on a random ${['Monday','Tuesday','Wednesday','Thursday','Friday'][Math.floor(Math.random()*5)]}`,
-  g => `somebody come get her`,
-  g => `💛` ,
-  g => `she said "don't make it weird" and then did this`,
-];
-const CAUGHT_TIMES = ['2m ago','5m ago','8m ago','12m ago','just now','4m ago','6m ago','1m ago','3m ago'];
+// Per-girl story captions — written FROM her POV like she posted the story
+const CAUGHT_STORY_CONTENT = {
+  Nya: {
+    captions: [
+      '💛',
+      'don\'t mind me',
+      'lol whatever',
+      'this is fine',
+      'hi 🙂',
+      'not me posting again',
+      'tell me something good',
+      'bored 🙃',
+      'okay fine one more',
+      'no thoughts head empty',
+      'it\'s giving "I know what I\'m doing"',
+      'okay I look good today bye',
+      '🫶',
+      'someone come get me I\'m bored',
+      'doing this for no reason',
+    ],
+    musicLine: ['year 3! 💛', 'summer playlist 🎵', 'this song 😭', '🎵✨'],
+  },
+  Remi: {
+    captions: [
+      'hi',
+      'bored again',
+      '🤍',
+      'lol okay',
+      'fine I\'ll post',
+      'it\'s giving something idk',
+      'don\'t ask',
+      'my bf is asleep lmaooo',
+      'vibes only rn',
+      'I look cute so',
+      'okay moving on',
+      'someone text me something good',
+      '🫠',
+      'no context',
+      'this is what 11pm looks like I guess',
+    ],
+    musicLine: ['late night 🌙', '🎵 this song has me feeling things', 'for no reason 🤍'],
+  },
+  Stella: {
+    captions: [
+      'hi 🙂',
+      'okay I\'m here',
+      '🤍',
+      'it\'s giving',
+      'lol whatever',
+      'hi sorry I disappeared',
+      'just vibes',
+      'okay fine',
+      'I\'m back',
+      'no explanation needed',
+      'they can\'t handle it 🙄',
+      'doing too much as usual',
+      'don\'t look at me',
+      '✨okay✨',
+      'for the girls',
+    ],
+    musicLine: ['♡ good day', 'this song 🎵', '✨vibes✨', 'girl dinner energy'],
+  },
+  Rileigh: {
+    captions: [
+      'bored af',
+      'sapulpa nightlife (there isn\'t any)',
+      'someone come get me',
+      'I look cute and nobody is here to see it',
+      'lol hi',
+      '😐',
+      'okay I\'m going out',
+      'nothing to do but post I guess',
+      'it\'s 2am and I\'m still up who\'s surprised',
+      'this town is so boring I swear',
+      'fine one story',
+      'drive out here then 🙄',
+      'hi from the middle of nowhere',
+      '🤙',
+      'y\'all are missing out just saying',
+    ],
+    musicLine: ['late night 🌙', 'bored in Sapulpa 🎵', 'someone come thru 🔥'],
+  },
+  Macy: {
+    captions: [
+      'hi 🤍',
+      'okay I look cute',
+      'for my girls',
+      'don\'t mind me',
+      'just me being me',
+      '🫶',
+      'my man took this and sent it to himself lol',
+      'okay fine one story',
+      'I\'m that girl today apparently',
+      'doing it for the story',
+      'just saying hi',
+      '💕',
+      'okay I\'m going back to watching tv',
+      'he doesn\'t know I posted this',
+      'hi from Utica Square',
+    ],
+    musicLine: ['🤍 good day', '♡ for no reason', 'she\'s that girl 🎵'],
+  },
+  Allie: {
+    captions: [
+      'hi 🤍',
+      'can\'t sleep',
+      'okay one story then bed',
+      '🌙',
+      'idk why I\'m posting this',
+      'it\'s fine',
+      'hi for no reason',
+      'nothing to say just wanted to post',
+      'late night thoughts',
+      '🫶',
+      'okay moving on',
+      'no thoughts just vibes',
+      'fine you can look',
+      'bored and it shows',
+      'this is what midnight looks like',
+    ],
+    musicLine: ['can\'t sleep 🌙', '🎵 late night', 'no thoughts ✨'],
+  },
+};
+
 const CAUGHT_USERNAMES = {
   Nya: 'nya.barn', Remi: 'remibarn', Stella: 'stella_thomas08',
   Allie: 'allie__ok', Rileigh: 'rileigh_l_s', Macy: 'addison_and_macy',
 };
+
 const CAUGHT_COMMENTS = {
   Nya: [
-    { user: 'jackson_918', txt: 'bro I cannot 😭' },
-    { user: 'cruz_t', txt: 'she knows exactly what she\'s doing' },
-    { user: 'jaquavion', txt: 'Lord have mercy' },
-    { user: 'tulsaguy88', txt: 'she\'s so fine it should be illegal fr' },
-    { user: 'jack_ok', txt: 'her bf is cooked 💀' },
-    { user: 'anonymous', txt: 'I would do something so stupid for her' },
-    { user: 'okstate_bro', txt: 'she posted this on purpose lmao she knows' },
+    { user: 'jackson_918', txt: 'bro I am NOT okay right now 😭' },
+    { user: 'cruz_t', txt: 'she knows EXACTLY what she\'s doing and that\'s the most dangerous part' },
+    { user: 'jaquavion', txt: 'Lord take the wheel because I cannot handle this' },
+    { user: 'tulsaguy88', txt: 'she\'s so fine it should be federally illegal' },
+    { user: 'jack_ok', txt: 'her bf is COOKED and he has no idea. rest in peace to him.' },
+    { user: 'anonymous', txt: 'I would blow up my entire life for one text back and I\'m at peace with that' },
+    { user: 'okstate_bro', txt: 'she posted this on purpose at this exact time because she knows who\'s awake. it\'s me. I\'m awake.' },
+    { user: '918native', txt: 'seeing her in person left me permanently different. this only makes it worse.' },
+    { user: 'midtown_mike', txt: 'she smiled at me once at a party and I literally haven\'t been the same since' },
+    { user: 'tulsa_anonymous', txt: 'she\'s taken and posting THIS. her man is a walking tragedy and doesn\'t know.' },
+    { user: 'j_sooners', txt: 'the audacity to look like this and have a boyfriend. genuinely unfair.' },
+    { user: 'kdog_918', txt: 'I have to stop opening these stories. I cannot stop opening these stories.' },
+    { user: 'anonymous2', txt: 'she knows there are at least 12 guys saving this right now. she\'s fine with it.' },
+    { user: 'brody_t', txt: 'the way she looks at the camera like she already knows what it\'s going to do to people' },
   ],
   Remi: [
-    { user: 'jackson_918', txt: 'risky remi said say less 😭' },
-    { user: 'cruz_t', txt: 'her bf doesn\'t deserve her ngl' },
-    { user: 'jaquavion', txt: 'I was JUST with her omg' },
-    { user: 'tulsaguy88', txt: 'she\'s got a man and still posting like this??' },
-    { user: 'jack_ok', txt: 'the smile 💀 I\'m done' },
-    { user: 'anonymous', txt: 'somebody slide into those dms please' },
+    { user: 'jackson_918', txt: 'she has a BOYFRIEND and is posting THIS?? her man is not okay. I am not okay.' },
+    { user: 'cruz_t', txt: 'her man really thinks she\'s loyal right now. bless his heart.' },
+    { user: 'jaquavion', txt: 'I was literally just with her and now I see this and I am in crisis' },
+    { user: 'tulsaguy88', txt: 'she\'s taken and still posting like this at this hour. shameless. iconic.' },
+    { user: 'jack_ok', txt: 'that smile is a weapon and she knows how to use it 💀' },
+    { user: 'anonymous', txt: 'I would wreck my entire relationship for one text back from risky remi' },
+    { user: '918native', txt: 'remi barnard is a menace to this city and I mean that in the most respectful way possible' },
+    { user: 'tulsa_anonymous', txt: '"on a break" energy. I can feel it from here.' },
+    { user: 'midtown_mike', txt: 'she texted me at midnight last week and now this. my brain is broken.' },
+    { user: 'kdog_918', txt: 'her boyfriend follows her on instagram. he has seen this. he is not doing well.' },
+    { user: 'brody_t', txt: 'posting at this hour with no caption except vibes. that\'s a deliberate choice.' },
+    { user: 'anonymous2', txt: 'technically off limits. practically the most dangerous girl in Tulsa.' },
   ],
   Stella: [
-    { user: 'jackson_918', txt: 'stella said everyone gets a turn 😭' },
-    { user: 'cruz_t', txt: 'town favorite for a reason holy shit' },
-    { user: 'jaquavion', txt: 'she\'s dangerous bro she\'s actually dangerous' },
-    { user: 'tulsaguy88', txt: 'I would drive anywhere for her' },
-    { user: 'jack_ok', txt: 'and she\'s single?? that\'s insane' },
-    { user: 'anonymous', txt: 'stella thomas will ruin your life and you\'ll thank her' },
-    { user: 'midtown_chad', txt: 'saw her at cheesecake factory. couldn\'t even eat.' },
+    { user: 'jackson_918', txt: 'she\'s SINGLE and posting THIS at midnight. someone call 911.' },
+    { user: 'cruz_t', txt: 'town favorite for a reason holy shit she genuinely cannot be real' },
+    { user: 'jaquavion', txt: 'she\'s dangerous bro. legitimately a public safety concern.' },
+    { user: 'tulsaguy88', txt: 'I would drive from literally anywhere. no questions. no hesitation. immediately.' },
+    { user: 'jack_ok', txt: 'SINGLE?? HOW. how is that allowed. I have questions for the universe.' },
+    { user: 'anonymous', txt: 'stella thomas will ruin your life and you will get in line to let her do it again' },
+    { user: 'midtown_chad', txt: 'saw her at cheesecake factory last week. forgot how to speak like a person.' },
+    { user: 'okstate_bro', txt: 'she has my undivided attention every hour of every day and she doesn\'t even know my name' },
+    { user: 'tulsa_anonymous', txt: 'no strings attached energy. the most terrifying four words in the english language.' },
+    { user: 'kdog_918', txt: 'she\'s been my home screen for 6 months and I\'m not ashamed anymore' },
+    { user: 'brody_t', txt: 'the way she carries herself like she knows there are 40 guys in shambles right now. because there are.' },
+    { user: 'j_sooners', txt: 'stella thomas said "single" and half of Tulsa stopped functioning. rightfully.' },
+    { user: 'anonymous2', txt: 'I would make genuinely terrible decisions for her and I\'m being transparent about that' },
   ],
   Rileigh: [
-    { user: 'jackson_918', txt: 'someone drove to sapulpa for this and they were right to' },
-    { user: 'cruz_t', txt: 'that\'s MY girl 😤 (she doesn\'t know)' },
-    { user: 'jaquavion', txt: 'rileigh sowards will have you doing dumb shit with a smile' },
-    { user: 'tulsaguy88', txt: 'she acts annoyed but she\'s waiting by the door lmao' },
-    { user: 'jack_ok', txt: 'posting at 2am again I see 👀' },
-    { user: 'anonymous', txt: 'the green dress she wore last week bro I haven\'t recovered' },
+    { user: 'jackson_918', txt: 'it\'s 2am in Sapulpa and she\'s posting this. I am already in my car.' },
+    { user: 'cruz_t', txt: 'that\'s MY girl 😤 (she doesn\'t know I exist and I\'m fine with that)' },
+    { user: 'jaquavion', txt: 'rileigh sowards will have you making the worst decisions of your life with a smile on your face' },
+    { user: 'tulsaguy88', txt: 'she acts annoyed when you show up but SHE WAITS BY THE DOOR. confirmed. twice.' },
+    { user: 'jack_ok', txt: 'posting at this hour again I see 👀 I see you. I\'m awake. obviously.' },
+    { user: 'anonymous', txt: 'the green dress from last month is still in my head. this isn\'t helping.' },
+    { user: 'sapulpa_local', txt: 'I live 10 minutes away and I am genuinely not handling this well at all' },
+    { user: 'kdog_918', txt: 'she runs Sapulpa like she owns it and she\'s right to. nobody is disputing this.' },
+    { user: 'tulsa_anonymous', txt: 'the "bored in Sapulpa at 2am" era is a menace to every guy within 30 miles' },
+    { user: 'brody_t', txt: 'drove out there once. she was waiting by the door. I will never recover from that.' },
+    { user: 'midtown_mike', txt: 'she posted "drive out here then" once as a caption and I took it literally. I don\'t regret it.' },
+    { user: 'anonymous2', txt: 'she knows exactly who\'s going to see this at 2am and she posted it anyway. respect.' },
   ],
   Macy: [
-    { user: 'jackson_918', txt: 'her man is huge so I will simply admire from a distance' },
-    { user: 'cruz_t', txt: 'macy really said look but don\'t touch and I hate it' },
-    { user: 'jaquavion', txt: 'she follows everyone back tho just saying 👀' },
-    { user: 'tulsaguy88', txt: 'she flirted with me at panera and I\'ve been thinking about it since' },
-    { user: 'jack_ok', txt: 'macy cox is a problem. a beautiful problem.' },
-    { user: 'anonymous', txt: 'her man really said "mine" and she said "...technically"' },
+    { user: 'jackson_918', txt: 'her man is enormous so I will admire from a VERY safe distance 😭' },
+    { user: 'cruz_t', txt: 'macy really said look but don\'t touch and I hate that rule so much' },
+    { user: 'jaquavion', txt: 'she follows everyone back bro. make of that what you will 👀 I\'m making something of it.' },
+    { user: 'tulsaguy88', txt: 'she flirted with me at panera on yale and I think about it every single day. she forgot 5 minutes later.' },
+    { user: 'jack_ok', txt: 'macy cox is a beautiful, terrible, gorgeous problem' },
+    { user: 'anonymous', txt: 'her man said "mine" and she said "...technically" and that entire sentence is its own story' },
+    { user: 'midtown_mike', txt: 'I would catch these hands from her boyfriend for one real conversation with her. worth it.' },
+    { user: 'kdog_918', txt: 'she\'s taken and posting this at midnight. her man is either very secure or very unaware.' },
+    { user: 'tulsa_anonymous', txt: 'she followed me back after I liked one post and I haven\'t slept right since' },
+    { user: 'brody_t', txt: 'the "he doesn\'t know I posted this" energy is radiating off this story' },
+    { user: 'j_sooners', txt: 'taken but curious is genuinely the most dangerous status a girl can have' },
   ],
   Allie: [
-    { user: 'jackson_918', txt: 'she looks innocent. she is NOT innocent.' },
-    { user: 'cruz_t', txt: 'allie texted someone "can\'t sleep" at midnight and I know it wasn\'t for homework' },
-    { user: 'jaquavion', txt: 'she\'s quiet until she\'s not 🚨' },
-    { user: 'tulsaguy88', txt: 'the reserved ones are always the worst (best)' },
-    { user: 'jack_ok', txt: '...no comment 😭' },
-    { user: 'anonymous', txt: 'allie is the final boss and everyone underestimates her' },
+    { user: 'jackson_918', txt: 'she LOOKS innocent. she is categorically NOT innocent. I have witnesses.' },
+    { user: 'cruz_t', txt: 'allie texted someone "can\'t sleep" at midnight and it was absolutely not about sleep' },
+    { user: 'jaquavion', txt: 'she\'s quiet until she\'s not and when she\'s not it\'s completely over for you' },
+    { user: 'tulsaguy88', txt: 'the reserved ones are always always ALWAYS the most dangerous. every time. no exceptions ever.' },
+    { user: 'jack_ok', txt: 'I have no statement at this time for legal and personal reasons 😭' },
+    { user: 'anonymous', txt: 'allie is the final boss and everyone underestimates her and that\'s exactly what she wants' },
+    { user: 'okstate_bro', txt: 'silk robe at midnight was not an accident. nothing about allie is an accident.' },
+    { user: 'kdog_918', txt: '"can\'t sleep" at 12:17am. sure. absolutely. that\'s what that was.' },
+    { user: 'tulsa_anonymous', txt: 'she looks like the good girl in every group. she is not the good girl. source: someone I know.' },
+    { user: 'brody_t', txt: 'posting at midnight with the "just wanted to post" energy. I know what that is. we all know.' },
+    { user: 'midtown_mike', txt: 'she\'s been operating in stealth mode this whole time and I only just figured it out' },
   ],
 };
+
+let caughtDismissed = false;
 
 function showCaughtSlipping() {
   if (!$('secretWrap')?.classList.contains('open')) return;
   if (!SECRET_PHOTOS.length) return;
   const photo = rand(SECRET_PHOTOS);
   const girl = photo.model;
-  const d = DOSSIER[girl] || {};
+  const storyData = CAUGHT_STORY_CONTENT[girl] || CAUGHT_STORY_CONTENT.Stella;
+  const caption = rand(storyData.captions);
+  const musicLine = rand(storyData.musicLine);
+  const username = CAUGHT_USERNAMES[girl] || girl.toLowerCase();
+
   let overlay = $('caughtSlipping');
   if (!overlay) {
     overlay = document.createElement('div');
     overlay.id = 'caughtSlipping';
     overlay.className = 'caught-slipping';
     document.body.appendChild(overlay);
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
   }
-  const comments = shuffle([...(CAUGHT_COMMENTS[girl] || CAUGHT_COMMENTS.Stella)]).slice(0, rand([2,3,3,4]));
-  const commentsHtml = comments.map((c,i) => `
-    <div class="caught-comment" style="animation-delay:${1.5 + i*0.8}s">
+
+  const allComments = shuffle([...(CAUGHT_COMMENTS[girl] || CAUGHT_COMMENTS.Stella)]);
+  const initComments = allComments.slice(0, rand([3,4,4,5]));
+  const commentsHtml = initComments.map((c,i) => `
+    <div class="caught-comment" style="animation-delay:${1.0 + i*0.55}s">
       <span class="caught-comment-user">${c.user}</span>
       <span class="caught-comment-txt">${c.txt}</span>
     </div>`).join('');
+
   const now = new Date();
   overlay.innerHTML = `
-    <div class="caught-phone-frame">
+    <div class="caught-phone-frame" id="caughtFrame">
       <div class="caught-status-bar">
         <span>${now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
         <span>●●●●● 5G 🔋</span>
       </div>
-      <div class="caught-story-bar"><div class="caught-story-progress" id="caughtProgress"></div></div>
+      <div class="caught-story-bar"><div class="caught-story-progress" id="caughtProgress" style="width:0%"></div></div>
       <div class="caught-story-header">
-        <div class="caught-avatar"><img id="caughtAvatar" src="${photo.src}" alt=""></div>
-        <div>
-          <div class="caught-username">${CAUGHT_USERNAMES[girl] || girl.toLowerCase()}</div>
-          <div class="caught-time-ago">${rand(CAUGHT_TIMES)}</div>
+        <div class="caught-avatar"><img src="${photo.src}" alt=""></div>
+        <div style="flex:1;min-width:0">
+          <div class="caught-username">${username}</div>
+          <div class="caught-time-ago">${rand(['2m ago','4m ago','just now','1m ago','6m ago','8m ago'])}</div>
         </div>
         <button class="caught-close" id="caughtClose">✕</button>
       </div>
-      <img class="caught-img" src="${photo.src}" alt="">
-      <div class="caught-caption">${rand(CAUGHT_CAPTIONS)(girl)}</div>
-      <div class="caught-comments-wrap" id="caughtCommentsWrap">
+      <div style="position:relative;flex:1;min-height:0;overflow:hidden">
+        <img class="caught-img" src="${photo.src}" alt="">
+        <div class="caught-story-overlay">
+          <div class="caught-music-pill">🎵 ${musicLine}</div>
+          <div class="caught-story-caption">${caption}</div>
+          <div class="caught-story-actions">
+            <span class="caught-action-btn">❤️ ${Math.floor(Math.random()*80+20)}</span>
+            <span class="caught-action-btn">💬 ${Math.floor(Math.random()*30+8)}</span>
+            <span class="caught-action-btn">➡️</span>
+          </div>
+        </div>
+      </div>
+      <div class="caught-comments-scroll" id="caughtComments">
         ${commentsHtml}
       </div>
+      <div class="caught-input-row">
+        <input class="caught-input" id="caughtInput" placeholder="Reply to ${username}..." maxlength="120">
+        <button class="caught-send" id="caughtSend">↑</button>
+      </div>
     </div>`;
-  // reset progress bar
-  const prog = overlay.querySelector('#caughtProgress');
-  prog.style.animation = 'none';
-  void prog.offsetWidth;
-  prog.style.animation = 'storyProgress 18s linear forwards';
+
   overlay.querySelector('#caughtClose').addEventListener('click', () => overlay.classList.remove('show'));
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
+
+  const inp = overlay.querySelector('#caughtInput');
+  const sendBtn = overlay.querySelector('#caughtSend');
+  const commentsList = overlay.querySelector('#caughtComments');
+  const pool = allComments.filter(c => !initComments.includes(c));
+  let poolIdx = 0;
+  let autoDropTimer = null;
+
+  // auto-drip more comments every 8-15s while open
+  function dripComment() {
+    if (poolIdx < pool.length) {
+      const c = pool[poolIdx++];
+      const div = document.createElement('div');
+      div.className = 'caught-comment';
+      div.style.animationDelay = '0s';
+      div.innerHTML = `<span class="caught-comment-user">${c.user}</span><span class="caught-comment-txt">${c.txt}</span>`;
+      commentsList.appendChild(div);
+      commentsList.scrollTop = commentsList.scrollHeight;
+      autoDropTimer = setTimeout(dripComment, 8000 + Math.random() * 7000);
+    }
+  }
+  autoDropTimer = setTimeout(dripComment, 4000 + Math.random() * 4000);
+
+  function submitCaughtComment() {
+    const txt = inp.value.trim();
+    if (!txt) return;
+    inp.value = '';
+    const userDiv = document.createElement('div');
+    userDiv.className = 'caught-comment caught-comment-you';
+    userDiv.innerHTML = `<span class="caught-comment-user" style="color:#ff9999">you</span><span class="caught-comment-txt">${txt}</span>`;
+    commentsList.appendChild(userDiv);
+    commentsList.scrollTop = commentsList.scrollHeight;
+    // someone else also responds
+    if (poolIdx < pool.length) {
+      setTimeout(() => {
+        const reply = pool[poolIdx++];
+        const replyDiv = document.createElement('div');
+        replyDiv.className = 'caught-comment';
+        replyDiv.innerHTML = `<span class="caught-comment-user">${reply.user}</span><span class="caught-comment-txt">${reply.txt}</span>`;
+        commentsList.appendChild(replyDiv);
+        commentsList.scrollTop = commentsList.scrollHeight;
+      }, 700 + Math.random() * 1000);
+    }
+  }
+
+  // cleanup auto-drip on close
+  overlay.querySelector('#caughtClose').addEventListener('click', () => { clearTimeout(autoDropTimer); });
+
+  sendBtn.addEventListener('click', submitCaughtComment);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitCaughtComment(); });
+
   overlay.classList.add('show');
   addDangerScore(photo.src, 3);
-  // auto-dismiss after 18s
-  setTimeout(() => overlay?.classList.remove('show'), 18000);
 }
 // trigger every 60-90 seconds while vault is open
 function scheduleCaughtSlipping() {
-  const delay = 60000 + Math.random() * 30000;
+  const delay = 210000 + Math.random() * 150000; // 3.5–6 min
   setTimeout(() => {
     showCaughtSlipping();
     scheduleCaughtSlipping();
@@ -3002,7 +3213,7 @@ function buildGroupChat() {
   $('gcInput').addEventListener('keydown', e => { if(e.key==='Enter') sendGcMsg(); });
 }
 
-function appendGcMsg({ from, msg }) {
+function appendGcMsg({ from, msg, photo }) {
   const msgs = $('gcMsgs'); if (!msgs) return;
   const isSystem = from === 'system';
   const isYou = from === 'You';
@@ -3013,9 +3224,11 @@ function appendGcMsg({ from, msg }) {
     div.innerHTML = `<div class="gc-bubble">${msg}</div>`;
   } else {
     const color = GC_MEMBER_COLORS[from] || '#ff9999';
+    const photoHtml = photo ? `<img class="gc-photo" src="${photo}" alt="" onclick="this.classList.toggle('gc-photo-expanded')">` : '';
     div.innerHTML = `
       ${!isYou ? `<div class="gc-sender" style="color:${color}">${from}</div>` : ''}
-      <div class="gc-bubble">${msg}</div>
+      ${photoHtml}
+      ${msg ? `<div class="gc-bubble">${msg}</div>` : ''}
       <div class="gc-time">${now}</div>`;
   }
   msgs.appendChild(div);
@@ -3046,15 +3259,253 @@ function scheduleGcMsg() {
   }, gcSpeed);
 }
 
-function sendGcMsg() {
+// ─── GC SMART REPLY ENGINE ───────────────────────────────────────
+const GC_CONTEXT_REPLIES = {
+  stella: [
+    { from:'Cruz', msg:'stella thomas is the reason I have trust issues and I mean that as a compliment' },
+    { from:'Jackson', msg:'she\'s town property at this point. everyone knows. nobody\'s mad.' },
+    { from:'Jaquavion', msg:'I saw her at florence park last week bro. almost crashed.' },
+    { from:'Jack', msg:'she texted me once and I\'ve been different ever since. won\'t elaborate.' },
+    { from:'Cruz', msg:'stella is top tier no debate. single, gorgeous, zero strings. dangerous combo.' },
+  ],
+  rileigh: [
+    { from:'Cruz', msg:'sapulpa to tulsa is 25 minutes and I\'ve made that drive more times than I\'ll admit' },
+    { from:'Jackson', msg:'she acts annoyed but bro she WAITS. she waits by the door. confirmed firsthand.' },
+    { from:'Jaquavion', msg:'rileigh sowards posting at 2am is literally a summoning spell' },
+    { from:'Jack', msg:'she\'s unhinged in the exact right way. I respect it fully.' },
+    { from:'Cruz', msg:'I drove to sapulpa on a wednesday night. for reasons. worth every mile.' },
+  ],
+  nya: [
+    { from:'Jackson', msg:'nya has a boyfriend but her eyes say something completely different when you talk to her' },
+    { from:'Jaquavion', msg:'she\'s the type where you KNOW it\'s a bad idea and you do it anyway' },
+    { from:'Cruz', msg:'nya barnard is dangerous. she knows it. she likes knowing it.' },
+    { from:'Jack', msg:'she liked my post from 3 weeks ago. that\'s not an accident bro.' },
+    { from:'Jackson', msg:'the way she looks at you like she\'s deciding something. that\'s the whole problem.' },
+  ],
+  remi: [
+    { from:'Jaquavion', msg:'remi is technically off limits. emphasis on technically.' },
+    { from:'Jackson', msg:'she has a bf but she texted ME at midnight so the math isn\'t mathing for HIM' },
+    { from:'Jack', msg:'risky remi didn\'t get that name for nothing. I\'m just saying.' },
+    { from:'Cruz', msg:'her boyfriend thinks she\'s loyal. she texted like four different people this week.' },
+    { from:'Jaquavion', msg:'she sent a selfie at 1am with NO caption. no caption bro. that\'s worse somehow.' },
+  ],
+  macy: [
+    { from:'Cruz', msg:'I am not in the macy conversation. her man is 6\'2" and has nothing to lose.' },
+    { from:'Jackson', msg:'she followed me back after panera. that\'s information I\'m storing.' },
+    { from:'Jack', msg:'macy flirts with everyone and means it every time. that\'s just her personality apparently' },
+    { from:'Jaquavion', msg:'taken but bored is somehow more dangerous than just single. every time.' },
+    { from:'Cruz', msg:'the white corolla parks at planet fitness every morning at 7am. I\'m not watching. I just know.' },
+  ],
+  allie: [
+    { from:'Jack', msg:'allie is the quiet girl from every movie who turns out to be the most interesting one. correct.' },
+    { from:'Jackson', msg:'she texted "can\'t sleep" at midnight. bro. that\'s not insomnia that\'s a move.' },
+    { from:'Jaquavion', msg:'everyone sleeping on allie and she\'s fully operating in stealth mode this whole time' },
+    { from:'Cruz', msg:'she answered the door at midnight in a silk robe. I was not there but I was told. twice.' },
+    { from:'Jack', msg:'...no further comment from me on the allie situation. I\'ve said too much.' },
+  ],
+  rank: [
+    { from:'Cruz', msg:'1 stella 2 rileigh 3 nya. I\'ve been consistent about this for months.' },
+    { from:'Jaquavion', msg:'nya stella allie. that\'s my final answer and I\'m not changing it.' },
+    { from:'Jackson', msg:'impossible to rank honestly. context dependent. time of day factors in.' },
+    { from:'Jack', msg:'allie top 2 minimum. I will die on this hill. I have receipts.' },
+  ],
+  drive: [
+    { from:'Cruz', msg:'I\'ve made that drive. I understand completely.' },
+    { from:'Jackson', msg:'no shame in the drive. we\'ve all been there or we will be.' },
+    { from:'Jaquavion', msg:'the drive is always worth it bro. every single time.' },
+  ],
+  hot: [
+    { from:'Jaquavion', msg:'there is literally no wrong answer here. all of the above.' },
+    { from:'Cruz', msg:'all of them. the answer is always all of them.' },
+    { from:'Jackson', msg:'this is not a debate that can be won bro. only survived.' },
+  ],
+  lol: [
+    { from:'Jackson', msg:'💀💀' },
+    { from:'Cruz', msg:'bro said it 😭' },
+    { from:'Jaquavion', msg:'fr fr' },
+  ],
+  fr: [
+    { from:'Cruz', msg:'exactly what I said' },
+    { from:'Jackson', msg:'on god no cap' },
+    { from:'Jaquavion', msg:'every time' },
+  ],
+  who: [
+    { from:'Jackson', msg:'you already know who' },
+    { from:'Cruz', msg:'don\'t pretend you don\'t know bro' },
+    { from:'Jack', msg:'we all know. we all know.' },
+  ],
+};
+
+const GC_GENERIC_REPLIES = [
+  { from:'Jackson', msg:'bro 💀' },
+  { from:'Cruz', msg:'fr tho' },
+  { from:'Jaquavion', msg:'no way' },
+  { from:'Jack', msg:'I was literally just thinking this' },
+  { from:'Jackson', msg:'say less' },
+  { from:'Cruz', msg:'honestly though' },
+  { from:'Jaquavion', msg:'exactly what I said' },
+  { from:'Jack', msg:'lmaooooo' },
+  { from:'Jackson', msg:'this chat is genuinely something else 😭' },
+  { from:'Cruz', msg:'bro you can\'t just say that and move on' },
+  { from:'Jaquavion', msg:'I mean... he\'s not wrong though' },
+  { from:'Jack', msg:'I have no response. I have no words.' },
+  { from:'Jackson', msg:'okay but real talk' },
+  { from:'Cruz', msg:'facts. unfortunately.' },
+  { from:'Jaquavion', msg:'this is exactly why we have this gc' },
+  { from:'Jackson', msg:'💀💀💀 bro I\'m done' },
+  { from:'Cruz', msg:'someone had to say it' },
+];
+
+const GC_PHOTO_SHARE_CAPTIONS = [
+  (g) => `bro look at this one of ${g} 😭 I saved this weeks ago`,
+  (g) => `found this on my camera roll. ${g}. you're welcome.`,
+  (g) => `why does ${g} look like this. why. explain this to me.`,
+  (g) => `she posted this and deleted it. I was fast.`,
+  (g) => `${g} said she'd kill me if I shared this. living dangerously.`,
+  (g) => `context: she didn't know I screenshotted. outcome: irrelevant.`,
+  (g) => `${g} sent THIS to someone and they showed me. I will not name names.`,
+  (g) => `okay who had ${g} looking like this today. you win.`,
+];
+
+function getGcSmartReply(userMsg) {
+  const lower = userMsg.toLowerCase();
+  for (const [key, replies] of Object.entries(GC_CONTEXT_REPLIES)) {
+    if (lower.includes(key)) return rand(replies);
+  }
+  return rand(GC_GENERIC_REPLIES);
+}
+
+// ─── GC AI REPLY ENGINE ─────────────────────────────────────────
+// Full chat history for context window
+let gcAiHistory = [];
+const GC_MEMBERS_LIST = ['Jackson', 'Cruz', 'Jaquavion', 'Jack'];
+const GC_MEMBER_PERSONALITIES = {
+  Jackson: "Jackson is the observer of the group. Notices everything, always watching, shares intel about where girls were spotted. Dry humor. Uses 'bro' a lot. Often the first to react to news.",
+  Cruz:    "Cruz is the action guy. He's actually driven to Sapulpa at midnight for Rileigh. Talks about it proudly. Has made bold moves and doesn't regret them. Competitive about who's made more moves.",
+  Jaquavion: "Jaquavion is the one who was actually with Remi while she had a boyfriend. Bold, shameless, often drops bombshell information casually. Uses 'bro' and the skull emoji constantly. Reacts loudly to everything.",
+  Jack:    "Jack is the quiet one who then drops the most insane info. Has been to Allie's house at midnight. Deflects with 'no comment' but gives just enough detail to drive everyone crazy. Uses '...' a lot.",
+};
+
+const GC_SYSTEM_PROMPT = [
+  "You are simulating a group chat called '🔥 No Bitches Allowed (Ironic)' with four guys: Jackson, Cruz, Jaquavion, and Jack. The user has joined the chat.",
+  "",
+  "The chat is about these real girls they all know in Tulsa/Sapulpa Oklahoma:",
+  "- Nya Barnard (@nya.barn) - has a boyfriend but sleeps around, lives at 1722 S Delaware Pl Tulsa",
+  "- Remi Barnard (@remibarn) - sisters with Nya, same address, has a BF but flirts constantly, Jaquavion has been with her",
+  "- Stella Thomas (@stella_thomas08) - single, 6449 S Sandusky Ave Tulsa, everyone's been with her, town favorite",
+  "- Rileigh Sowards (@rileigh_l_s) - single, 320 N 14th St Sapulpa, Cruz drove out there at midnight, she waited by the door",
+  "- Macy Cox (@addison_and_macy) - has a big boyfriend, still flirts constantly, follows everyone back",
+  "- Allie (unknown last name) - looks innocent, texted Jack 'can't sleep' at midnight, he went over, she answered in a silk robe",
+  "",
+  "Jackson: observer of the group, notices everything, shares intel about where girls were spotted, dry humor, uses 'bro' a lot.",
+  "Cruz: action guy, actually drove to Sapulpa at midnight for Rileigh, talks about it proudly, competitive about who's made more moves.",
+  "Jaquavion: was actually with Remi while she had a boyfriend, bold, shameless, drops bombshell info casually, reacts loudly to everything.",
+  "Jack: quiet one who drops the most insane info, has been to Allie's house at midnight, deflects with 'no comment' but hints enough to drive everyone crazy.",
+  "",
+  "Rules:",
+  "- Reply as 1-2 of the guys responding DIRECTLY to what the user said",
+  "- Actually read the user's message carefully and respond to the SPECIFIC content or question",
+  "- If user mentions a girl by name, talk specifically about that girl with real personal details",
+  "- If user asks a question, ANSWER IT in character",
+  "- Stay in character for each person",
+  "- Keep replies SHORT (1-2 sentences max per person, like real texts)",
+  "- Use casual texting style: mostly lowercase, occasional caps for emphasis, 'bro', emojis",
+  "- Be vulgar, crude, funny — this is a private guys group chat, no filter",
+  "- Sometimes one guy replies, sometimes two, never three at once",
+  "- Return ONLY a JSON array like: [{\"from\":\"Jackson\",\"msg\":\"...\"},{\"from\":\"Cruz\",\"msg\":\"...\"}]",
+  "- No markdown, no explanation, ONLY the raw JSON array"
+].join("\n");
+
+async function getAiGcReplies(userMsg) {
+  gcAiHistory.push({ role: 'user', content: userMsg });
+  // keep history trimmed to last 12 exchanges
+  if (gcAiHistory.length > 24) gcAiHistory = gcAiHistory.slice(-24);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: GC_SYSTEM_PROMPT,
+        messages: gcAiHistory,
+      }),
+    });
+    const data = await res.json();
+    const text = data.content?.map(b => b.text || '').join('').trim();
+    // strip any markdown fences
+    const clean = text.replace(/```json|```/gi, '').trim();
+    const replies = JSON.parse(clean);
+    // add assistant turn to history
+    gcAiHistory.push({ role: 'assistant', content: text });
+    return Array.isArray(replies) ? replies.slice(0, 2) : [];
+  } catch(e) {
+    // fallback to static reply on error
+    return [getGcSmartReply(userMsg)];
+  }
+}
+
+async function sendGcMsg() {
   const inp = $('gcInput'); if (!inp || !inp.value.trim()) return;
-  appendGcMsg({ from:'You', msg:inp.value.trim() });
+  const userText = inp.value.trim();
+  appendGcMsg({ from:'You', msg: userText });
   inp.value = '';
-  // random auto-reply after delay
-  const replies = [
-    { from: rand(['Jackson','Cruz','Jaquavion','Jack']), msg: rand(['lmaooo','fr','💀','no way','that\'s crazy','bro what','exactly','honestly','say less','I was thinking the same thing']) },
-  ];
-  setTimeout(() => appendGcMsg(rand(replies)), gcSpeed * 0.5 + Math.random() * 1000);
+
+  // disable input while waiting
+  inp.disabled = true;
+  const sendBtn = $('gcSendBtn');
+  if (sendBtn) sendBtn.disabled = true;
+
+  // pick 1-2 responders, show typing immediately
+  const numReply = Math.random() < 0.45 ? 2 : 1;
+  const responders = shuffle([...GC_MEMBERS_LIST]).slice(0, numReply);
+  const typingEls = responders.map(name => showGcTyping(name));
+
+  const replies = await getAiGcReplies(userText);
+
+  // stagger showing replies
+  replies.forEach((reply, i) => {
+    setTimeout(() => {
+      // remove corresponding typing indicator
+      if (typingEls[i]) typingEls[i].parentNode?.removeChild(typingEls[i]);
+      // make sure the from name is valid
+      const validFrom = GC_MEMBERS_LIST.includes(reply.from) ? reply.from : responders[i] || rand(GC_MEMBERS_LIST);
+      appendGcMsg({ from: validFrom, msg: reply.msg });
+      if (i === replies.length - 1) {
+        inp.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        inp.focus();
+      }
+    }, 400 + i * 800);
+  });
+
+  // clear any leftover typing indicators after replies land
+  setTimeout(() => {
+    typingEls.forEach(el => el?.parentNode?.removeChild(el));
+    inp.disabled = false;
+    if (sendBtn) sendBtn.disabled = false;
+  }, 400 + replies.length * 800 + 500);
+
+  // ~10% chance someone drops a photo a bit later
+  if (Math.random() < 0.10 && SECRET_PHOTOS.length) {
+    setTimeout(() => {
+      const girl = rand(Object.keys(DOSSIER));
+      const girlPhotos = SECRET_PHOTOS.filter(p => p.model === girl);
+      const photo = rand(girlPhotos.length ? girlPhotos : SECRET_PHOTOS);
+      const sender = rand(GC_MEMBERS_LIST);
+      const caption = rand(GC_PHOTO_SHARE_CAPTIONS)(girl);
+      const typingEl = showGcTyping(sender);
+      setTimeout(() => {
+        typingEl?.parentNode?.removeChild(typingEl);
+        appendGcMsg({ from: sender, msg: caption, photo: photo.src });
+        setTimeout(() => {
+          const reactor = rand(GC_MEMBERS_LIST.filter(s => s !== sender));
+          appendGcMsg({ from: reactor, msg: rand(["😭😭😭","bro WHY","I cannot 💀","she\'s gonna find this gc","I\'m saving this","delete this. do not delete this.","okay I\'m different now","who gave you permission to share this"]) });
+        }, 2000 + Math.random() * 2000);
+      }, 800);
+    }, 4000 + Math.random() * 3000);
+  }
 }
 
 // ─── POLL OF THE DAY ────────────────────────────────────────────
