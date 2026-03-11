@@ -68,6 +68,8 @@
       <button class="game-tab" data-pane="paneFmk">💋 F/M/K</button>
       <button class="game-tab" data-pane="paneSlot">🎰 Slots</button>
       <button class="game-tab" data-pane="paneRoast">🔥 Roast or Toast</button>
+      <button class="game-tab" data-pane="paneRoster">👑 The Roster</button>
+      <button class="game-tab" data-pane="paneBingo">🎯 Bingo</button>
     </div>
     <div class="game-pane on" id="paneWyr">
       <p class="wyr-score">Wins — Left: <span id="wyrScoreL">0</span> · Right: <span id="wyrScoreR">0</span></p>
@@ -146,6 +148,43 @@
         <button class="roast-submit" id="roastSubmit">POST IT</button>
       </div>
       <div class="roast-wall" id="roastWall"></div>
+    </div>
+
+    <!-- THE ROSTER -->
+    <div class="game-pane" id="paneRoster">
+      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px">Build your perfect girl. No compromises.</p>
+      <div class="roster-grid" id="rosterGrid">
+        <div class="roster-slot" data-part="face">
+          <div class="roster-label">FACE</div>
+          <div class="roster-drop" id="rosterFace" data-part="face">Click to select</div>
+        </div>
+        <div class="roster-slot" data-part="tits">
+          <div class="roster-label">TITS</div>
+          <div class="roster-drop" id="rosterTits" data-part="tits">Click to select</div>
+        </div>
+        <div class="roster-slot" data-part="ass">
+          <div class="roster-label">ASS</div>
+          <div class="roster-drop" id="rosterAss" data-part="ass">Click to select</div>
+        </div>
+        <div class="roster-slot" data-part="legs">
+          <div class="roster-label">LEGS</div>
+          <div class="roster-drop" id="rosterLegs" data-part="legs">Click to select</div>
+        </div>
+        <div class="roster-slot" data-part="feet">
+          <div class="roster-label">FEET</div>
+          <div class="roster-drop" id="rosterFeet" data-part="feet">Click to select</div>
+        </div>
+      </div>
+      <button class="game-btn primary" id="rosterRandom">🎲 Random Build</button>
+      <button class="game-btn" id="rosterClear">Clear All</button>
+    </div>
+
+    <!-- BINGO -->
+    <div class="game-pane" id="paneBingo">
+      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px">Find them all. Get BINGO.</p>
+      <div class="bingo-board" id="bingoBoard"></div>
+      <button class="game-btn primary" id="bingoNew">New Card 🎯</button>
+      <div class="bingo-status" id="bingoStatus"></div>
     </div>
   </div>
 </section>
@@ -582,9 +621,17 @@
         <div class="secret-section" id="slastseen">
           <div class="game-wrap">
             <h2 class="game-title vault-title">📍 Last Seen</h2>
-            <p class="game-sub">Real-time location intel. Classified.</p>
+            <p class="game-sub">Real-time surveillance. Eyes everywhere.</p>
             <div class="div vault-div"></div>
-            <div class="lastseen-wrap" id="lastSeenList"></div>
+            
+            <!-- Instagram Activity -->
+            <div class="lastseen-instagram" id="lastSeenInsta"></div>
+            
+            <!-- Sighting Board -->
+            <div class="sighting-board-wrap">
+              <div class="sighting-board-header">🔍 Recent Sightings</div>
+              <div class="sighting-board" id="sightingBoard"></div>
+            </div>
           </div>
         </div>
 
@@ -709,6 +756,51 @@
             <p class="game-sub">We tracked everything. You should be concerned.</p>
             <div class="div vault-div"></div>
             <div id="rateNightWrap"></div>
+          </div>
+        </div>
+
+        <!-- VAULT ROSTER -->
+        <div class="secret-section" id="sroster">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">👑 Perfect Build</h2>
+            <p class="game-sub">Build her. Your way. No limits.</p>
+            <div class="div vault-div"></div>
+            <div class="roster-grid vault-roster" id="vaultRosterGrid">
+              <div class="roster-slot vault-slot" data-part="face">
+                <div class="roster-label vault-label">FACE</div>
+                <div class="roster-drop vault-drop" id="vaultRosterFace" data-part="face">Click to select</div>
+              </div>
+              <div class="roster-slot vault-slot" data-part="tits">
+                <div class="roster-label vault-label">TITS</div>
+                <div class="roster-drop vault-drop" id="vaultRosterTits" data-part="tits">Click to select</div>
+              </div>
+              <div class="roster-slot vault-slot" data-part="ass">
+                <div class="roster-label vault-label">ASS</div>
+                <div class="roster-drop vault-drop" id="vaultRosterAss" data-part="ass">Click to select</div>
+              </div>
+              <div class="roster-slot vault-slot" data-part="legs">
+                <div class="roster-label vault-label">LEGS</div>
+                <div class="roster-drop vault-drop" id="vaultRosterLegs" data-part="legs">Click to select</div>
+              </div>
+              <div class="roster-slot vault-slot" data-part="feet">
+                <div class="roster-label vault-label">FEET</div>
+                <div class="roster-drop vault-drop" id="vaultRosterFeet" data-part="feet">Click to select</div>
+              </div>
+            </div>
+            <button class="game-btn vault-btn" id="vaultRosterRandom">🎲 Random Build</button>
+            <button class="game-btn vault-btn" id="vaultRosterClear">Clear All</button>
+          </div>
+        </div>
+
+        <!-- VAULT BINGO -->
+        <div class="secret-section" id="sbingo">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">🎯 Vault Bingo</h2>
+            <p class="game-sub">Find them all. Prove you've seen everything.</p>
+            <div class="div vault-div"></div>
+            <div class="bingo-board vault-bingo-board" id="vaultBingoBoard"></div>
+            <button class="game-btn vault-btn" id="vaultBingoNew">New Card 🎯</button>
+            <div class="bingo-status vault-bingo-status" id="vaultBingoStatus"></div>
           </div>
         </div>
 
