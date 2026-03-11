@@ -715,3 +715,34 @@ body.vault-open{overflow:hidden}
 @keyframes sparkleFly{to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy)));opacity:0}}
 @keyframes secIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 @keyframes particleFloat{0%{transform:translateY(0);opacity:.15}100%{transform:translateY(-100vh);opacity:0}}
+
+/* ── MISSING CLASSES RESTORED ── */
+.cmodel{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.cname{font-family:'Playfair Display',serif;font-size:12px;color:rgba(245,230,234,.9)}
+.card-num{position:absolute;top:8px;left:8px;font-size:9px;letter-spacing:2px;color:rgba(245,230,234,.3);font-family:'Montserrat',sans-serif;pointer-events:none}
+.shine{position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 60%);pointer-events:none}
+.empty-state{text-align:center;padding:80px 20px;color:var(--dim)}
+.empty-state .big{font-size:48px;opacity:.2;margin-bottom:16px}
+.empty-state p{font-size:16px;font-style:italic;margin-bottom:8px}
+.empty-state small{font-size:11px;letter-spacing:2px}
+/* draft */
+.draft-slots{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+.draft-slot{text-align:center;width:90px;cursor:pointer;transition:all .2s}
+.draft-slot-num{font-size:9px;letter-spacing:2px;color:var(--red3);margin-bottom:4px;text-transform:uppercase}
+.draft-slot-img{width:90px;height:120px;object-fit:cover;object-position:top;display:block;border:1px solid rgba(255,34,34,.2)}
+.draft-slot-name{font-size:9px;letter-spacing:1px;color:var(--red2);margin-top:4px}
+.draft-slot-empty{width:90px;height:120px;border:1px dashed rgba(255,34,34,.15);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--red3)}
+.draft-pick{cursor:pointer;transition:all .2s;text-align:center;width:70px}
+.draft-pick img{width:70px;height:93px;object-fit:cover;object-position:top;border:1px solid rgba(255,34,34,.15)}
+.draft-pick-name{font-size:8px;letter-spacing:1px;color:var(--red2);margin-top:3px}
+.draft-pool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px;border:1px solid rgba(255,34,34,.08)}
+.draft-pool-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--red2);margin:16px 0 8px}
+/* match result */
+.match-result{text-align:center;padding:32px 16px;animation:fadeSlide .4s ease}
+.match-result img{width:180px;height:240px;object-fit:cover;object-position:top;margin:0 auto 20px;display:block;border:1px solid rgba(244,167,185,.2)}
+/* roast */
+.roast-meta{font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:6px;font-style:normal;font-family:'Montserrat',sans-serif}
+.is-roast{border-left-color:#ff6666!important}
+/* misc */
+.bracket-champion-model{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--red2);margin-bottom:20px}
+.model-count{font-size:9px;color:var(--dim);margin-left:4px}
