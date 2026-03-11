@@ -783,3 +783,34 @@ body.vault-open{overflow:hidden}
 .vault-open .spin-modal-overlay{z-index:9350}
 .vault-open .spin-modal-box{background:#060000;border-color:rgba(255,34,34,.2);box-shadow:0 0 100px rgba(255,34,34,.1)}
 .vault-open .spin-modal-close:hover{border-color:var(--red);color:var(--red)}
+
+/* ── JOI MODE ── */
+.joi-overlay{display:none;position:fixed;inset:0;background:#000;z-index:9150;flex-direction:column}
+.joi-overlay.show{display:flex}
+body.joi-open{overflow:hidden}
+
+.joi-progress{position:absolute;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--pink));z-index:2;width:0%}
+
+.joi-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:0;transition:opacity .25s ease}
+
+.joi-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.7) 100%);z-index:1;pointer-events:none}
+
+/* cucumber — right side, vertically centered */
+.joi-cucumber-wrap{position:absolute;right:40px;top:50%;transform:translateY(-50%);z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:center;width:60px;height:300px}
+.joi-cucumber{font-size:52px;line-height:1;transform-origin:center bottom;user-select:none}
+
+/* top controls */
+.joi-controls{position:absolute;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;gap:16px;padding:16px 20px;background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent)}
+.joi-speed-wrap{display:flex;align-items:center;gap:8px}
+.joi-speed-label{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+.joi-speed-slider{-webkit-appearance:none;width:120px;height:2px;background:rgba(255,255,255,.2);outline:none;border-radius:2px;cursor:pointer}
+.joi-speed-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--pink);cursor:pointer;box-shadow:0 0 8px rgba(244,167,185,.5)}
+.joi-speed-val{font-size:11px;color:var(--pink);min-width:28px;font-family:'Montserrat',sans-serif}
+.joi-bpm-display{font-size:12px;letter-spacing:2px;color:var(--gold);font-family:'Montserrat',sans-serif}
+.joi-stop{margin-left:auto;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);font-size:9px;letter-spacing:3px;padding:6px 14px;cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif;text-transform:uppercase}
+.joi-stop:hover{border-color:var(--pink);color:var(--pink)}
+
+/* bottom info */
+.joi-info{position:absolute;bottom:0;left:0;right:0;z-index:4;padding:40px 24px 24px;background:linear-gradient(to top,rgba(0,0,0,.8),transparent);text-align:center}
+.joi-name{font-family:'Playfair Display',serif;font-size:20px;font-style:italic;color:var(--text);margin-bottom:4px}
+.joi-model{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--muted)}
