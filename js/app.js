@@ -418,11 +418,64 @@ function drawWheel(angle){
   ctx.beginPath();ctx.arc(cx,cy,18,0,2*Math.PI);ctx.fillStyle='#d4af37';ctx.fill();ctx.fillStyle='#000';ctx.font='bold 8px serif';ctx.textAlign='center';ctx.fillText('SGG',cx,cy+3);
 }
 function doSpin(velId,angleVar,canvasId,resultId,imgId,nameId,photos,colors){
+  const isVault = colors === SWC;
   let vel=0.18+Math.random()*0.25,ang=0,animId=null;
   $(velId)&&($(velId).disabled=true);
-  $(resultId).classList.remove('show');
-  function frame(){ang+=vel;vel*=0.988;drawWheelOn(canvasId,ang,photos,colors);if(vel>0.002){animId=requestAnimationFrame(frame);}else{$(velId)&&($(velId).disabled=false);const n=photos.length,arc=(2*Math.PI)/n,norm=((Math.PI-ang)%(2*Math.PI)+2*Math.PI)%(2*Math.PI),photo=photos[Math.floor(norm/arc)%n];$(imgId).src=photo.src;$(nameId).textContent=`${photo.name} · ${photo.model}`;$(resultId).classList.add('show');}}
+  if($(resultId)) $(resultId).classList.remove('show');
+  function frame(){
+    ang+=vel;vel*=0.988;drawWheelOn(canvasId,ang,photos,colors);
+    if(vel>0.002){animId=requestAnimationFrame(frame);}
+    else{
+      $(velId)&&($(velId).disabled=false);
+      const n=photos.length,arc=(2*Math.PI)/n,norm=((Math.PI-ang)%(2*Math.PI)+2*Math.PI)%(2*Math.PI),photo=photos[Math.floor(norm/arc)%n];
+      showSpinModal(photo, isVault);
+    }
+  }
   animId=requestAnimationFrame(frame);
+}
+
+function showSpinModal(photo, isVault) {
+  let modal = $('spinModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'spinModal';
+    modal.className = 'spin-modal-overlay';
+    modal.innerHTML = `
+      <div class="spin-modal-box" id="spinModalBox">
+        <button class="spin-modal-close" id="spinModalClose">✕</button>
+        <div class="spin-modal-label" id="spinModalLabel"></div>
+        <img class="spin-modal-img" id="spinModalImg" src="" alt="">
+        <div class="spin-modal-name" id="spinModalName"></div>
+        <div class="spin-modal-model" id="spinModalModel"></div>
+        <button class="spin-modal-again" id="spinModalAgain">Spin Again</button>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if(e.target===modal) closeSpinModal(); });
+    $('spinModalClose').addEventListener('click', closeSpinModal);
+    document.addEventListener('keydown', e => { if(e.key==='Escape') closeSpinModal(); });
+  }
+  $('spinModalLabel').textContent = isVault ? "TONIGHT'S PICK" : "TODAY'S PICK";
+  $('spinModalLabel').style.color = isVault ? 'var(--red)' : 'var(--gold)';
+  $('spinModalImg').src = photo.src;
+  $('spinModalName').textContent = photo.name;
+  $('spinModalModel').textContent = photo.model;
+  $('spinModalAgain').style.borderColor = isVault ? 'var(--red)' : 'var(--gold)';
+  $('spinModalAgain').style.color = isVault ? 'var(--red)' : 'var(--gold)';
+  $('spinModalAgain').onclick = () => {
+    closeSpinModal();
+    // re-trigger the right spin button
+    const btn = isVault ? $('sSpinBtn') : $('spinBtn');
+    if (btn) btn.click();
+  };
+  modal.classList.add('open');
+  // stagger image fade in
+  $('spinModalImg').style.opacity = '0';
+  setTimeout(() => { $('spinModalImg').style.opacity = '1'; }, 50);
+}
+
+function closeSpinModal() {
+  const modal = $('spinModal');
+  if (modal) modal.classList.remove('open');
 }
 function drawWheelOn(id,angle,photos,colors){
   const cv=$(id);if(!cv)return;const ctx=cv.getContext('2d'),cx=cv.width/2,cy=cv.height/2,r=cx-4;
@@ -2126,26 +2179,85 @@ const FEED_USERS = [
   'southside_ok','BradleyP','NateDogg_T','StreetLevel918',
 ];
 const FEED_ACTIONS = [
-  g => `liked ${DOSSIER[g]?.fullName||g}'s photo at ${rand(['midnight','1am','2am','3am','late last night','this morning'])}`,
-  g => `saved ${g} to their private collection`,
-  g => `viewed ${DOSSIER[g]?.fullName||g}'s full gallery`,
-  g => `rated ${g} ${rand(['9/10','10/10','easily a 10','dangerous/10','way too high/10'])}`,
-  g => `matched ${g}'s vibe on the alibi game`,
-  g => `picked ${g} for the 2am scenario`,
-  g => `smashed on ${DOSSIER[g]?.fullName||g} without hesitation`,
-  g => `spent ${rand(['8','12','20','35','47'])} minutes on ${g}'s photos`,
-  g => `put ${g} in S tier. immediately.`,
-  g => `looked up ${DOSSIER[g]?.addr||'Tulsa'} after seeing ${g}'s photos`,
-  g => `screenshot ${g}'s page (allegedly)`,
-  g => `drafted ${g} as their #1 pick`,
-  g => `said ${g} is "${rand(['untouchable','a problem','the one','dangerous','illegal','a 10 every time'])}"`,
-  g => `ran stalker mode on ${g} for ${rand(['3','5','8','12','20'])} minutes straight`,
-  g => `checked ${DOSSIER[g]?.insta||'her insta'} after seeing the vault`,
-  g => `rewound ${g}'s gallery ${rand(['twice','three times','four times','too many times'])}`,
-  g => `called ${DOSSIER[g]?.phone||'her number'} — no answer (probably for the best)`,
-  g => `gave ${g} a danger score of ${rand(['47','62','89','94','100'])}`,
+  // generic engagement
+  g => `liked ${DOSSIER[g]?.fullName||g}'s photo at ${rand(['midnight','1am','2am','3am','4am','late last night'])}`,
+  g => `saved ${DOSSIER[g]?.fullName||g} to their private collection`,
+  g => `viewed ${DOSSIER[g]?.fullName||g}'s full gallery ${rand(['twice','3 times','back to back','again'])}`,
+  g => `rated ${g} ${rand(['9/10','10/10','easily a 10','dangerous/10','too high/10','11/10 not fair'])}`,
+  g => `put ${g} in S tier. no hesitation.`,
+  g => `spent ${rand(['8','12','20','35','47','an hour'])} minutes on ${DOSSIER[g]?.fullName||g}'s photos`,
+  g => `rewound ${g}'s gallery ${rand(['twice','three times','four times','too many times to count'])}`,
+  g => `drafted ${DOSSIER[g]?.fullName||g} as their #1 pick`,
   g => `voted ${g} Most Wanted this session`,
-  g => `debated between ${g} and ${rand(ONLINE_GIRLS.filter(x=>x!==g))} for 10 minutes`,
+  g => `said ${g} is "${rand(['untouchable','a problem','the one','dangerous','illegal','a 10 every time','too real'])}"`,
+  // stalker/address specific
+  g => `looked up ${DOSSIER[g]?.addr||'her address'} on Google Maps`,
+  g => `searched "${DOSSIER[g]?.addr||'Tulsa OK'}" after seeing ${g}'s vault photos`,
+  g => `dropped a pin at ${DOSSIER[g]?.addr||'her place'} and saved it`,
+  g => `drove past ${DOSSIER[g]?.addr?.split(',')[0]||'her street'} twice tonight`,
+  g => `screenshotted ${g}'s address from the dossier`,
+  g => `typed "${DOSSIER[g]?.addr||'her address'}" into their GPS at ${rand(['11pm','midnight','1am','2am'])}`,
+  g => `saved ${DOSSIER[g]?.addr?.split(',')[0]||'her block'} in their contacts as "don't do it"`,
+  g => `ran stalker mode on ${g} for ${rand(['3','5','8','12','20','30'])} minutes straight`,
+  g => `checked if ${g}'s house has a driveway (it does)`,
+  // phone number specific
+  g => `called ${DOSSIER[g]?.phone||'her number'} — no answer`,
+  g => `texted ${DOSSIER[g]?.phone||'her number'} "u up" at 2am. no reply.`,
+  g => `saved ${DOSSIER[g]?.phone||'her digits'} as "${rand(['don\'t','bad idea','maybe','her 🔥','do not call'])}"`,
+  g => `called ${DOSSIER[g]?.phone||'her number'} blocked. hung up after one ring.`,
+  g => `copy-pasted ${DOSSIER[g]?.phone||'her number'} into their phone ${rand(['twice','three times','four times'])} before saving it`,
+  g => `texted ${DOSSIER[g]?.phone||'her'} "hey" at ${rand(['12:47am','1:13am','2:06am','11:58pm'])}. read receipt. no reply.`,
+  g => `has ${DOSSIER[g]?.phone||'her number'} memorized now. didn't mean to.`,
+  g => `almost called ${DOSSIER[g]?.phone||'the number'} three times. closed the app each time.`,
+  // instagram specific
+  g => `checked ${DOSSIER[g]?.insta||'her insta'} after the vault`,
+  g => `followed then unfollowed ${DOSSIER[g]?.insta||'her'} three times tonight`,
+  g => `screen-recorded ${DOSSIER[g]?.insta||'her instagram'} stories`,
+  g => `liked something on ${DOSSIER[g]?.insta||'her page'} from 47 weeks ago. panicked. unliked.`,
+  g => `went through every photo on ${DOSSIER[g]?.insta||'her profile'} in one sitting`,
+  g => `dm'd ${DOSSIER[g]?.insta||'her'} "hey" then deleted it 4 seconds later`,
+  g => `screenshot ${DOSSIER[g]?.insta||'her page'} — "for research"`,
+  g => `followed ${DOSSIER[g]?.insta||'her'} on a burner. she hasn't accepted yet.`,
+  // relationship status exploits
+  g => `picked ${g} because "${rand(['she has a boyfriend so it\'s fine','taken girls hit different','her man doesn\'t deserve her anyway','she said she\'s on a break'])}"`,
+  g => `messaged ${g} knowing she's taken. said "just being friendly"`,
+  g => `said ${g}'s situationship is "basically single"`,
+  g => `texted ${g} while her boyfriend was literally in her stories`,
+  g => `said "${g} picks up regardless" — based on experience apparently`,
+  // very personal per-girl
+  g => g==='Remi' ? `texted Remi (${DOSSIER.Remi.phone}) at 1am. her bf posted a story 10 min later. she never replied.` : `hit up ${g} at 1am knowing she's taken`,
+  g => g==='Stella' ? `drove down Sandusky Ave just to slow down in front of her house` : `drove past her street at ${rand(['11pm','midnight','1am'])}`,
+  g => g==='Rileigh' ? `made the drive to Sapulpa at midnight. worth it apparently.` : `made a 25 minute drive for her at midnight`,
+  g => g==='Macy' ? `messaged Macy knowing her man is 6'4" 240. said "I'll take those odds"` : `slid in knowing she's taken`,
+  g => g==='Nya' ? `found Nya on ${DOSSIER.Nya.insta} through the vault. following from a burner now.` : `found her insta from the dossier info`,
+  g => g==='Rileigh' ? `called ${DOSSIER.Rileigh.phone} — she picked up. conversation lasted 2 hours.` : `called her — she actually picked up`,
+  g => g==='Stella' ? `texted ${DOSSIER.Stella.phone} "you free tonight" at 11pm` : `texted her asking if she's free tonight`,
+  g => g==='Macy' ? `called ${DOSSIER.Macy.phone} from a blocked number just to hear her voice` : `called blocked just to hear her voice`,
+  g => g==='Remi' ? `looked up ${DOSSIER.Remi.addr} on street view. spent 12 minutes on that block.` : `looked up her address on street view`,
+  g => g==='Nya' ? `went to 1722 S Delaware and sat outside for 20 minutes` : `drove to her address and just... sat there`,
+  // alibi/game-based
+  g => `matched ${g} in the alibi game and didn't even feel bad`,
+  g => `picked ${g} for every scenario in the alibi game. every. single. one.`,
+  g => `smashed on ${DOSSIER[g]?.fullName||g} without hesitating`,
+  g => `gave ${g} a danger score of ${rand(['87','94','97','100','103 (broken the scale)'])}`,
+  g => `picked ${g} for the 2am scenario. twice.`,
+  g => `chose ${g} in F/M/K for all three options somehow`,
+  // late night energy
+  g => `opened the vault at ${rand(['2:14am','3:07am','12:53am','1:41am','4:02am'])} specifically for ${g}`,
+  g => `set ${g} as their phone wallpaper. changed it back before morning.`,
+  g => `told themselves "just 5 more minutes" looking at ${g}'s photos. 40 minutes ago.`,
+  g => `fell asleep with ${g}'s gallery open`,
+  g => `said "${g} could ruin my whole life and I'd thank her"`,
+  g => `said they're not obsessed with ${g}, just "very attentive"`,
+  g => `opened the vault just to look at ${g}. not even going to pretend otherwise.`,
+  // degenerate
+  g => `asked if ${g}'s address is accurate. (it is)`,
+  g => `said they'd drive to ${DOSSIER[g]?.addr?.split(',')[0]||'her street'} right now if asked`,
+  g => `voted ${g} "most likely to destroy me" for the third session in a row`,
+  g => `admitted they have ${g}'s schedule figured out`,
+  g => `said ${g} looks better every time they open the vault`,
+  g => `spent the last hour in ${g}'s section. no regrets stated.`,
+  g => `bookmarked ${DOSSIER[g]?.insta||'her instagram'} on three different devices`,
 ];
 
 const FEED_TIMESTAMPS = [
@@ -2887,12 +2999,12 @@ function runFeedNotif() {
     <div class="feed-notif-time">just now</div>`;
   feedNotifEl.classList.remove('hide');
   feedNotifEl.classList.add('show');
-  // hide after 20s, wait 30s total between notifications
+  // hide after 8s, gap 5s, then next
   setTimeout(() => {
     feedNotifEl.classList.add('hide');
     feedNotifEl.classList.remove('show');
-    setTimeout(runFeedNotif, 10000);
-  }, 20000);
+    setTimeout(runFeedNotif, 5000);
+  }, 8000);
 }
 
 function generateFeedBatch(n) {
