@@ -43,6 +43,7 @@
 
 <!-- GALLERY -->
 <section class="sec on" id="moodboard">
+  <div id="potdBanner" class="potd-banner"></div>
   <div class="fun-btns-bar">
     <button class="fun-btn" id="surpriseBtn">🎲 Surprise Me</button>
     <button class="fun-btn" id="randomGirlBtn">🔀 Random Girl</button>
@@ -269,6 +270,15 @@
         <button class="secret-model-btn" data-ssection="srankfit">👗 Rank the Fit</button>
         <button class="secret-model-btn" data-ssection="ssmashpass">💋 Smash or Pass</button>
         <button class="secret-model-btn" data-ssection="sfeed">📡 Activity Feed</button>
+        <button class="secret-model-btn" data-ssection="slastseen">📍 Last Seen</button>
+        <button class="secret-model-btn" data-ssection="snotes">📝 Secret Notes</button>
+        <button class="secret-model-btn" data-ssection="scompare">⚖️ Compare</button>
+        <button class="secret-model-btn" data-ssection="smatch">💘 Your Match</button>
+        <div class="secret-sidebar-divider"></div>
+        <div class="secret-sidebar-title">🆕 New</div>
+        <button class="secret-model-btn" data-ssection="sshesaid">🗣️ She Said</button>
+        <button class="secret-model-btn" data-ssection="sgroupchat">💬 Group Chat</button>
+        <button class="secret-model-btn" data-ssection="spollofday">🗳️ Poll</button>
       </aside>
 
       <!-- CONTENT -->
@@ -505,6 +515,90 @@
             <p class="game-sub">What's happening in the vault right now</p>
             <div class="div vault-div"></div>
             <div class="feed-wrap" id="feedWrap"></div>
+          </div>
+        </div>
+
+        <!-- LAST SEEN -->
+        <div class="secret-section" id="slastseen">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">📍 Last Seen</h2>
+            <p class="game-sub">Real-time location intel. Classified.</p>
+            <div class="div vault-div"></div>
+            <div class="lastseen-wrap" id="lastSeenList"></div>
+          </div>
+        </div>
+
+        <!-- SECRET NOTES -->
+        <div class="secret-section" id="snotes">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">📝 Secret Notes</h2>
+            <p class="game-sub">Private. Eyes only.</p>
+            <div class="div vault-div"></div>
+            <div id="notesContainer">
+              <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+                <select class="compare-sel" id="noteGirlSelect" style="min-width:120px">
+                  <option value="Nya">Nya</option>
+                  <option value="Remi">Remi</option>
+                  <option value="Stella">Stella</option>
+                  <option value="Allie">Allie</option>
+                  <option value="Rileigh">Rileigh</option>
+                  <option value="Macy">Macy</option>
+                </select>
+                <textarea id="noteInput" placeholder="Write something about her..." style="flex:1;min-width:200px;background:rgba(255,20,20,0.03);border:1px solid rgba(255,34,34,0.2);color:#cc8888;padding:10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;min-height:60px"></textarea>
+                <button class="game-btn vault-btn" onclick="submitNote()">Save ✦</button>
+              </div>
+              <div id="notesWall"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPARE -->
+        <div class="secret-section" id="scompare">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">⚖️ Compare</h2>
+            <p class="game-sub">Side by side. No mercy.</p>
+            <div class="div vault-div"></div>
+            <div id="compareWrap"></div>
+          </div>
+        </div>
+
+        <!-- MATCH CALCULATOR -->
+        <div class="secret-section" id="smatch">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">💘 Your Match</h2>
+            <p class="game-sub">5 questions. One answer.</p>
+            <div class="div vault-div"></div>
+            <div id="matchContainer"></div>
+          </div>
+        </div>
+
+        <!-- SHE SAID -->
+        <div class="secret-section" id="sshesaid">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">🗣️ She Said</h2>
+            <p class="game-sub">True or False — who actually said this?</p>
+            <div class="div vault-div"></div>
+            <div id="sheSaidContainer"></div>
+          </div>
+        </div>
+
+        <!-- GROUP CHAT -->
+        <div class="secret-section" id="sgroupchat">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">💬 Group Chat</h2>
+            <p class="game-sub">The boys are talking. You're in it.</p>
+            <div class="div vault-div"></div>
+            <div id="groupChatWrap"></div>
+          </div>
+        </div>
+
+        <!-- POLL OF THE DAY -->
+        <div class="secret-section" id="spollofday">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">🗳️ Poll of the Day</h2>
+            <p class="game-sub">One question. No wrong answers. (Some wrong answers.)</p>
+            <div class="div vault-div"></div>
+            <div id="pollContainer"></div>
           </div>
         </div>
 
