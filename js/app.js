@@ -1170,11 +1170,11 @@ $('shesABtn')&&$('shesABtn').addEventListener('click',showShesA);
 // ─── STALKER MODE ─────────────────────────────────────────────────────────────
 const STALKER_NICKNAMES = {
   Nya:     'Naughty Nya',
-  Remi:    'Rumptious Remi',
-  Stella:  'Slutty Stella',
+  Remi:    'Risky Remi',
+  Stella:  'Sweet Stella',
   Allie:   'Angelic Allie',
-  Rileigh: 'Raunchy Rileigh',
-  Macy:    'Minxy Macy',
+  Rileigh: 'Reckless Rileigh',
+  Macy:    'Mischievous Macy',
 };
 let stalkerTimer=null, stalkerIdx=0, stalkerPhotos=[], stalkerInterval=6000;
 function startStalkerMode() {
@@ -1699,3 +1699,379 @@ document.querySelectorAll('.card img').forEach(img => {
     }, { once: true });
   }
 });
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  NEW FEATURES: DOSSIER · ALIBI · RANK THE FIT · SMASH OR PASS
+//                LEADERBOARD · WHO'S ONLINE · ACTIVITY FEED
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── GIRL DOSSIER DATA ───────────────────────────────────────────
+const DOSSIER = {
+  Nya: {
+    nickname: 'Naughty Nya',
+    fullName: 'Nya Barnard',
+    status: 'Taken — but she sleeps around',
+    weakness: 'Tell her she\'s the prettiest in the room. Bite her neck. She folds.',
+    threat: 9,
+    addr: '1722 S Delaware Pl, Tulsa OK 74104',
+    insta: '@nya.barn',
+    phone: 'Unknown',
+    notes: 'Dangerous. Knows exactly what she\'s doing. Has a boyfriend but that hasn\'t stopped anyone.',
+  },
+  Remi: {
+    nickname: 'Risky Remi',
+    fullName: 'Remi Barnard',
+    status: 'Has a BF — flirts with everyone anyway',
+    weakness: 'Compliment her smile. Get her laughing. She\'s a sucker for attention she\'s not supposed to want.',
+    threat: 8,
+    addr: '1722 S Delaware Pl, Tulsa OK 74104',
+    insta: '@remibarn',
+    phone: '918-284-8365',
+    notes: 'Technically off limits. Practically not. If you make her feel seen she forgets she has a boyfriend.',
+  },
+  Stella: {
+    nickname: 'Sweet Stella',
+    fullName: 'Stella Thomas',
+    status: 'Single — everyone\'s been there',
+    weakness: 'Touch the small of her back. Whisper. She pretends to resist for about 30 seconds.',
+    threat: 10,
+    addr: '6449 S Sandusky Ave, Tulsa OK 74136',
+    insta: '@stella_thomas08',
+    phone: '918-998-5774',
+    notes: 'Town favorite for a reason. No strings attached, no drama. Just don\'t catch feelings.',
+  },
+  Allie: {
+    nickname: 'Angelic Allie',
+    fullName: 'Allie',
+    status: 'Single — reserved but lowkey flirty',
+    weakness: 'Be patient. She needs to feel safe first. Once she trusts you, she\'s a completely different girl.',
+    threat: 7,
+    addr: 'Tulsa, Oklahoma',
+    insta: 'Unknown',
+    phone: 'Unknown',
+    notes: 'Acts innocent. Isn\'t. Takes longer to crack but once you do — worth every second.',
+  },
+  Rileigh: {
+    nickname: 'Reckless Rileigh',
+    fullName: 'Rileigh Sowards',
+    status: 'Single — runs Sapulpa like she owns it',
+    weakness: 'Drive out to her. Show up unexpected. She acts annoyed, she\'s not.',
+    threat: 9,
+    addr: '320 N 14th St, Sapulpa OK',
+    insta: '@rileigh_l_s',
+    phone: '918-261-6532',
+    notes: 'Sapulpa\'s worst kept secret. She knows everyone and everyone knows her. Unpredictable in the best way.',
+  },
+  Macy: {
+    nickname: 'Mischievous Macy',
+    fullName: 'Macy Cox',
+    status: 'Taken — dating a big guy, good luck',
+    weakness: 'She likes feeling wanted even if she can\'t act on it. Make her feel like the main character.',
+    threat: 8,
+    addr: 'Tulsa, Oklahoma',
+    insta: '@addison_and_macy',
+    phone: '918-805-3623',
+    notes: 'Has a man. A big one. But she still likes attention and isn\'t exactly quiet about it.',
+  },
+};
+
+function buildDossier() {
+  const tabs = $('dossierTabs'); if (!tabs) return;
+  const card = $('dossierCard');
+  const girls = Object.keys(DOSSIER);
+  tabs.innerHTML = girls.map(g => `<button class="dossier-tab" data-girl="${g}">${g}</button>`).join('');
+  function showDossier(girl) {
+    const d = DOSSIER[girl];
+    const stars = '⚡'.repeat(d.threat) + '·'.repeat(10 - d.threat);
+    card.innerHTML = `
+      <div class="dossier-header">
+        <div class="dossier-nickname">${d.nickname}</div>
+        <div class="dossier-fullname">${d.fullName}</div>
+      </div>
+      <div class="dossier-row"><span class="dossier-label">STATUS</span><span class="dossier-val">${d.status}</span></div>
+      <div class="dossier-row"><span class="dossier-label">WEAKNESS</span><span class="dossier-val dossier-weakness">${d.weakness}</span></div>
+      <div class="dossier-row"><span class="dossier-label">THREAT LEVEL</span><span class="dossier-val dossier-threat">${stars} ${d.threat}/10</span></div>
+      <div class="dossier-row"><span class="dossier-label">ADDRESS</span><span class="dossier-val">📍 ${d.addr}</span></div>
+      <div class="dossier-row"><span class="dossier-label">INSTAGRAM</span><span class="dossier-val">📸 ${d.insta}</span></div>
+      <div class="dossier-row"><span class="dossier-label">PHONE</span><span class="dossier-val">📞 ${d.phone}</span></div>
+      <div class="dossier-notes">"${d.notes}"</div>
+    `;
+    tabs.querySelectorAll('.dossier-tab').forEach(t => t.classList.toggle('on', t.dataset.girl === girl));
+  }
+  tabs.querySelectorAll('.dossier-tab').forEach(t => t.addEventListener('click', () => showDossier(t.dataset.girl)));
+  showDossier(girls[0]);
+}
+buildDossier();
+
+// ─── ALIBI GAME ──────────────────────────────────────────────────
+const ALIBI_SCENARIOS = [
+  { prompt: "It's 2:47am. Your phone lights up. Who is it?", type: 'pick1' },
+  { prompt: "You got one night, no consequences, no one finds out. Who are you calling?", type: 'pick1' },
+  { prompt: "You're stuck in a hotel room for 24 hours with no wifi. Who do you want in that room?", type: 'pick1' },
+  { prompt: "She texts you 'come over, parents are gone.' Who do you drop everything for?", type: 'pick1' },
+  { prompt: "You're driving around at midnight. Who's in the passenger seat?", type: 'pick1' },
+  { prompt: "One of them is your alibi for the whole night. Who do you trust to cover for you?", type: 'pick1' },
+  { prompt: "She's sending texts she shouldn't be sending. Who's in your inbox right now?", type: 'pick1' },
+  { prompt: "Last person you see before everything goes sideways. Who is it?", type: 'pick1' },
+  { prompt: "She wants to sneak out. You're the getaway driver. Who are you picking up?", type: 'pick1' },
+  { prompt: "You wake up and she's still there. Who do you not mind seeing at 7am?", type: 'pick1' },
+  { prompt: "Who's the one you'd actually delete the texts for?", type: 'pick1' },
+  { prompt: "She invites you to her place when her man is out of town. Who just texted?", type: 'pick1' },
+  { prompt: "You've got 30 minutes before someone gets home. Who are you with?", type: 'pick1' },
+  { prompt: "Which one has you checking your phone every 5 minutes?", type: 'pick1' },
+  { prompt: "She calls crying at 1am. Who do you actually get up for?", type: 'pick1' },
+  { prompt: "You can only save one contact. Who stays in your phone?", type: 'pick1' },
+  { prompt: "Who are you texting right now that you probably shouldn't be?", type: 'pick1' },
+  { prompt: "She says 'I won't tell anyone.' Who do you believe?", type: 'pick1' },
+  { prompt: "Who's the one you'd risk it all for, no questions asked?", type: 'pick1' },
+  { prompt: "Last call of the night. Who picks up?", type: 'pick1' },
+];
+
+const ALIBI_REACTIONS = {
+  Nya: ["bold choice, her bf is right there 💀", "naughty nya living up to the name", "you're brave fr", "she'll say yes but deny it tomorrow"],
+  Remi: ["her boyfriend is gonna find out lmao", "risky remi doing what she does", "you're not the first. won't be the last.", "she flirts back every time tho ngl"],
+  Stella: ["classic. everyone picks stella.", "stella season never ends", "honestly the correct answer", "no judgment. everyone already knows."],
+  Allie: ["she's quieter about it but don't be fooled", "angelic allie... sure", "she's gonna make you work for it", "reserved in public, different story in private"],
+  Rileigh: ["sapulpa to tulsa for this one huh", "reckless rileigh, no surprise", "she's already on her way", "she acts annoyed but she's not"],
+  Macy: ["bro her man is BUILT 💀", "mischievous macy loves the attention", "she's taken but she loves feeling wanted", "bold. very bold."],
+};
+
+let alibiIdx = 0;
+const alibiOrder = shuffle([...Array(ALIBI_SCENARIOS.length).keys()]);
+
+function buildAlibi() {
+  const arena = $('alibiArena'); if (!arena) return;
+  const sc = ALIBI_SCENARIOS[alibiOrder[alibiIdx % alibiOrder.length]];
+  $('alibiScenario').textContent = sc.prompt;
+  $('alibiReaction').textContent = '';
+  const girls = Object.keys(DOSSIER);
+  arena.innerHTML = girls.map(g => `
+    <button class="alibi-btn" data-girl="${g}">
+      <div class="alibi-name">${DOSSIER[g].nickname}</div>
+      <div class="alibi-sub">${g}</div>
+    </button>`).join('');
+  arena.querySelectorAll('.alibi-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const g = btn.dataset.girl;
+      const reactions = ALIBI_REACTIONS[g] || ["interesting choice..."];
+      $('alibiReaction').textContent = rand(reactions);
+      arena.querySelectorAll('.alibi-btn').forEach(b => b.classList.remove('picked'));
+      btn.classList.add('picked');
+      addDangerScore(g, 2);
+    });
+  });
+}
+$('alibiNext') && $('alibiNext').addEventListener('click', () => { alibiIdx++; buildAlibi(); });
+buildAlibi();
+
+// ─── RANK THE FIT ────────────────────────────────────────────────
+let rankfitCurrent = [];
+function buildRankFit() {
+  const pool = $('rankfitPool'); const slots = $('rankfitSlots');
+  if (!pool || !slots) return;
+  if (!SECRET_PHOTOS.length) { pool.innerHTML = '<p style="color:#8a3030;text-align:center">No vault photos yet</p>'; return; }
+  rankfitCurrent = shuffle(SECRET_PHOTOS).slice(0, 6);
+  pool.innerHTML = rankfitCurrent.map((p, i) => `
+    <div class="rankfit-item" draggable="true" data-idx="${i}">
+      <img src="${p.src}" alt="">
+      <div class="rankfit-label">${p.model}</div>
+    </div>`).join('');
+  slots.innerHTML = Array.from({length: rankfitCurrent.length}, (_, i) => `
+    <div class="rankfit-slot" data-rank="${i+1}">
+      <div class="rankfit-rank">#${i+1}</div>
+      <div class="rankfit-drop-area">Drop here</div>
+    </div>`).join('');
+  // drag events
+  let dragging = null;
+  pool.querySelectorAll('.rankfit-item').forEach(item => {
+    item.addEventListener('dragstart', () => { dragging = item; item.classList.add('dragging'); });
+    item.addEventListener('dragend', () => { item.classList.remove('dragging'); dragging = null; });
+  });
+  slots.querySelectorAll('.rankfit-slot').forEach(slot => {
+    slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('over'); });
+    slot.addEventListener('dragleave', () => slot.classList.remove('over'));
+    slot.addEventListener('drop', e => {
+      e.preventDefault(); slot.classList.remove('over');
+      if (!dragging) return;
+      const drop = slot.querySelector('.rankfit-drop-area');
+      if (slot.querySelector('.rankfit-item')) {
+        // swap back to pool
+        pool.appendChild(slot.querySelector('.rankfit-item'));
+      }
+      drop.textContent = '';
+      drop.appendChild(dragging);
+    });
+  });
+}
+$('rankfitShuffle') && $('rankfitShuffle').addEventListener('click', buildRankFit);
+buildRankFit();
+
+// ─── SMASH OR PASS ───────────────────────────────────────────────
+const smpScores = {};
+let smpPool = [], smpIdx = 0;
+function smpInit() {
+  if (!SECRET_PHOTOS.length) return;
+  smpPool = shuffle(SECRET_PHOTOS);
+  smpIdx = 0;
+  smpNext();
+}
+function smpNext() {
+  if (!smpPool.length) return;
+  const photo = smpPool[smpIdx % smpPool.length];
+  $('smpImg').src = photo.src;
+  $('smpOverlay').textContent = '';
+  $('smpOverlay').className = 'hon-overlay';
+  renderSmpLeaderboard();
+}
+function smpVote(vote, photo) {
+  const key = photo.model;
+  if (!smpScores[key]) smpScores[key] = { smash: 0, pass: 0 };
+  smpScores[key][vote]++;
+  $('smpOverlay').textContent = vote === 'smash' ? '💋 SMASH' : '✗ PASS';
+  $('smpOverlay').classList.add(vote === 'smash' ? 'hot' : 'not');
+  addDangerScore(photo.src, vote === 'smash' ? 4 : 0);
+  setTimeout(() => { smpIdx++; smpNext(); }, 700);
+  renderSmpLeaderboard();
+}
+function renderSmpLeaderboard() {
+  const lb = $('smpLeaderboard'); if (!lb) return;
+  const girls = Object.keys(smpScores).sort((a, b) => (smpScores[b].smash||0) - (smpScores[a].smash||0));
+  if (!girls.length) { lb.innerHTML = ''; return; }
+  lb.innerHTML = '<div style="font-size:9px;letter-spacing:3px;color:#8a3030;margin-bottom:10px;text-transform:uppercase">Smash Rate</div>' +
+    girls.map(g => {
+      const s = smpScores[g]; const total = s.smash + s.pass;
+      const pct = total ? Math.round(s.smash / total * 100) : 0;
+      return `<div class="smp-row"><span class="smp-name">${g}</span><div class="smp-bar-wrap"><div class="smp-bar" style="width:${pct}%"></div></div><span class="smp-pct">${pct}%</span></div>`;
+    }).join('');
+}
+$('smpSmash') && $('smpSmash').addEventListener('click', () => { const p = smpPool[smpIdx % smpPool.length]; if(p) smpVote('smash', p); });
+$('smpPass') && $('smpPass').addEventListener('click', () => { const p = smpPool[smpIdx % smpPool.length]; if(p) smpVote('pass', p); });
+smpInit();
+
+// ─── LEADERBOARD ─────────────────────────────────────────────────
+function buildLeaderboard() {
+  const el = $('leaderboardList'); if (!el) return;
+  // Count likes per model from state.likes (src-based)
+  const counts = {};
+  Object.keys(DOSSIER).forEach(g => counts[g] = 0);
+  state.likes.forEach(src => {
+    const photo = SECRET_PHOTOS.find(p => p.src === src);
+    if (photo && counts[photo.model] !== undefined) counts[photo.model]++;
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣'];
+  el.innerHTML = sorted.map(([girl, count], i) => `
+    <div class="lb-row">
+      <span class="lb-medal">${medals[i]||'·'}</span>
+      <span class="lb-name">${DOSSIER[girl]?.nickname||girl}</span>
+      <div class="lb-bar-wrap"><div class="lb-bar" style="width:${count ? Math.min(count*10,100) : 2}%"></div></div>
+      <span class="lb-count">${count} like${count!==1?'s':''}</span>
+    </div>`).join('');
+}
+
+// ─── WHO'S ONLINE ────────────────────────────────────────────────
+const ONLINE_GIRLS = ['Nya','Remi','Stella','Allie','Rileigh','Macy'];
+function updateOnlineIndicator() {
+  const el = $('onlineIndicator'); if (!el) return;
+  const active = rand(ONLINE_GIRLS);
+  el.innerHTML = `<span class="online-dot"></span><span class="online-name">● ${active} is active</span>`;
+  el.title = `${active} was last seen recently`;
+}
+updateOnlineIndicator();
+setInterval(updateOnlineIndicator, 12000);
+
+// ─── ACTIVITY FEED ───────────────────────────────────────────────
+const FEED_USERS = [
+  'jackson_918','cruz_t','jaquavion','tulsaguy88','anonymous_okc','918_lurker',
+  'deadass_tulsa','realmvp_ok','notabot_918','Xander_T','bro_real_talk',
+  'yungbull_ok','tulsa_finest','cruisin_ok','osu_fan_real','ghost_user_918',
+  'oklahoma_kid','no_cap_918','Dre_local','BigMike_T','JayFromJenks',
+  'southside_ok','BradleyP','NateDogg_T','StreetLevel918',
+];
+const FEED_ACTIONS = [
+  g => `liked ${DOSSIER[g]?.fullName||g}'s photo at ${rand(['midnight','1am','2am','3am','late last night','this morning'])}`,
+  g => `saved ${g} to their private collection`,
+  g => `viewed ${DOSSIER[g]?.fullName||g}'s full gallery`,
+  g => `rated ${g} ${rand(['9/10','10/10','easily a 10','dangerous/10','way too high/10'])}`,
+  g => `matched ${g}'s vibe on the alibi game`,
+  g => `picked ${g} for the 2am scenario`,
+  g => `smashed on ${DOSSIER[g]?.fullName||g} without hesitation`,
+  g => `spent ${rand(['8','12','20','35','47'])} minutes on ${g}'s photos`,
+  g => `put ${g} in S tier. immediately.`,
+  g => `looked up ${DOSSIER[g]?.addr||'Tulsa'} after seeing ${g}'s photos`,
+  g => `screenshot ${g}'s page (allegedly)`,
+  g => `drafted ${g} as their #1 pick`,
+  g => `said ${g} is "${rand(['untouchable','a problem','the one','dangerous','illegal','a 10 every time'])}"`,
+  g => `ran stalker mode on ${g} for ${rand(['3','5','8','12','20'])} minutes straight`,
+  g => `checked ${DOSSIER[g]?.insta||'her insta'} after seeing the vault`,
+  g => `rewound ${g}'s gallery ${rand(['twice','three times','four times','too many times'])}`,
+  g => `called ${DOSSIER[g]?.phone||'her number'} — no answer (probably for the best)`,
+  g => `gave ${g} a danger score of ${rand(['47','62','89','94','100'])}`,
+  g => `voted ${g} Most Wanted this session`,
+  g => `debated between ${g} and ${rand(ONLINE_GIRLS.filter(x=>x!==g))} for 10 minutes`,
+];
+
+const FEED_TIMESTAMPS = [
+  'just now', '1m ago', '2m ago', '3m ago', '5m ago', '7m ago',
+  '9m ago', '11m ago', '14m ago', '18m ago', '22m ago', '28m ago',
+  '34m ago', '41m ago', '49m ago', '58m ago', '1h ago', '1h 12m ago',
+];
+
+let feedEntries = [];
+function generateFeedEntry() {
+  const user = rand(FEED_USERS);
+  const girl = rand(ONLINE_GIRLS);
+  const action = rand(FEED_ACTIONS)(girl);
+  const time = rand(FEED_TIMESTAMPS);
+  return { user, action, time };
+}
+function buildFeed() {
+  const wrap = $('feedWrap'); if (!wrap) return;
+  // seed with 30 entries
+  feedEntries = Array.from({length: 30}, generateFeedEntry);
+  renderFeed();
+}
+function renderFeed() {
+  const wrap = $('feedWrap'); if (!wrap) return;
+  wrap.innerHTML = feedEntries.map(e => `
+    <div class="feed-entry">
+      <div class="feed-user">${e.user}</div>
+      <div class="feed-action">${e.action}</div>
+      <div class="feed-time">${e.time}</div>
+    </div>`).join('');
+}
+function pushFeedEntry(girl, actionFn) {
+  const user = rand(FEED_USERS);
+  const action = actionFn ? actionFn(girl) : rand(FEED_ACTIONS)(girl);
+  feedEntries.unshift({ user, action, time: 'just now' });
+  if (feedEntries.length > 60) feedEntries.pop();
+  // age previous entries
+  feedEntries.forEach((e, i) => {
+    if (i > 0) e.time = FEED_TIMESTAMPS[Math.min(i, FEED_TIMESTAMPS.length-1)];
+  });
+  const wrap = $('feedWrap');
+  if (wrap && $('sfeed').classList.contains('on')) renderFeed();
+}
+// Auto-push new entries every ~15-25s when feed is open
+setInterval(() => {
+  if (!$('secretWrap')?.classList.contains('open')) return;
+  const girl = rand(ONLINE_GIRLS);
+  pushFeedEntry(girl);
+}, Math.random() * 10000 + 15000);
+
+buildFeed();
+
+// refresh leaderboard and feed when those sections open
+const _origShowSecretSection = showSecretSection;
+function showSecretSection(id) {
+  document.querySelectorAll('.secret-section').forEach(s => s.classList.remove('on'));
+  const el = $(id);
+  if (el) { el.classList.add('on'); void el.offsetWidth; }
+  if (id === 'sleaderboard') buildLeaderboard();
+  if (id === 'sfeed') renderFeed();
+  if (id === 'sdossier') buildDossier();
+  if (id === 'salibi') buildAlibi();
+  if (id === 'srankfit') buildRankFit();
+  if (id === 'ssmashpass') smpInit();
+}
