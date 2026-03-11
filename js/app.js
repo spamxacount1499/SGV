@@ -82,10 +82,28 @@ function checkPassword() {
 // ─── VAULT OPEN / SPOTLIGHT ──────────────────────────────────────────────────
 function openVault() {
   state.secretUnlocked = true;
-  $('secretWrap').classList.add('open');
   document.body.style.overflow = 'hidden';
   document.body.classList.add('vault-open');
-  // show spotlight
+  // door animation then spotlight
+  const door = $('vaultDoor');
+  if (door) {
+    door.classList.add('show');
+    setTimeout(() => {
+      door.classList.add('opening');
+      setTimeout(() => {
+        door.classList.remove('show', 'opening');
+        _showVaultSpotlight();
+      }, 1100);
+    }, 600);
+  } else {
+    _showVaultSpotlight();
+  }
+  // init feed notif
+  if (!feedNotifEl) setTimeout(initFeedNotif, 2000);
+}
+function _showVaultSpotlight() {
+  $('secretWrap').classList.add('open');
+  updateVaultPhotoCount();
   if (SECRET_PHOTOS.length) {
     const featured = rand(SECRET_PHOTOS);
     $('spotlightImg').src = featured.src;
@@ -98,6 +116,9 @@ function openVault() {
     $('vaultMain').style.display = 'flex';
     initVaultContent();
   }
+  startCursorTrail();
+  startVaultParticles();
+  setVaultCursor(true);
 }
 $('spotlightEnter').addEventListener('click', () => {
   $('vaultSpotlight').style.display = 'none';
@@ -1001,27 +1022,6 @@ function openVaultWithDoor(cb) {
       cb();
     },1100);
   },600);
-}
-
-// Patch openVault to use door animation
-const _origOpenVault=openVault;
-function openVault() {
-  state.secretUnlocked=true;
-  openVaultWithDoor(()=>{
-    $('secretWrap').classList.add('open');
-    if(SECRET_PHOTOS.length){
-      const featured=rand(SECRET_PHOTOS);
-      $('spotlightImg').src=featured.src;
-      $('spotlightName').textContent=featured.name;
-      $('spotlightModel').textContent=featured.model;
-      $('vaultSpotlight').style.display='flex';
-      $('vaultMain').style.display='none';
-    } else {
-      $('vaultSpotlight').style.display='none';
-      $('vaultMain').style.display='flex';
-      initVaultContent();
-    }
-  });
 }
 
 // ─── HOT TAKE GENERATOR ──────────────────────────────────────────────────────
@@ -2465,13 +2465,6 @@ function generateFeedBatch(n) {
     const girl = rand(ONLINE_GIRLS);
     return { user: rand(FEED_USERS), action: rand(FEED_ACTIONS)(girl), time: 'just now' };
   });
-}
-
-// init feed notif after vault opens
-const _origOpenVault2 = openVault;
-function openVault() {
-  _origOpenVault2();
-  if (!feedNotifEl) setTimeout(initFeedNotif, 2000);
 }
 
 // ─── WIRE UP NEW SECTIONS ────────────────────────────────────────
