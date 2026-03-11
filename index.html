@@ -239,6 +239,7 @@
     <div class="secret-layout">
       <!-- SIDEBAR -->
       <aside class="secret-sidebar">
+        <div class="online-indicator" id="onlineIndicator"></div>
         <div class="secret-sidebar-title">🔥 The Girls</div>
         <button class="secret-model-btn on" data-smodel="All">All Girls</button>
         <button class="secret-model-btn" data-smodel="Nya">Nya</button>
@@ -256,10 +257,18 @@
         <div class="secret-sidebar-divider"></div>
         <div class="secret-sidebar-title">📊 Stats</div>
         <button class="secret-model-btn" data-ssection="smostwanted">🔥 Most Wanted</button>
+        <button class="secret-model-btn" data-ssection="sleaderboard">🏅 Leaderboard</button>
         <div class="secret-sidebar-divider"></div>
         <div class="secret-sidebar-title">💬 Social</div>
         <button class="secret-model-btn" data-ssection="squiz">💋 Type Quiz</button>
         <button class="secret-model-btn" data-ssection="sconfessions">🔒 Confessions</button>
+        <div class="secret-sidebar-divider"></div>
+        <div class="secret-sidebar-title">🕵️ Intel</div>
+        <button class="secret-model-btn" data-ssection="sdossier">📁 Dossier</button>
+        <button class="secret-model-btn" data-ssection="salibi">🌙 Alibi</button>
+        <button class="secret-model-btn" data-ssection="srankfit">👗 Rank the Fit</button>
+        <button class="secret-model-btn" data-ssection="ssmashpass">💋 Smash or Pass</button>
+        <button class="secret-model-btn" data-ssection="sfeed">📡 Activity Feed</button>
       </aside>
 
       <!-- CONTENT -->
@@ -425,6 +434,77 @@
             <div class="draft-pool-label" style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8a3030;margin:16px 0 8px">Available</div>
             <div class="draft-pool" id="draftPool"></div>
             <button class="game-btn vault-btn" style="margin-top:16px" id="draftReset">Reset Draft ↺</button>
+          </div>
+        </div>
+
+        <!-- LEADERBOARD -->
+        <div class="secret-section" id="sleaderboard">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">🏅 Leaderboard</h2>
+            <p class="game-sub">Ranked by likes this session</p>
+            <div class="div vault-div"></div>
+            <div id="leaderboardList"></div>
+          </div>
+        </div>
+
+        <!-- DOSSIER -->
+        <div class="secret-section" id="sdossier">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">📁 Intel Dossier</h2>
+            <p class="game-sub">Classified. Eyes only.</p>
+            <div class="div vault-div"></div>
+            <div class="dossier-tabs" id="dossierTabs"></div>
+            <div class="dossier-card" id="dossierCard"></div>
+          </div>
+        </div>
+
+        <!-- ALIBI GAME -->
+        <div class="secret-section" id="salibi">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">🌙 Alibi</h2>
+            <p class="game-sub">The scenario. Your choice. No judgment.</p>
+            <div class="div vault-div"></div>
+            <div class="alibi-scenario" id="alibiScenario"></div>
+            <div class="alibi-arena" id="alibiArena"></div>
+            <div class="alibi-reaction" id="alibiReaction"></div>
+            <button class="game-btn vault-btn" id="alibiNext">Next Scenario →</button>
+          </div>
+        </div>
+
+        <!-- RANK THE FIT -->
+        <div class="secret-section" id="srankfit">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">👗 Rank the Fit</h2>
+            <p class="game-sub">Drag to rank. No ties.</p>
+            <div class="div vault-div"></div>
+            <div class="rankfit-pool" id="rankfitPool"></div>
+            <div class="rankfit-slots" id="rankfitSlots"></div>
+            <button class="game-btn vault-btn" style="margin-top:20px" id="rankfitShuffle">New Round ↺</button>
+          </div>
+        </div>
+
+        <!-- SMASH OR PASS -->
+        <div class="secret-section" id="ssmashpass">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">💋 Smash or Pass</h2>
+            <p class="game-sub">Be honest.</p>
+            <div class="div vault-div"></div>
+            <div class="hon-stage"><div class="hon-card"><img id="smpImg" src="" alt=""><div class="hon-overlay" id="smpOverlay"></div></div></div>
+            <div class="hon-btns">
+              <button class="hon-btn not-btn" id="smpPass">✗ PASS</button>
+              <button class="hon-btn vault-hot-btn" id="smpSmash">💋 SMASH</button>
+            </div>
+            <div class="hon-podium" id="smpLeaderboard"></div>
+          </div>
+        </div>
+
+        <!-- ACTIVITY FEED -->
+        <div class="secret-section" id="sfeed">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">📡 Activity Feed</h2>
+            <p class="game-sub">What's happening in the vault right now</p>
+            <div class="div vault-div"></div>
+            <div class="feed-wrap" id="feedWrap"></div>
           </div>
         </div>
 
