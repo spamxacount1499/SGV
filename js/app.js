@@ -1176,11 +1176,21 @@ function startStalkerMode() {
   $('stalkerOverlay').classList.add('show');
   showStalkerPhoto();
 }
+const STALKER_LOCATIONS = {
+  Nya:     { name: 'Nya Barnard',   addr: '📍 1722 S Delaware Pl, Tulsa OK 74104', phone: null,             insta: '📸 @nya.barn' },
+  Remi:    { name: 'Remi Barnard',  addr: '📍 1722 S Delaware Pl, Tulsa OK 74104', phone: '📞 918-284-8365', insta: '📸 @remibarn' },
+  Stella:  { name: 'Stella Thomas', addr: '📍 6449 S Sandusky Ave, Tulsa OK 74136', phone: '📞 918-998-5774', insta: '📸 @stella_thomas08' },
+  Allie:   { name: 'Allie',         addr: '📍 Tulsa, Oklahoma',                     phone: null,             insta: null },
+  Rileigh: { name: 'Rileigh Sowards',addr: '📍 320 N 14th St, Sapulpa OK',          phone: '📞 918-261-6532', insta: '📸 @rileigh_l_s' },
+  Macy:    { name: 'Macy Cox',      addr: '📍 Tulsa, Oklahoma',                     phone: '📞 918-805-3623', insta: '📸 @addison_and_macy' },
+};
 function showStalkerPhoto() {
   const photo=stalkerPhotos[stalkerIdx%stalkerPhotos.length];
+  const info=STALKER_LOCATIONS[photo.model]||{name:photo.model,addr:'📍 Tulsa, Oklahoma',phone:null,insta:null};
   $('stalkerImg').src=photo.src;
-  $('stalkerName').textContent=photo.model;
-  $('stalkerModel').textContent='📍 Tulsa, Oklahoma';
+  $('stalkerName').textContent=info.name;
+  const details=[info.addr, info.phone, info.insta].filter(Boolean).join('   ');
+  $('stalkerModel').textContent=details;
   addDangerScore(photo.src,1);
   // progress bar
   const prog=$('stalkerProgress');
