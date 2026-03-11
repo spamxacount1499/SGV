@@ -4228,3 +4228,102 @@ body.vault-open {
   margin-top: 4px !important;
   line-height: 1.8 !important;
 }
+
+/* ╔═══════════════════════════════════════════════════════╗
+   ║     VAULT FULL PAGE FIX + STALKER INFO BIGGER         ║
+   ╚═══════════════════════════════════════════════════════╝ */
+
+/* Secret wrap must fill entire viewport */
+.secret-wrap {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: none;
+  flex-direction: column;
+  overflow: hidden !important;
+}
+.secret-wrap.open { display: flex !important; }
+
+/* Vault main fills all remaining height */
+.vault-main {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+#vaultMain[style*="flex"] { display: flex !important; }
+
+/* Secret layout fills remaining space */
+.secret-layout {
+  display: flex !important;
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+
+/* Sidebar — narrow, scrollable */
+.secret-sidebar {
+  width: 110px !important;
+  min-width: 110px !important;
+  max-width: 110px !important;
+  flex-shrink: 0 !important;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* Content — takes ALL remaining space */
+.secret-content {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: 0 !important; /* forces flex to control width */
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: 100% !important;
+}
+
+/* Sections fill content area */
+.secret-section {
+  display: none !important;
+  width: 100% !important;
+}
+.secret-section.on {
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Secret grid fills full content width */
+#secretGrid {
+  width: 100% !important;
+  padding: 0 8px 60px !important;
+  box-sizing: border-box !important;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+}
+
+/* Fun buttons bar full width */
+#sgallery .fun-btns-bar {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* ── STALKER INFO BIGGER ── */
+.stalker-name {
+  font-size: clamp(28px, 5vw, 52px) !important;
+  font-weight: 900 !important;
+  letter-spacing: 2px !important;
+  color: #ff4444 !important;
+  text-shadow: 0 0 40px rgba(255,34,34,0.5) !important;
+  margin-bottom: 8px !important;
+}
+.stalker-model {
+  font-size: 13px !important;
+  letter-spacing: 2px !important;
+  color: #cc6666 !important;
+  gap: 4px 20px !important;
+  line-height: 2 !important;
+}
+.stalker-info {
+  padding: 80px 32px 32px !important;
+}
