@@ -2468,9 +2468,9 @@ function generateFeedBatch(n) {
 }
 
 // init feed notif after vault opens
-const _origOpenVault = openVault;
+const _origOpenVault2 = openVault;
 function openVault() {
-  _origOpenVault();
+  _origOpenVault2();
   if (!feedNotifEl) setTimeout(initFeedNotif, 2000);
 }
 
