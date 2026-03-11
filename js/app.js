@@ -1170,11 +1170,11 @@ $('shesABtn')&&$('shesABtn').addEventListener('click',showShesA);
 // ─── STALKER MODE ─────────────────────────────────────────────────────────────
 const STALKER_NICKNAMES = {
   Nya:     'Naughty Nya',
-  Remi:    'Risky Remi',
-  Stella:  'Sweet Stella',
+  Remi:    'Rumptious Remi',
+  Stella:  'Slutty Stella',
   Allie:   'Angelic Allie',
-  Rileigh: 'Reckless Rileigh',
-  Macy:    'Mischievous Macy',
+  Rileigh: 'Raunchy Rileigh',
+  Macy:    'Minxy Macy',
 };
 let stalkerTimer=null, stalkerIdx=0, stalkerPhotos=[], stalkerInterval=6000;
 function startStalkerMode() {
