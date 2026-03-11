@@ -241,53 +241,104 @@
       <!-- SIDEBAR -->
       <aside class="secret-sidebar">
         <div class="online-indicator" id="onlineIndicator"></div>
-        <div class="secret-sidebar-title">🔥 The Girls</div>
-        <button class="secret-model-btn on" data-smodel="All">All Girls</button>
-        <button class="secret-model-btn" data-smodel="Nya">Nya</button>
-        <button class="secret-model-btn" data-smodel="Remi">Remi</button>
-        <button class="secret-model-btn" data-smodel="Stella">Stella</button>
-        <button class="secret-model-btn" data-smodel="Allie">Allie</button>
-        <button class="secret-model-btn" data-smodel="Rileigh">Rileigh</button>
-        <button class="secret-model-btn" data-smodel="Macy">Macy</button>
-        <div class="secret-sidebar-divider"></div>
-        <div class="secret-sidebar-title">⚡ Games</div>
-        <button class="secret-model-btn" data-ssection="sgames">Games Room</button>
-        <button class="secret-model-btn" data-ssection="stierlist">👑 Tier List</button>
-        <button class="secret-model-btn" data-ssection="sbracket">🏆 Tournament</button>
-        <button class="secret-model-btn" data-ssection="sdraft">🏈 Fantasy Draft</button>
-        <div class="secret-sidebar-divider"></div>
-        <div class="secret-sidebar-title">📊 Stats</div>
-        <button class="secret-model-btn" data-ssection="smostwanted">🔥 Most Wanted</button>
-        <button class="secret-model-btn" data-ssection="sleaderboard">🏅 Leaderboard</button>
-        <div class="secret-sidebar-divider"></div>
-        <div class="secret-sidebar-title">💬 Social</div>
-        <button class="secret-model-btn" data-ssection="squiz">💋 Type Quiz</button>
-        <button class="secret-model-btn" data-ssection="sconfessions">🔒 Confessions</button>
-        <div class="secret-sidebar-divider"></div>
-        <div class="secret-sidebar-title">🕵️ Intel</div>
-        <button class="secret-model-btn" data-ssection="sdossier">📁 Dossier</button>
-        <button class="secret-model-btn" data-ssection="salibi">🌙 Alibi</button>
-        <button class="secret-model-btn" data-ssection="srankfit">👗 Rank the Fit</button>
-        <button class="secret-model-btn" data-ssection="ssmashpass">💋 Smash or Pass</button>
-        <button class="secret-model-btn" data-ssection="sfeed">📡 Activity Feed</button>
-        <button class="secret-model-btn" data-ssection="slastseen">📍 Last Seen</button>
-        <button class="secret-model-btn" data-ssection="snotes">📝 Secret Notes</button>
-        <button class="secret-model-btn" data-ssection="scompare">⚖️ Compare</button>
-        <button class="secret-model-btn" data-ssection="smatch">💘 Your Match</button>
-        <div class="secret-sidebar-divider"></div>
-        <div class="secret-sidebar-title">🆕 New</div>
-        <button class="secret-model-btn" data-ssection="sshesaid">🗣️ She Said</button>
-        <button class="secret-model-btn" data-ssection="sgroupchat">💬 Group Chat</button>
-        <button class="secret-model-btn" data-ssection="spollofday">🗳️ Poll</button>
-        <div class="secret-sidebar-divider"></div>
-        <div class="secret-sidebar-title">📱 Hacked</div>
-        <button class="secret-model-btn" data-ssection="sphonehack">📲 Phone Hack</button>
-        <button class="secret-model-btn" data-ssection="svoicemail">📞 Voicemail</button>
-        <div class="secret-sidebar-divider"></div>
-        <div class="secret-sidebar-title">🎯 Extras</div>
-        <button class="secret-model-btn drop-btn" data-ssection="sdrop">⏱️ The Drop</button>
-        <button class="secret-model-btn" data-ssection="swanted">🚨 Wanted Poster</button>
-        <button class="secret-model-btn" data-ssection="sratemynight">📊 Rate My Night</button>
+
+        <!-- GIRLS FILTER — always visible -->
+        <div class="sb-group open" id="sbg-girls">
+          <div class="sb-group-header" onclick="toggleSbGroup('sbg-girls')">
+            <span>🔥 The Girls</span><span class="sb-arrow">▾</span>
+          </div>
+          <div class="sb-group-body">
+            <button class="secret-model-btn on" data-smodel="All">All Girls</button>
+            <button class="secret-model-btn" data-smodel="Nya">Nya</button>
+            <button class="secret-model-btn" data-smodel="Remi">Remi</button>
+            <button class="secret-model-btn" data-smodel="Stella">Stella</button>
+            <button class="secret-model-btn" data-smodel="Allie">Allie</button>
+            <button class="secret-model-btn" data-smodel="Rileigh">Rileigh</button>
+            <button class="secret-model-btn" data-smodel="Macy">Macy</button>
+          </div>
+        </div>
+
+        <div class="sb-group" id="sbg-games">
+          <div class="sb-group-header" onclick="toggleSbGroup('sbg-games')">
+            <span>⚡ Games</span><span class="sb-arrow">▸</span>
+          </div>
+          <div class="sb-group-body">
+            <button class="secret-model-btn" data-ssection="sgames">🎮 Games Room</button>
+            <button class="secret-model-btn" data-ssection="stierlist">👑 Tier List</button>
+            <button class="secret-model-btn" data-ssection="sbracket">🏆 Tournament</button>
+            <button class="secret-model-btn" data-ssection="sdraft">🏈 Fantasy Draft</button>
+            <button class="secret-model-btn" data-ssection="sshesaid">🗣️ She Said</button>
+            <button class="secret-model-btn" data-ssection="spollofday">🗳️ Poll</button>
+          </div>
+        </div>
+
+        <div class="sb-group" id="sbg-stats">
+          <div class="sb-group-header" onclick="toggleSbGroup('sbg-stats')">
+            <span>📊 Stats</span><span class="sb-arrow">▸</span>
+          </div>
+          <div class="sb-group-body">
+            <button class="secret-model-btn" data-ssection="smostwanted">🔥 Most Wanted</button>
+            <button class="secret-model-btn" data-ssection="sleaderboard">🏅 Leaderboard</button>
+            <button class="secret-model-btn" data-ssection="sratemynight">📊 Rate My Night</button>
+          </div>
+        </div>
+
+        <div class="sb-group" id="sbg-social">
+          <div class="sb-group-header" onclick="toggleSbGroup('sbg-social')">
+            <span>💬 Social</span><span class="sb-arrow">▸</span>
+          </div>
+          <div class="sb-group-body">
+            <button class="secret-model-btn" data-ssection="squiz">💋 Type Quiz</button>
+            <button class="secret-model-btn" data-ssection="sconfessions">🔒 Confessions</button>
+            <button class="secret-model-btn" data-ssection="sgroupchat">💬 Group Chat</button>
+            <button class="secret-model-btn" data-ssection="sfeed">📡 Activity Feed</button>
+          </div>
+        </div>
+
+        <div class="sb-group" id="sbg-intel">
+          <div class="sb-group-header" onclick="toggleSbGroup('sbg-intel')">
+            <span>🕵️ Intel</span><span class="sb-arrow">▸</span>
+          </div>
+          <div class="sb-group-body">
+            <button class="secret-model-btn" data-ssection="sdossier">📁 Dossier</button>
+            <button class="secret-model-btn" data-ssection="salibi">🌙 Alibi</button>
+            <button class="secret-model-btn" data-ssection="slastseen">📍 Last Seen</button>
+            <button class="secret-model-btn" data-ssection="scompare">⚖️ Compare</button>
+            <button class="secret-model-btn" data-ssection="smatch">💘 Your Match</button>
+            <button class="secret-model-btn" data-ssection="snotes">📝 Secret Notes</button>
+          </div>
+        </div>
+
+        <div class="sb-group" id="sbg-games2">
+          <div class="sb-group-header" onclick="toggleSbGroup('sbg-games2')">
+            <span>🎯 Play</span><span class="sb-arrow">▸</span>
+          </div>
+          <div class="sb-group-body">
+            <button class="secret-model-btn" data-ssection="srankfit">👗 Rank the Fit</button>
+            <button class="secret-model-btn" data-ssection="ssmashpass">💋 Smash or Pass</button>
+            <button class="secret-model-btn" data-ssection="swanted">🚨 Wanted Poster</button>
+          </div>
+        </div>
+
+        <div class="sb-group" id="sbg-hacked">
+          <div class="sb-group-header" onclick="toggleSbGroup('sbg-hacked')">
+            <span>📱 Hacked</span><span class="sb-arrow">▸</span>
+          </div>
+          <div class="sb-group-body">
+            <button class="secret-model-btn" data-ssection="sphonehack">📲 Phone Hack</button>
+            <button class="secret-model-btn" data-ssection="svoicemail">📞 Voicemail</button>
+          </div>
+        </div>
+
+        <div class="sb-group" id="sbg-extras">
+          <div class="sb-group-header" onclick="toggleSbGroup('sbg-extras')">
+            <span>🔴 Extras</span><span class="sb-arrow">▸</span>
+          </div>
+          <div class="sb-group-body">
+            <button class="secret-model-btn drop-btn" data-ssection="sdrop">⏱️ The Drop</button>
+          </div>
+        </div>
+
       </aside>
 
       <!-- CONTENT -->
