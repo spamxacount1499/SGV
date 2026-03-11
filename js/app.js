@@ -119,6 +119,7 @@ function _showVaultSpotlight() {
   startCursorTrail();
   startVaultParticles();
   setVaultCursor(true);
+  startAutoVaultConfessions();
 }
 $('spotlightEnter').addEventListener('click', () => {
   $('vaultSpotlight').style.display = 'none';
@@ -434,6 +435,76 @@ function drawWheelOn(id,angle,photos,colors){
 $('spinBtn').addEventListener('click',()=>{if(!WHEEL_PHOTOS.length)return;doSpin('spinBtn','sa','spinWheel','spinResult','spinResultImg','spinResultName',WHEEL_PHOTOS,WC);});
 
 // ─── CONFESSIONS ─────────────────────────────────────────────────────────────
+const AUTO_CONFESSIONS_PUBLIC = [
+  "I saved every photo of Sophie on my phone. My girlfriend doesn't know. Sophie doesn't know. Nobody knows.",
+  "Breckie Hill ruined my attention span. I haven't been able to focus on anything else for three weeks.",
+  "I told myself I was just browsing. That was 45 minutes ago.",
+  "She smiled at me once at a party and I still think about it before I fall asleep.",
+  "I don't have a type anymore. This site is my type.",
+  "I drove past her place twice. Didn't stop. Couldn't explain why if you asked me.",
+  "The way she looked in that one photo should come with a warning label.",
+  "I follow all her socials on a finsta. She has no idea I exist. I'm fine with that.",
+  "My ex used to look at me the way she looks at the camera in that photo. I miss that.",
+  "I've voted her Hot in Hot or Not like 40 times today. Zero regrets.",
+  "She's literally the reason I opened this site for the fourth time today.",
+  "I'm in a whole relationship and I'm on here confessing. Don't ask.",
+  "I matched with her on Tinder once and panicked and unmatched. Biggest mistake of my life.",
+  "This site is dangerous. I've been here for 2 hours. Send help.",
+  "She posted a story at 2am and I watched it within 30 seconds. That's a problem.",
+];
+const AUTO_CONFESSIONS_VAULT = [
+  "I know her schedule. I'm not proud of that but I do.",
+  "Rileigh responded to my Instagram story once and I've been thinking about it for a month.",
+  "I drove to Sapulpa at midnight. I'm not telling you for who. You can guess.",
+  "Stella texted me 'come over' once. I didn't go. I regret it every day.",
+  "I saw Macy at Utica Square and just stood there. Her man was right there. I didn't care.",
+  "I know her address. I've never shown up. But I know it.",
+  "Nya acts like she doesn't know what she's doing. She knows exactly what she's doing.",
+  "Remi is the reason I don't trust myself around taken girls anymore.",
+  "I would do something genuinely stupid for Stella and I'm at peace with that.",
+  "She posted at 2am and I was awake. We both know what that means.",
+  "Allie said she 'couldn't sleep' in a text at midnight. I know what that means.",
+  "I've rated every one of these photos and I'm starting to think I have a problem.",
+  "Rileigh came to Tulsa once and I found out and I just kind of showed up nearby. Yeah.",
+  "She changed her profile pic and my heart did something it's not supposed to do.",
+  "I thought about her during a work meeting. For 20 minutes. Didn't retain a single thing said.",
+  "I saved her number even though she never actually gave it to me. I'm not explaining that.",
+  "Macy followed me back and I panicked for 10 minutes before calming down.",
+  "The dossier on Stella is too accurate. Someone's been watching. It might be me.",
+];
+let autoConfTimer = null;
+let autoConfVaultTimer = null;
+
+function startAutoConfessions() {
+  if (autoConfTimer) return;
+  const pool = shuffle([...AUTO_CONFESSIONS_PUBLIC]);
+  let idx = 0;
+  function drop() {
+    if (idx < pool.length) {
+      const time = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      state.confessions.push({ text: pool[idx++], time });
+      renderConfessionWall('confessionWall', state.confessions, false);
+    }
+    autoConfTimer = setTimeout(drop, 25000 + Math.random() * 35000);
+  }
+  autoConfTimer = setTimeout(drop, 8000);
+}
+
+function startAutoVaultConfessions() {
+  if (autoConfVaultTimer) return;
+  const pool = shuffle([...AUTO_CONFESSIONS_VAULT]);
+  let idx = 0;
+  function drop() {
+    if (idx < pool.length) {
+      const time = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      state.sConfessions.push({ text: pool[idx++], time });
+      renderConfessionWall('sConfessionWall', state.sConfessions, true);
+    }
+    autoConfVaultTimer = setTimeout(drop, 20000 + Math.random() * 25000);
+  }
+  autoConfVaultTimer = setTimeout(drop, 5000);
+}
+
 function addConfession(text, wallId, arr, isVault=false) {
   if(!text.trim()) return;
   const now = new Date();
@@ -445,7 +516,7 @@ function renderConfessionWall(wallId, arr, isVault=false) {
   const wall=$(wallId);
   if(!wall) return;
   if(!arr.length){wall.innerHTML=`<div style="text-align:center;padding:40px;font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:${isVault?'#8a3030':'var(--muted)'}">No confessions yet. Say something.</div>`;return;}
-  wall.innerHTML=arr.slice(0,50).map(c=>`
+  wall.innerHTML=arr.slice(0,60).map(c=>`
     <div class="confession-card ${isVault?'vault-confession':''}">
       ${c.text}
       <div class="confession-time">Anonymous · ${c.time}</div>
@@ -458,6 +529,9 @@ $('confessionSubmit').addEventListener('click',()=>{
 });
 $('confessionInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){addConfession($('confessionInput').value,'confessionWall',state.confessions,false);$('confessionInput').value='';}});
 function renderSConfessions(){renderConfessionWall('sConfessionWall',state.sConfessions,true);}
+
+// kick off auto confessions on page load
+startAutoConfessions();
 
 // ─── QUIZ ─────────────────────────────────────────────────────────────────────
 const PUBLIC_QUIZ = [
@@ -1718,6 +1792,15 @@ const DOSSIER = {
     insta: '@nya.barn',
     phone: 'Unknown',
     notes: 'Dangerous. Knows exactly what she\'s doing. Has a boyfriend but that hasn\'t stopped anyone.',
+    age: '20',
+    school: 'TU / Tulsa Community College',
+    car: 'Dark grey Honda Civic',
+    hangout: 'Brookside, Gathering Place, QT on S Memorial',
+    schedule: 'Usually free after 8pm. Boyfriend works nights on weekdays.',
+    flag: 'Acts sweet but has eyes on everyone in the room. Always positioned near the exit.',
+    intel: 'Was seen leaving McNellie\'s with someone who wasn\'t her boyfriend. He doesn\'t know. Responds to DMs after 11pm.',
+    type: 'The dangerous kind. Knows she\'s attractive and uses it precisely.',
+    lastActive: '14 min ago',
   },
   Remi: {
     nickname: 'Risky Remi',
@@ -1729,6 +1812,15 @@ const DOSSIER = {
     insta: '@remibarn',
     phone: '918-284-8365',
     notes: 'Technically off limits. Practically not. If you make her feel seen she forgets she has a boyfriend.',
+    age: '19',
+    school: 'OSU Tulsa',
+    car: 'White Jeep Wrangler',
+    hangout: 'Panera on Yale, OSU Tulsa campus, Walmart on 71st late nights',
+    schedule: 'Classes Mon/Wed/Fri. "On a break" status unclear. Boyfriend out of town most weekends.',
+    flag: 'Texts back immediately then goes quiet for 3 hours. Playing games or playing innocent, unclear.',
+    intel: 'Same address as Nya — sisters. Can confirm Remi was at McNellie\'s Pub past 1am last Thursday. Her location was off.',
+    type: 'The taken-but-available type. Needs to feel like she\'s the exception, not the rule.',
+    lastActive: '8 min ago',
   },
   Stella: {
     nickname: 'Sweet Stella',
@@ -1740,6 +1832,15 @@ const DOSSIER = {
     insta: '@stella_thomas08',
     phone: '918-998-5774',
     notes: 'Town favorite for a reason. No strings attached, no drama. Just don\'t catch feelings.',
+    age: '20',
+    school: 'University of Tulsa',
+    car: 'White Toyota Camry, 2021',
+    hangout: 'Cheesecake Factory 71st, Florence Park, midtown bar crawl every other Friday',
+    schedule: 'Lives alone on S Sandusky. Parents are in Broken Arrow. Basically unsupervised 24/7.',
+    flag: 'Has her location shared with 3 different guys simultaneously. None of them know about each other.',
+    intel: 'Was seen leaving a house on S Sandusky that isn\'t hers at 12:30am. Someone drove her. Plate unknown.',
+    type: 'The main character. No games, no strings, just chaos and confidence.',
+    lastActive: '22 min ago',
   },
   Allie: {
     nickname: 'Angelic Allie',
@@ -1751,6 +1852,15 @@ const DOSSIER = {
     insta: 'Unknown',
     phone: 'Unknown',
     notes: 'Acts innocent. Isn\'t. Takes longer to crack but once you do — worth every second.',
+    age: '19',
+    school: 'Tulsa Community College',
+    car: 'Unknown — gets rides or drives a silver car seen around midtown',
+    hangout: 'TCC campus, Target on 71st, Route 66 area, coffee shops in midtown',
+    schedule: 'Morning classes. Usually free by noon. Posts stories between 9-11pm.',
+    flag: 'The quiet ones always have a secret. She knows more than she lets on and she likes it that way.',
+    intel: 'Someone confirmed she texted them at midnight saying she "couldn\'t sleep." They went over. She answered the door. Draw your own conclusions.',
+    type: 'The sleeper agent. Looks like the good girl. Operates like anything but.',
+    lastActive: '1h ago',
   },
   Rileigh: {
     nickname: 'Reckless Rileigh',
@@ -1762,6 +1872,15 @@ const DOSSIER = {
     insta: '@rileigh_l_s',
     phone: '918-261-6532',
     notes: 'Sapulpa\'s worst kept secret. She knows everyone and everyone knows her. Unpredictable in the best way.',
+    age: '20',
+    school: 'Part-time TCC, mostly just vibes',
+    car: 'Beat-up silver Hyundai Elantra. Recognizable.',
+    hangout: 'BP off Hwy 66, Dollar General Sapulpa, anyone\'s house in Tulsa if you drive for her',
+    schedule: 'No real schedule. Posts at 2am regularly. Always "bored" in Sapulpa. Extremely available if you put in the drive.',
+    flag: 'She knows the entire zip code. Nothing stays private in a town that small. But she doesn\'t care.',
+    intel: 'At least two people in this chat have driven to Sapulpa after midnight. Both said it was worth it. Neither will elaborate.',
+    type: 'The wild card. You never know if you\'re the only one or one of many. Probably both.',
+    lastActive: '6 min ago',
   },
   Macy: {
     nickname: 'Mischievous Macy',
@@ -1773,6 +1892,15 @@ const DOSSIER = {
     insta: '@addison_and_macy',
     phone: '918-805-3623',
     notes: 'Has a man. A big one. But she still likes attention and isn\'t exactly quiet about it.',
+    age: '20',
+    school: 'University of Tulsa',
+    car: 'Black Nissan Rogue (his) or her own white Corolla',
+    hangout: 'Utica Square, Chick-fil-A Peoria, Woodland Hills Mall, Planet Fitness 41st',
+    schedule: 'Gym every morning 7am. Classes afternoons. Her man works construction, gone 7am-5pm weekdays.',
+    flag: 'Follows back everyone who slides into her DMs. Doesn\'t mean anything. Might mean something.',
+    intel: 'Flirted with someone at Panera on Yale and immediately followed them on Instagram. Her man doesn\'t follow her stories that closely.',
+    type: 'The taken-but-curious type. Has a man, wants attention, won\'t act on it. Probably.',
+    lastActive: '18 min ago',
   },
 };
 
@@ -1788,14 +1916,22 @@ function buildDossier() {
       <div class="dossier-header">
         <div class="dossier-nickname">${d.nickname}</div>
         <div class="dossier-fullname">${d.fullName}</div>
+        <div style="font-size:9px;letter-spacing:3px;color:#ff4444;margin-top:4px;text-transform:uppercase">● Active ${d.lastActive||'recently'}</div>
       </div>
       <div class="dossier-row"><span class="dossier-label">STATUS</span><span class="dossier-val">${d.status}</span></div>
+      <div class="dossier-row"><span class="dossier-label">AGE</span><span class="dossier-val">${d.age||'Unknown'}</span></div>
+      <div class="dossier-row"><span class="dossier-label">SCHOOL</span><span class="dossier-val">${d.school||'Unknown'}</span></div>
+      <div class="dossier-row"><span class="dossier-label">ADDRESS</span><span class="dossier-val">📍 ${d.addr}</span></div>
+      <div class="dossier-row"><span class="dossier-label">PHONE</span><span class="dossier-val">📞 ${d.phone}</span></div>
+      <div class="dossier-row"><span class="dossier-label">INSTAGRAM</span><span class="dossier-val">📸 ${d.insta}</span></div>
+      <div class="dossier-row"><span class="dossier-label">CAR</span><span class="dossier-val">🚗 ${d.car||'Unknown'}</span></div>
+      <div class="dossier-row"><span class="dossier-label">HANGOUTS</span><span class="dossier-val">${d.hangout||'Unknown'}</span></div>
+      <div class="dossier-row"><span class="dossier-label">SCHEDULE</span><span class="dossier-val dossier-weakness">${d.schedule||'Unknown'}</span></div>
       <div class="dossier-row"><span class="dossier-label">WEAKNESS</span><span class="dossier-val dossier-weakness">${d.weakness}</span></div>
       <div class="dossier-row"><span class="dossier-label">THREAT LEVEL</span><span class="dossier-val dossier-threat">${stars} ${d.threat}/10</span></div>
-      <div class="dossier-row"><span class="dossier-label">ADDRESS</span><span class="dossier-val">📍 ${d.addr}</span></div>
-      <div class="dossier-row"><span class="dossier-label">INSTAGRAM</span><span class="dossier-val">📸 ${d.insta}</span></div>
-      <div class="dossier-row"><span class="dossier-label">PHONE</span><span class="dossier-val">📞 ${d.phone}</span></div>
-      <div class="dossier-notes">"${d.notes}"</div>
+      <div class="dossier-row"><span class="dossier-label">TYPE</span><span class="dossier-val" style="color:#ff8888;font-style:italic">${d.type||''}</span></div>
+      <div class="dossier-row"><span class="dossier-label">⚑ RED FLAG</span><span class="dossier-val" style="color:#ff4444">${d.flag||''}</span></div>
+      <div class="dossier-notes">📡 INTEL: "${d.intel||d.notes}"</div>
     `;
     tabs.querySelectorAll('.dossier-tab').forEach(t => t.classList.toggle('on', t.dataset.girl === girl));
   }
@@ -2087,18 +2223,74 @@ const CAUGHT_CAPTIONS = [
   g => `caught ${DOSSIER[g]?.fullName||g} being way too fine for a Tuesday`,
   g => `${DOSSIER[g]?.fullName||g} said don't post this. posted it anyway.`,
   g => `she doesn't know this is saved`,
-  g => `${DOSSIER[g]?.nickname||g} doing what she does best`,
+  g => `${DOSSIER[g]?.nickname||g} doing what she does best 🔴`,
   g => `this one lives rent free`,
   g => `the reason you can't focus`,
   g => `she looked up and this happened`,
   g => `not supposed to exist but here we are`,
-  g => `${DOSSIER[g]?.fullName||g} slipping again 🔴`,
-  g => `the boys are not ready`,
+  g => `${DOSSIER[g]?.fullName||g} slipping again`,
+  g => `the boys are not ready for this one`,
+  g => `out here looking like that on a random ${['Monday','Tuesday','Wednesday','Thursday','Friday'][Math.floor(Math.random()*5)]}`,
+  g => `somebody come get her`,
+  g => `💛` ,
+  g => `she said "don't make it weird" and then did this`,
 ];
-const CAUGHT_TIMES = ['2m ago','5m ago','8m ago','12m ago','just now','4m ago','6m ago'];
+const CAUGHT_TIMES = ['2m ago','5m ago','8m ago','12m ago','just now','4m ago','6m ago','1m ago','3m ago'];
 const CAUGHT_USERNAMES = {
   Nya: 'nya.barn', Remi: 'remibarn', Stella: 'stella_thomas08',
   Allie: 'allie__ok', Rileigh: 'rileigh_l_s', Macy: 'addison_and_macy',
+};
+const CAUGHT_COMMENTS = {
+  Nya: [
+    { user: 'jackson_918', txt: 'bro I cannot 😭' },
+    { user: 'cruz_t', txt: 'she knows exactly what she\'s doing' },
+    { user: 'jaquavion', txt: 'Lord have mercy' },
+    { user: 'tulsaguy88', txt: 'she\'s so fine it should be illegal fr' },
+    { user: 'jack_ok', txt: 'her bf is cooked 💀' },
+    { user: 'anonymous', txt: 'I would do something so stupid for her' },
+    { user: 'okstate_bro', txt: 'she posted this on purpose lmao she knows' },
+  ],
+  Remi: [
+    { user: 'jackson_918', txt: 'risky remi said say less 😭' },
+    { user: 'cruz_t', txt: 'her bf doesn\'t deserve her ngl' },
+    { user: 'jaquavion', txt: 'I was JUST with her omg' },
+    { user: 'tulsaguy88', txt: 'she\'s got a man and still posting like this??' },
+    { user: 'jack_ok', txt: 'the smile 💀 I\'m done' },
+    { user: 'anonymous', txt: 'somebody slide into those dms please' },
+  ],
+  Stella: [
+    { user: 'jackson_918', txt: 'stella said everyone gets a turn 😭' },
+    { user: 'cruz_t', txt: 'town favorite for a reason holy shit' },
+    { user: 'jaquavion', txt: 'she\'s dangerous bro she\'s actually dangerous' },
+    { user: 'tulsaguy88', txt: 'I would drive anywhere for her' },
+    { user: 'jack_ok', txt: 'and she\'s single?? that\'s insane' },
+    { user: 'anonymous', txt: 'stella thomas will ruin your life and you\'ll thank her' },
+    { user: 'midtown_chad', txt: 'saw her at cheesecake factory. couldn\'t even eat.' },
+  ],
+  Rileigh: [
+    { user: 'jackson_918', txt: 'someone drove to sapulpa for this and they were right to' },
+    { user: 'cruz_t', txt: 'that\'s MY girl 😤 (she doesn\'t know)' },
+    { user: 'jaquavion', txt: 'rileigh sowards will have you doing dumb shit with a smile' },
+    { user: 'tulsaguy88', txt: 'she acts annoyed but she\'s waiting by the door lmao' },
+    { user: 'jack_ok', txt: 'posting at 2am again I see 👀' },
+    { user: 'anonymous', txt: 'the green dress she wore last week bro I haven\'t recovered' },
+  ],
+  Macy: [
+    { user: 'jackson_918', txt: 'her man is huge so I will simply admire from a distance' },
+    { user: 'cruz_t', txt: 'macy really said look but don\'t touch and I hate it' },
+    { user: 'jaquavion', txt: 'she follows everyone back tho just saying 👀' },
+    { user: 'tulsaguy88', txt: 'she flirted with me at panera and I\'ve been thinking about it since' },
+    { user: 'jack_ok', txt: 'macy cox is a problem. a beautiful problem.' },
+    { user: 'anonymous', txt: 'her man really said "mine" and she said "...technically"' },
+  ],
+  Allie: [
+    { user: 'jackson_918', txt: 'she looks innocent. she is NOT innocent.' },
+    { user: 'cruz_t', txt: 'allie texted someone "can\'t sleep" at midnight and I know it wasn\'t for homework' },
+    { user: 'jaquavion', txt: 'she\'s quiet until she\'s not 🚨' },
+    { user: 'tulsaguy88', txt: 'the reserved ones are always the worst (best)' },
+    { user: 'jack_ok', txt: '...no comment 😭' },
+    { user: 'anonymous', txt: 'allie is the final boss and everyone underestimates her' },
+  ],
 };
 
 function showCaughtSlipping() {
@@ -2112,45 +2304,47 @@ function showCaughtSlipping() {
     overlay = document.createElement('div');
     overlay.id = 'caughtSlipping';
     overlay.className = 'caught-slipping';
-    overlay.innerHTML = `
-      <div class="caught-phone-frame">
-        <div class="caught-status-bar">
-          <span id="caughtTime"></span>
-          <span>●●●●● 5G 🔋</span>
-        </div>
-        <div class="caught-story-bar"><div class="caught-story-progress" id="caughtProgress"></div></div>
-        <div class="caught-story-header">
-          <div class="caught-avatar"><img id="caughtAvatar" src="" alt=""></div>
-          <div>
-            <div class="caught-username" id="caughtUsername"></div>
-            <div class="caught-time-ago" id="caughtTimeAgo"></div>
-          </div>
-        </div>
-        <img class="caught-img" id="caughtImg" src="" alt="">
-        <div class="caught-caption" id="caughtCaption"></div>
-        <button class="caught-close" id="caughtClose">✕</button>
-      </div>`;
     document.body.appendChild(overlay);
-    $('caughtClose').addEventListener('click', () => overlay.classList.remove('show'));
     overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
   }
+  const comments = shuffle([...(CAUGHT_COMMENTS[girl] || CAUGHT_COMMENTS.Stella)]).slice(0, rand([2,3,3,4]));
+  const commentsHtml = comments.map((c,i) => `
+    <div class="caught-comment" style="animation-delay:${1.5 + i*0.8}s">
+      <span class="caught-comment-user">${c.user}</span>
+      <span class="caught-comment-txt">${c.txt}</span>
+    </div>`).join('');
+  const now = new Date();
+  overlay.innerHTML = `
+    <div class="caught-phone-frame">
+      <div class="caught-status-bar">
+        <span>${now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+        <span>●●●●● 5G 🔋</span>
+      </div>
+      <div class="caught-story-bar"><div class="caught-story-progress" id="caughtProgress"></div></div>
+      <div class="caught-story-header">
+        <div class="caught-avatar"><img id="caughtAvatar" src="${photo.src}" alt=""></div>
+        <div>
+          <div class="caught-username">${CAUGHT_USERNAMES[girl] || girl.toLowerCase()}</div>
+          <div class="caught-time-ago">${rand(CAUGHT_TIMES)}</div>
+        </div>
+        <button class="caught-close" id="caughtClose">✕</button>
+      </div>
+      <img class="caught-img" src="${photo.src}" alt="">
+      <div class="caught-caption">${rand(CAUGHT_CAPTIONS)(girl)}</div>
+      <div class="caught-comments-wrap" id="caughtCommentsWrap">
+        ${commentsHtml}
+      </div>
+    </div>`;
   // reset progress bar
-  const prog = $('caughtProgress');
+  const prog = overlay.querySelector('#caughtProgress');
   prog.style.animation = 'none';
   void prog.offsetWidth;
-  prog.style.animation = 'storyProgress 6s linear forwards';
-  // fill data
-  const now = new Date();
-  $('caughtTime').textContent = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-  $('caughtUsername').textContent = CAUGHT_USERNAMES[girl] || girl.toLowerCase();
-  $('caughtTimeAgo').textContent = rand(CAUGHT_TIMES);
-  $('caughtImg').src = photo.src;
-  $('caughtAvatar').src = photo.src;
-  $('caughtCaption').textContent = rand(CAUGHT_CAPTIONS)(girl);
+  prog.style.animation = 'storyProgress 18s linear forwards';
+  overlay.querySelector('#caughtClose').addEventListener('click', () => overlay.classList.remove('show'));
   overlay.classList.add('show');
   addDangerScore(photo.src, 3);
-  // auto-dismiss after 6s
-  setTimeout(() => overlay?.classList.remove('show'), 6000);
+  // auto-dismiss after 18s
+  setTimeout(() => overlay?.classList.remove('show'), 18000);
 }
 // trigger every 60-90 seconds while vault is open
 function scheduleCaughtSlipping() {
@@ -2165,60 +2359,84 @@ scheduleCaughtSlipping();
 // ─── LAST SEEN ───────────────────────────────────────────────────
 const LAST_SEEN_DATA = {
   Nya: [
-    { place: 'QuikTrip on S Memorial Dr', when: '14 min ago' },
-    { place: 'Brookside Starbucks', when: '32 min ago' },
-    { place: 'Gathering Place parking lot', when: '1h ago' },
-    { place: 'Utica Square', when: '2h ago' },
-    { place: 'Home — 1722 S Delaware Pl', when: 'last night, 11:48pm' },
+    { place: 'QuikTrip on S Memorial Dr', when: '14 min ago', note: 'alone, on her phone' },
+    { place: 'Brookside Starbucks', when: '32 min ago', note: 'with another girl, laughing' },
+    { place: 'Gathering Place parking lot', when: '1h ago', note: 'sitting on someone\'s car hood. not hers.' },
+    { place: 'Utica Square', when: '2h ago', note: 'shopping. ignored three guys.' },
+    { place: 'Home — 1722 S Delaware Pl', when: 'last night, 11:48pm', note: 'lights off by midnight. or so they thought.' },
+    { place: 'McNellie\'s Pub', when: 'Thursday, 1:20am', note: 'left with someone. boyfriend wasn\'t there.' },
+    { place: 'Snap Map — somewhere on S Peoria', when: 'this morning 10am', note: 'ghost mode turned off for exactly 4 minutes' },
   ],
   Remi: [
-    { place: 'Walmart on 71st', when: '8 min ago' },
-    { place: 'Panera on Yale Ave', when: '45 min ago' },
-    { place: 'OSU Tulsa campus', when: '2h ago' },
-    { place: 'McNellie\'s Pub', when: 'last night, 1:12am' },
-    { place: 'Home — 1722 S Delaware Pl', when: 'this morning, 9am' },
+    { place: 'Walmart on 71st', when: '8 min ago', note: 'self-checkout. white Jeep outside.' },
+    { place: 'Panera on Yale Ave', when: '45 min ago', note: 'sat alone with AirPods in. responded to texts.' },
+    { place: 'OSU Tulsa campus', when: '2h ago', note: 'between classes. someone walked her out.' },
+    { place: 'McNellie\'s Pub', when: 'last night, 1:12am', note: 'boyfriend was not present. confirmed.' },
+    { place: 'Home — 1722 S Delaware Pl', when: 'this morning, 9am', note: 'Jeep wasn\'t there until 9. somewhere overnight.' },
+    { place: 'Target on 71st', when: 'Sunday', note: 'with Nya. both on their phones constantly.' },
+    { place: 'Unknown — location off', when: 'Friday 11pm–2am', note: 'three hour gap. location deliberately hidden.' },
   ],
   Stella: [
-    { place: 'Florence Park', when: '22 min ago' },
-    { place: 'Cheesecake Factory on 71st', when: '1h ago' },
-    { place: 'Someone\'s place on S Sandusky', when: 'last night, 12:30am' },
-    { place: 'Reasor\'s on 61st', when: '3h ago' },
-    { place: 'Midtown bar crawl', when: 'Friday night — all of it' },
+    { place: 'Florence Park', when: '22 min ago', note: 'walking alone. earbuds in. unapproachable energy.' },
+    { place: 'Cheesecake Factory on 71st', when: '1h ago', note: 'dinner. two guys, one bill.' },
+    { place: 'Someone\'s place on S Sandusky', when: 'last night, 12:30am', note: 'walked out at 12:30. Uber home.' },
+    { place: 'Reasor\'s on 61st', when: '3h ago', note: 'wine and snacks. that\'s a tell.' },
+    { place: 'Midtown bar crawl', when: 'Friday night — all of it', note: 'four locations. closed down at least two of them.' },
+    { place: 'University of Tulsa campus', when: 'yesterday, 2pm', note: 'left campus with someone in a black truck.' },
+    { place: 'Home — 6449 S Sandusky', when: 'this morning', note: 'Camry in driveway by 8am. Was out until 1.' },
   ],
   Allie: [
-    { place: 'Tulsa Community College', when: '1h ago' },
-    { place: 'Target on 71st', when: '3h ago' },
-    { place: 'Route 66 area', when: 'yesterday afternoon' },
+    { place: 'Tulsa Community College', when: '1h ago', note: 'morning classes. quietly on her laptop.' },
+    { place: 'Target on 71st', when: '3h ago', note: 'alone. picked up things she definitely doesn\'t need.' },
+    { place: 'Route 66 area', when: 'yesterday afternoon', note: 'with friends. untagged photos later.' },
+    { place: 'Coffee shop — Chimera Cafe', when: 'this morning 8am', note: 'by herself. journaling or texting nonstop, unclear.' },
+    { place: 'Unknown — midtown Tulsa', when: 'last Wednesday midnight', note: 'snap map disappeared. back home by 2am.' },
+    { place: 'TCC parking lot', when: 'Monday 12:10pm', note: 'sat in car for 20 min before driving. thinking something through.' },
   ],
   Rileigh: [
-    { place: 'Dollar General, Sapulpa', when: '6 min ago' },
-    { place: 'Creek County Courthouse area', when: '1h ago' },
-    { place: 'BP station off Hwy 66, Sapulpa', when: '2h ago' },
-    { place: '320 N 14th St', when: 'this morning' },
-    { place: 'Tulsa — someone drove her', when: 'last night, late' },
+    { place: 'Dollar General, Sapulpa', when: '6 min ago', note: 'Hyundai Elantra out front. usual.' },
+    { place: 'Creek County Courthouse area', when: '1h ago', note: 'unclear reason. didn\'t stay long.' },
+    { place: 'BP station off Hwy 66, Sapulpa', when: '2h ago', note: 'fueling up. posted a story from the pump.' },
+    { place: '320 N 14th St', when: 'this morning', note: 'lights on until midnight. someone else\'s car parked outside earlier.' },
+    { place: 'Tulsa — someone drove her', when: 'last night, late', note: 'posted a story from midtown at 2:12am. posted from home at 8am. the math is something.' },
+    { place: 'Panera on Yale', when: 'last Saturday', note: 'wasn\'t alone. the other person left fast when we walked in.' },
+    { place: 'QuikTrip on Peoria, Tulsa', when: 'Friday 11:45pm', note: 'someone picked her up here. plate not captured.' },
   ],
   Macy: [
-    { place: 'Utica Square', when: '18 min ago' },
-    { place: 'Chick-fil-A on Peoria', when: '1h ago' },
-    { place: 'Her man\'s place', when: 'last night — all night' },
-    { place: 'Planet Fitness on 41st', when: 'this morning, 7am' },
-    { place: 'Woodland Hills Mall', when: 'yesterday' },
+    { place: 'Utica Square', when: '18 min ago', note: 'shopping. answered a call and laughed for 10 minutes straight.' },
+    { place: 'Chick-fil-A on Peoria', when: '1h ago', note: 'drive-through. white Corolla.' },
+    { place: 'Her man\'s place', when: 'last night — all night', note: 'his truck was there. she was too. good for him, I guess.' },
+    { place: 'Planet Fitness on 41st', when: 'this morning, 7am', note: 'gym every single morning. white Corolla in same spot each time.' },
+    { place: 'Woodland Hills Mall', when: 'yesterday', note: 'with a group. one of them wasn\'t her boyfriend.' },
+    { place: 'Panera on Yale', when: 'two weeks ago', note: 'flirted with someone in line. followed them on Instagram immediately after. noted.' },
+    { place: 'QuikTrip on 51st', when: 'Sunday night 10pm', note: 'alone. her man\'s truck wasn\'t with her.' },
   ],
 };
+
+const LASTSEEN_NOTES_STYLES = [
+  'color:#ff6666;font-size:10px;font-style:italic;',
+  'color:#cc8888;font-size:10px;font-style:italic;',
+  'color:#ff4444;font-size:10px;font-style:italic;',
+];
 
 function buildLastSeen() {
   const el = $('lastSeenList'); if (!el) return;
   const girls = Object.keys(LAST_SEEN_DATA);
+  // pick weighted-random entry per girl (bias toward recent)
   el.innerHTML = girls.map(g => {
     const locs = LAST_SEEN_DATA[g];
-    const current = rand(locs);
+    // pick from first 3 entries (most recent) 70% of the time
+    const pool = Math.random() < 0.7 ? locs.slice(0,3) : locs;
+    const current = rand(pool);
+    const noteStyle = LASTSEEN_NOTES_STYLES[Math.floor(Math.random()*LASTSEEN_NOTES_STYLES.length)];
     return `
       <div class="lastseen-entry">
         <div class="lastseen-dot"></div>
         <div class="lastseen-detail">
-          <div class="lastseen-name">${DOSSIER[g]?.fullName||g}</div>
+          <div class="lastseen-name">${DOSSIER[g]?.fullName||g} <span style="font-size:9px;letter-spacing:2px;color:#8a3030;text-transform:uppercase">${DOSSIER[g]?.nickname||''}</span></div>
           <div class="lastseen-location">📍 ${current.place}</div>
           <div class="lastseen-when">${current.when}</div>
+          ${current.note ? `<div style="${noteStyle}">↳ ${current.note}</div>` : ''}
         </div>
       </div>`;
   }).join('');
@@ -2381,13 +2599,19 @@ window.pickMatchOpt = pickMatchOpt;
 
 // ─── COMPARE TWO GIRLS ───────────────────────────────────────────
 const COMPARE_STATS = [
-  { label: 'Threat Level', key: 'threat', fmt: v => `${v}/10` },
+  { label: 'Threat Level', key: 'threat', fmt: v => `⚡${v}/10` },
   { label: 'Status', key: 'status', fmt: v => v },
-  { label: 'Weakness', key: 'weakness', fmt: v => v },
+  { label: 'Age', key: 'age', fmt: v => v },
+  { label: 'School', key: 'school', fmt: v => v },
   { label: 'Location', key: 'addr', fmt: v => `📍 ${v}` },
   { label: 'Instagram', key: 'insta', fmt: v => `📸 ${v}` },
   { label: 'Phone', key: 'phone', fmt: v => `📞 ${v}` },
-  { label: 'Intel', key: 'notes', fmt: v => v },
+  { label: 'Car', key: 'car', fmt: v => `🚗 ${v}` },
+  { label: 'Hangouts', key: 'hangout', fmt: v => v },
+  { label: 'Weakness', key: 'weakness', fmt: v => v },
+  { label: 'Type', key: 'type', fmt: v => v },
+  { label: 'Red Flag', key: 'flag', fmt: v => v },
+  { label: 'Intel', key: 'intel', fmt: v => v },
 ];
 function buildCompare() {
   const wrap = $('compareWrap'); if (!wrap) return;
@@ -2452,12 +2676,12 @@ function runFeedNotif() {
     <div class="feed-notif-time">just now</div>`;
   feedNotifEl.classList.remove('hide');
   feedNotifEl.classList.add('show');
-  // hide after 4s, wait 20s total between notifications
+  // hide after 20s, wait 30s total between notifications
   setTimeout(() => {
     feedNotifEl.classList.add('hide');
     feedNotifEl.classList.remove('show');
-    setTimeout(runFeedNotif, 16000);
-  }, 4000);
+    setTimeout(runFeedNotif, 10000);
+  }, 20000);
 }
 
 function generateFeedBatch(n) {
@@ -2478,8 +2702,7 @@ function showSecretSection(id) {
   if (id === 'smatch') buildMatchCalc();
 }
 
-// build photo of the day on main site load
-buildPhotoOfTheDay();
+// build ticker on main site load
 
 // ═══════════════════════════════════════════════════════════════
 //  SHE SAID · GROUP CHAT · POLL OF THE DAY
@@ -2512,6 +2735,27 @@ const SHE_SAID_QUOTES = [
   { quote: "The reserved thing is an act. I figured out it makes guys try harder.", girl: 'Allie', decoy: ['Nya','Remi','Macy'] },
   { quote: "I answered at 2am. That's not an invitation. But also it kind of is.", girl: 'Rileigh', decoy: ['Stella','Nya','Allie'] },
   { quote: "My location is always off. Not because I'm hiding. Because I'm always hiding.", girl: 'Remi', decoy: ['Nya','Macy','Stella'] },
+  { quote: "I texted him 'can't sleep' at midnight. I could sleep. I just didn't want to.", girl: 'Allie', decoy: ['Remi','Nya','Macy'] },
+  { quote: "He keeps asking if we're a thing. I keep changing the subject. He keeps coming back. System works.", girl: 'Nya', decoy: ['Stella','Rileigh','Remi'] },
+  { quote: "I have his location. He doesn't have mine. That's how it should be.", girl: 'Rileigh', decoy: ['Stella','Macy','Allie'] },
+  { quote: "I wore that on purpose and I will not be apologizing for what happened next.", girl: 'Stella', decoy: ['Rileigh','Nya','Remi'] },
+  { quote: "I'm literally so loyal. To whoever I'm with at that exact moment.", girl: 'Stella', decoy: ['Remi','Macy','Rileigh'] },
+  { quote: "He drove to Sapulpa for me. I made him wait in the driveway for 15 minutes. He waited.", girl: 'Rileigh', decoy: ['Allie','Nya','Stella'] },
+  { quote: "My boyfriend follows all my friends. He doesn't follow the accounts I'm on.", girl: 'Macy', decoy: ['Remi','Allie','Stella'] },
+  { quote: "I smiled at him twice and now he's fully down bad. Not my problem but also kind of my favorite thing.", girl: 'Nya', decoy: ['Stella','Allie','Remi'] },
+  { quote: "I have a type and it's 'emotionally available enough to be useful but not so much that he gets attached'", girl: 'Stella', decoy: ['Nya','Rileigh','Macy'] },
+  { quote: "I told him nothing was going on. Nothing was going on yet. Technically true.", girl: 'Remi', decoy: ['Macy','Stella','Allie'] },
+  { quote: "I got into his car. I did not tell anyone I got into his car.", girl: 'Allie', decoy: ['Remi','Nya','Rileigh'] },
+  { quote: "He's been texting for three weeks. I respond every fourth text. He tries harder every time.", girl: 'Nya', decoy: ['Rileigh','Stella','Macy'] },
+  { quote: "My man would literally fight someone for me. I find that hot. And occasionally useful.", girl: 'Macy', decoy: ['Stella','Remi','Allie'] },
+  { quote: "I'm not flirting I'm just friendly. To everyone. Constantly. In a way that is indistinguishable from flirting.", girl: 'Remi', decoy: ['Nya','Allie','Macy'] },
+  { quote: "Two of his friends have my number. He gave it to them. He thought that was fine. It was not fine.", girl: 'Stella', decoy: ['Rileigh','Remi','Nya'] },
+  { quote: "I know exactly who's driving through Sapulpa hoping to 'run into' me. I just don't say anything.", girl: 'Rileigh', decoy: ['Allie','Macy','Remi'] },
+  { quote: "He asked if I liked him. I said 'obviously' and then walked away. That's enough for now.", girl: 'Allie', decoy: ['Nya','Stella','Rileigh'] },
+  { quote: "I went to his house. His roommates now have a nickname for me. I've heard it. I'm fine with it.", girl: 'Stella', decoy: ['Macy','Rileigh','Nya'] },
+  { quote: "I only post at night because I know exactly who's still up and checking.", girl: 'Rileigh', decoy: ['Nya','Remi','Allie'] },
+  { quote: "He said he wasn't like other guys. He was exactly like other guys but in a way I was okay with.", girl: 'Nya', decoy: ['Stella','Macy','Remi'] },
+  { quote: "My ex still watches all my stories within 30 seconds. My boyfriend takes three days. Read into that.", girl: 'Macy', decoy: ['Remi','Stella','Allie'] },
 ];
 
 let sheSaidIdx = 0;
@@ -2636,6 +2880,74 @@ const GC_SCRIPT = [
   { from:'Cruz', msg:'it\'s only 25 minutes' },
   { from:'Jack', msg:'you have a problem' },
   { from:'Cruz', msg:'I have a destination' },
+  { from:'Jackson', msg:'okay real talk though. ranking time. go.' },
+  { from:'Cruz', msg:'1 stella 2 rileigh 3 nya. locked in.' },
+  { from:'Jaquavion', msg:'1 nya 2 stella 3 macy. final answer.' },
+  { from:'Jack', msg:'1 allie 2 rileigh 3 stella' },
+  { from:'Jackson', msg:'JACK putting allie first is sending me' },
+  { from:'Jack', msg:'she texted me at midnight and showed up to the door in a silk robe. I stand by my ranking.' },
+  { from:'Cruz', msg:'WHAT' },
+  { from:'Jaquavion', msg:'BRO SAY MORE' },
+  { from:'Jack', msg:'I said what I said' },
+  { from:'Jackson', msg:'allie has been so slept on this entire time. I feel robbed.' },
+  { from:'Cruz', msg:'okay changing my ranking. allie is top 2 now.' },
+  { from:'Jaquavion', msg:'same honestly. quiet ones really are built different.' },
+  { from:'Jackson', msg:'switching topics. has anyone actually tried to talk to macy or is her man too scary' },
+  { from:'Cruz', msg:'I accidentally made eye contact with him at walmart once and apologized for no reason' },
+  { from:'Jaquavion', msg:'💀💀 coward behavior' },
+  { from:'Cruz', msg:'he\'s built like a small truck. I\'m not dying for macy cox.' },
+  { from:'Jack', msg:'she keeps liking my stuff though. like consistently.' },
+  { from:'Jackson', msg:'that\'s not an accident. she\'s bored or she\'s curious.' },
+  { from:'Jaquavion', msg:'probably both. taken girls get bored.' },
+  { from:'Cruz', msg:'I\'m not getting involved. I want to live.' },
+  { from:'Jackson', msg:'what about nya though. for real.' },
+  { from:'Jaquavion', msg:'she has a boyfriend' },
+  { from:'Jackson', msg:'remi also has a boyfriend and you were with her' },
+  { from:'Jaquavion', msg:'okay we\'re not doing this again' },
+  { from:'Jack', msg:'nya is a trap bro. she knows she\'s attractive. she uses it.' },
+  { from:'Cruz', msg:'that\'s literally all of them' },
+  { from:'Jack', msg:'nya does it on purpose with a smile on her face. different level.' },
+  { from:'Jackson', msg:'I saw her at QT last week. she looked up from her phone, met my eyes, then went back to her phone.' },
+  { from:'Jaquavion', msg:'classic. she clocked you and decided what to do in one second.' },
+  { from:'Cruz', msg:'she lives rent free in your head and she doesn\'t even know your name bro' },
+  { from:'Jackson', msg:'correct. and I\'m fine with it.' },
+  { from:'Jack', msg:'remi update: she texted me again last night' },
+  { from:'Cruz', msg:'BRO.' },
+  { from:'Jaquavion', msg:'what did she say' },
+  { from:'Jack', msg:'"hey what are you up to" at 11:30pm' },
+  { from:'Jackson', msg:'that is NOT a casual text. that is a deliberate text.' },
+  { from:'Cruz', msg:'what did you say back' },
+  { from:'Jack', msg:'"not much, you?" like a normal person' },
+  { from:'Jaquavion', msg:'you are not a normal person that is a power move' },
+  { from:'Jack', msg:'she said "bored lol" and I said "same" and then she went quiet for 40 minutes' },
+  { from:'Cruz', msg:'she was deciding how far to take it' },
+  { from:'Jackson', msg:'and then?' },
+  { from:'Jack', msg:'sent a selfie at midnight with no caption' },
+  { from:'Jaquavion', msg:'I\'M SORRY WHAT' },
+  { from:'Cruz', msg:'THAT IS NOT A CASUAL SELFIE' },
+  { from:'Jackson', msg:'remi barnard is not okay and I mean that in the best way' },
+  { from:'Jack', msg:'I didn\'t respond until morning. she sent a "lol nm" at 1am.' },
+  { from:'Jaquavion', msg:'you played her perfectly by accident' },
+  { from:'Cruz', msg:'what\'s her boyfriend doing in all this' },
+  { from:'Jack', msg:'apparently they\'re on a break again. third time this year.' },
+  { from:'Jackson', msg:'"on a break" is the most dangerous phrase in the english language' },
+  { from:'Jaquavion', msg:'because it means anything could happen and nothing counts' },
+  { from:'Cruz', msg:'I think about stella and this conversation will not help' },
+  { from:'Jackson', msg:'she posted at 2am again. the video with the song in the background.' },
+  { from:'Jaquavion', msg:'bro that song is what she plays when she\'s in her feelings' },
+  { from:'Cruz', msg:'or when she wants someone to notice she\'s in her feelings' },
+  { from:'Jack', msg:'the difference is irrelevant. both require action.' },
+  { from:'Jackson', msg:'rileigh also posted at 2am by the way. this is a pattern.' },
+  { from:'Cruz', msg:'they coordinate. I\'m convinced.' },
+  { from:'Jaquavion', msg:'imagine if rileigh and stella were in the same place at the same time' },
+  { from:'Jack', msg:'that would be genuinely dangerous for everyone involved' },
+  { from:'Jackson', msg:'I need to not be alive for that event because I would make bad decisions' },
+  { from:'Cruz', msg:'you\'re already making bad decisions and they\'re not even here' },
+  { from:'Jaquavion', msg:'on that note I\'m going to bed. gonna think about nya. goodnight.' },
+  { from:'Jackson', msg:'💀 same. night.' },
+  { from:'Jack', msg:'night. remi texted again btw.' },
+  { from:'Cruz', msg:'JACK' },
+  { from:'Jack', msg:'I\'m handling it. goodnight.' },
 ];
 
 let gcIdx = 0;
