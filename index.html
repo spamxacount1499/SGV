@@ -70,6 +70,8 @@
       <button class="game-tab" data-pane="paneRoast">🔥 Roast or Toast</button>
       <button class="game-tab" data-pane="paneRoster">👑 The Roster</button>
       <button class="game-tab" data-pane="paneBingo">🎯 Bingo</button>
+      <button class="game-tab" data-pane="paneCards">🃏 Trading Cards</button>
+      <button class="game-tab" data-pane="paneScreenshot">📱 Screenshot</button>
     </div>
     <div class="game-pane on" id="paneWyr">
       <p class="wyr-score">Wins — Left: <span id="wyrScoreL">0</span> · Right: <span id="wyrScoreR">0</span></p>
@@ -185,6 +187,102 @@
       <div class="bingo-board" id="bingoBoard"></div>
       <button class="game-btn primary" id="bingoNew">New Card 🎯</button>
       <div class="bingo-status" id="bingoStatus"></div>
+    </div>
+
+    <!-- TRADING CARDS -->
+    <div class="game-pane" id="paneCards">
+      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px">Collect them all. Battle your way to the top.</p>
+      <div class="card-tabs">
+        <button class="card-tab on" data-card-view="collection">My Collection</button>
+        <button class="card-tab" data-card-view="packs">Open Packs</button>
+        <button class="card-tab" data-card-view="battle">Card Battle</button>
+      </div>
+      
+      <div class="card-view on" id="cardCollection">
+        <div class="card-stats-bar">
+          <div class="card-stat">
+            <span class="card-stat-val" id="cardTotal">0</span>
+            <span class="card-stat-lbl">Total Cards</span>
+          </div>
+          <div class="card-stat">
+            <span class="card-stat-val" id="cardLegendary">0</span>
+            <span class="card-stat-lbl">Legendary</span>
+          </div>
+          <div class="card-stat">
+            <span class="card-stat-val" id="cardRare">0</span>
+            <span class="card-stat-lbl">Rare</span>
+          </div>
+        </div>
+        <div class="card-grid" id="cardGrid"></div>
+      </div>
+      
+      <div class="card-view" id="cardPacks">
+        <div class="pack-showcase">
+          <div class="pack-card" id="packCard">
+            <div class="pack-shine"></div>
+            <div class="pack-label">STARTER PACK</div>
+            <div class="pack-subtitle">5 Random Cards</div>
+          </div>
+        </div>
+        <button class="game-btn primary" id="openPackBtn">OPEN PACK ✦</button>
+        <div class="pack-results" id="packResults"></div>
+      </div>
+      
+      <div class="card-view" id="cardBattle">
+        <div class="battle-arena">
+          <div class="battle-side">
+            <div class="battle-card" id="battlePlayerCard"></div>
+            <div class="battle-stats" id="battlePlayerStats"></div>
+          </div>
+          <div class="battle-vs">VS</div>
+          <div class="battle-side">
+            <div class="battle-card" id="battleOpponentCard"></div>
+            <div class="battle-stats" id="battleOpponentStats"></div>
+          </div>
+        </div>
+        <div class="battle-result" id="battleResult"></div>
+        <button class="game-btn primary" id="battleBtn">START BATTLE ⚔️</button>
+      </div>
+    </div>
+
+    <!-- SCREENSHOT GALLERY -->
+    <div class="game-pane" id="paneScreenshot">
+      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px">Create the perfect screenshot. Make it look real.</p>
+      <div class="screenshot-workspace">
+        <div class="screenshot-preview" id="screenshotPreview">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen" id="phoneScreen">
+              <div class="screenshot-time">2:47 AM</div>
+              <div class="screenshot-content" id="screenshotContent"></div>
+            </div>
+          </div>
+        </div>
+        <div class="screenshot-controls">
+          <div class="control-group">
+            <label>Template</label>
+            <select id="screenshotTemplate" class="screenshot-select">
+              <option value="text">Text Message</option>
+              <option value="ig-dm">Instagram DM</option>
+              <option value="ig-story">Instagram Story</option>
+              <option value="snap">Snapchat</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Select Photo</label>
+            <button class="game-btn" id="selectPhotoBtn">Choose Photo</button>
+          </div>
+          <div class="control-group">
+            <label>Message Text</label>
+            <textarea id="screenshotText" class="screenshot-textarea" placeholder="Type message here..."></textarea>
+          </div>
+          <div class="control-group">
+            <label>Sender Name</label>
+            <input type="text" id="screenshotName" class="screenshot-input" placeholder="Sophie">
+          </div>
+          <button class="game-btn primary" id="downloadScreenshot">📥 Download Screenshot</button>
+        </div>
+      </div>
     </div>
   </div>
 </section>
