@@ -1388,3 +1388,592 @@ body.joi-open{overflow:hidden}
 .vault-bingo-status {
   color: var(--red);
 }
+
+/* ── BINGO PHOTO LABELS ── */
+.bingo-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(13, 5, 8, 0.95), transparent);
+  padding: 8px 4px 4px;
+  font-size: 9px;
+  text-align: center;
+  color: var(--pink);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 2;
+  transition: all 0.3s;
+}
+
+.bingo-cell:hover .bingo-label {
+  background: linear-gradient(to top, rgba(13, 5, 8, 1), rgba(13, 5, 8, 0.8));
+  padding-bottom: 8px;
+}
+
+.bingo-cell.marked .bingo-label {
+  background: linear-gradient(to top, rgba(244, 167, 185, 0.95), rgba(244, 167, 185, 0.7));
+  color: var(--bg);
+}
+
+.bingo-cell.marked::before {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  color: var(--pink);
+  font-weight: 700;
+  z-index: 3;
+  text-shadow: 
+    0 0 10px rgba(244, 167, 185, 0.8),
+    0 0 20px rgba(244, 167, 185, 0.6),
+    2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.bingo-cell.marked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(244, 167, 185, 0.3);
+  z-index: 2;
+}
+
+/* Vault bingo labels */
+.vault-bingo-label {
+  color: var(--red);
+}
+
+.vault-bingo-board .bingo-cell.marked .bingo-label {
+  background: linear-gradient(to top, rgba(255, 34, 34, 0.95), rgba(255, 34, 34, 0.7));
+  color: var(--bg);
+}
+
+.vault-bingo-board .bingo-cell.marked::before {
+  color: var(--red);
+  text-shadow: 
+    0 0 10px rgba(255, 34, 34, 0.8),
+    0 0 20px rgba(255, 34, 34, 0.6),
+    2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.vault-bingo-board .bingo-cell.marked::after {
+  background: rgba(255, 34, 34, 0.3);
+}
+
+/* ══════════════════════════════════════════════════════
+   TRADING CARDS
+══════════════════════════════════════════════════════ */
+
+.card-tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.card-tab {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 8px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.card-tab:hover, .card-tab.on {
+  border-color: var(--pink);
+  color: var(--pink);
+  background: rgba(244, 167, 185, 0.05);
+}
+
+.card-view {
+  display: none;
+}
+
+.card-view.on {
+  display: block;
+}
+
+/* Card Stats Bar */
+.card-stats-bar {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(244, 167, 185, 0.03);
+  border: 1px solid var(--border);
+}
+
+.card-stat {
+  text-align: center;
+}
+
+.card-stat-val {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: var(--pink);
+  font-weight: 700;
+}
+
+.card-stat-lbl {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Card Grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.trading-card {
+  aspect-ratio: 2.5/3.5;
+  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.trading-card:hover {
+  transform: translateY(-8px) scale(1.05);
+  border-color: var(--pink);
+  box-shadow: 0 10px 30px rgba(244, 167, 185, 0.3);
+}
+
+.trading-card.legendary {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #2a2010, #3a3020);
+}
+
+.trading-card.legendary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+  animation: shine 3s ease infinite;
+}
+
+@keyframes shine {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
+.trading-card.rare {
+  border-color: var(--pink);
+}
+
+.card-img {
+  width: 100%;
+  height: 60%;
+  object-fit: cover;
+}
+
+.card-info {
+  padding: 10px;
+  height: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.card-model {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.card-rarity {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(13, 5, 8, 0.9);
+  padding: 4px 8px;
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: 1px solid;
+}
+
+.card-rarity.legendary {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.card-rarity.rare {
+  color: var(--pink);
+  border-color: var(--pink);
+}
+
+.card-rarity.common {
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.card-power {
+  font-size: 11px;
+  color: var(--pink);
+  font-weight: 600;
+}
+
+/* Pack Opening */
+.pack-showcase {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  padding: 40px;
+}
+
+.pack-card {
+  width: 250px;
+  height: 350px;
+  background: linear-gradient(135deg, var(--gold), var(--pink));
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pack-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 50px rgba(244, 167, 185, 0.5);
+}
+
+.pack-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shine 2s ease infinite;
+}
+
+.pack-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--bg);
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.pack-subtitle {
+  font-size: 14px;
+  color: var(--bg);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 10px;
+  z-index: 2;
+}
+
+.pack-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 30px;
+  animation: fadeInUp 0.6s ease;
+}
+
+/* Card Battle */
+.battle-arena {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 30px;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 30px;
+  background: rgba(244, 167, 185, 0.03);
+  border: 1px solid var(--border);
+}
+
+.battle-side {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.battle-card {
+  width: 200px;
+  min-height: 280px;
+}
+
+.battle-vs {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--pink);
+}
+
+.battle-stats {
+  width: 100%;
+  background: rgba(244, 167, 185, 0.05);
+  padding: 15px;
+  border: 1px solid var(--border);
+}
+
+.battle-stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.battle-stat-label {
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.battle-stat-val {
+  color: var(--pink);
+  font-weight: 600;
+}
+
+.battle-result {
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  color: var(--pink);
+  min-height: 40px;
+  margin-bottom: 20px;
+}
+
+/* ══════════════════════════════════════════════════════
+   SCREENSHOT GALLERY
+══════════════════════════════════════════════════════ */
+
+.screenshot-workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  padding: 20px;
+}
+
+.screenshot-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(244, 167, 185, 0.03);
+  border: 1px solid var(--border);
+  padding: 40px;
+  min-height: 600px;
+}
+
+.phone-frame {
+  width: 350px;
+  background: #000;
+  border-radius: 40px;
+  padding: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.phone-notch {
+  width: 120px;
+  height: 25px;
+  background: #000;
+  border-radius: 0 0 20px 20px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.phone-screen {
+  background: #fff;
+  border-radius: 30px;
+  overflow: hidden;
+  min-height: 600px;
+  position: relative;
+}
+
+.screenshot-time {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+  color: #fff;
+  padding: 30px 20px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.screenshot-content {
+  padding: 20px;
+}
+
+.screenshot-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-group label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.screenshot-select,
+.screenshot-input,
+.screenshot-textarea {
+  background: rgba(244, 167, 185, 0.03);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  transition: all 0.3s;
+}
+
+.screenshot-select:focus,
+.screenshot-input:focus,
+.screenshot-textarea:focus {
+  outline: none;
+  border-color: var(--pink);
+  background: rgba(244, 167, 185, 0.06);
+}
+
+.screenshot-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Screenshot Templates */
+.ss-text-message {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ss-bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.ss-bubble.received {
+  background: #e5e5ea;
+  color: #000;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.ss-bubble.sent {
+  background: #007aff;
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.ss-ig-dm {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.ss-ig-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.ss-ig-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--pink), var(--gold));
+}
+
+.ss-ig-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #000;
+}
+
+.ss-ig-message {
+  padding: 15px;
+}
+
+.ss-ig-bubble {
+  background: #efefef;
+  padding: 12px 16px;
+  border-radius: 20px;
+  display: inline-block;
+  max-width: 75%;
+  font-size: 14px;
+  color: #000;
+}
+
+.ss-ig-photo {
+  width: 100%;
+  max-width: 250px;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 968px) {
+  .screenshot-workspace {
+    grid-template-columns: 1fr;
+  }
+  
+  .phone-frame {
+    width: 300px;
+  }
+  
+  .phone-screen {
+    min-height: 500px;
+  }
+  
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  
+  .battle-arena {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .battle-vs {
+    font-size: 32px;
+  }
+}
