@@ -191,10 +191,10 @@
 
     <!-- TRADING CARDS -->
     <div class="game-pane" id="paneCards">
-      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px">Collect them all. Battle your way to the top.</p>
+      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px">Collect. Battle. Dominate.</p>
       <div class="card-tabs">
         <button class="card-tab on" data-card-view="collection">My Collection</button>
-        <button class="card-tab" data-card-view="packs">Open Packs</button>
+        <button class="card-tab" data-card-view="packs">Pack Shop</button>
         <button class="card-tab" data-card-view="battle">Card Battle</button>
       </div>
       
@@ -203,6 +203,14 @@
           <div class="card-stat">
             <span class="card-stat-val" id="cardTotal">0</span>
             <span class="card-stat-lbl">Total Cards</span>
+          </div>
+          <div class="card-stat">
+            <span class="card-stat-val" id="cardPointsDisplay">0</span>
+            <span class="card-stat-lbl">Points</span>
+          </div>
+          <div class="card-stat">
+            <span class="card-stat-val" id="cardWinsDisplay">0</span>
+            <span class="card-stat-lbl">Wins</span>
           </div>
           <div class="card-stat">
             <span class="card-stat-val" id="cardLegendary">0</span>
@@ -217,14 +225,11 @@
       </div>
       
       <div class="card-view" id="cardPacks">
-        <div class="pack-showcase">
-          <div class="pack-card" id="packCard">
-            <div class="pack-shine"></div>
-            <div class="pack-label">STARTER PACK</div>
-            <div class="pack-subtitle">5 Random Cards</div>
-          </div>
+        <div class="pack-shop-header">
+          <h3 style="font-family:'Playfair Display',serif;color:var(--pink);margin-bottom:10px">Pack Shop</h3>
+          <p style="font-size:12px;color:var(--muted)">Win battles to earn points, then buy packs to grow your collection</p>
         </div>
-        <button class="game-btn primary" id="openPackBtn">OPEN PACK ✦</button>
+        <div class="pack-shop-grid" id="packShopGrid"></div>
         <div class="pack-results" id="packResults"></div>
       </div>
       
@@ -247,7 +252,7 @@
 
     <!-- SCREENSHOT GALLERY -->
     <div class="game-pane" id="paneScreenshot">
-      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px">Create the perfect screenshot. Make it look real.</p>
+      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px">Create fake text conversations. Make it look real.</p>
       <div class="screenshot-workspace">
         <div class="screenshot-preview" id="screenshotPreview">
           <div class="phone-frame">
@@ -260,17 +265,9 @@
         </div>
         <div class="screenshot-controls">
           <div class="control-group">
-            <label>Template</label>
-            <select id="screenshotTemplate" class="screenshot-select">
-              <option value="text">Text Message</option>
-              <option value="ig-dm">Instagram DM</option>
-              <option value="ig-story">Instagram Story</option>
-              <option value="snap">Snapchat</option>
-            </select>
-          </div>
-          <div class="control-group">
             <label>Select Photo</label>
             <button class="game-btn" id="selectPhotoBtn">Choose Photo</button>
+            <div id="selectedPhotoPreview" style="margin-top:10px"></div>
           </div>
           <div class="control-group">
             <label>Message Text</label>
@@ -278,9 +275,9 @@
           </div>
           <div class="control-group">
             <label>Sender Name</label>
-            <input type="text" id="screenshotName" class="screenshot-input" placeholder="Sophie">
+            <input type="text" id="screenshotName" class="screenshot-input" placeholder="Sophie" value="Sophie">
           </div>
-          <button class="game-btn primary" id="downloadScreenshot">📥 Download Screenshot</button>
+          <button class="game-btn primary" id="downloadScreenshot">📥 Save Screenshot</button>
         </div>
       </div>
     </div>
@@ -440,8 +437,6 @@
             <button class="secret-model-btn" data-ssection="sdossier">📁 Dossier</button>
             <button class="secret-model-btn" data-ssection="salibi">🌙 Alibi</button>
             <button class="secret-model-btn" data-ssection="slastseen">📍 Last Seen</button>
-            <button class="secret-model-btn" data-ssection="scompare">⚖️ Compare</button>
-            <button class="secret-model-btn" data-ssection="smatch">💘 Your Match</button>
             <button class="secret-model-btn" data-ssection="snotes">📝 Secret Notes</button>
           </div>
         </div>
@@ -758,25 +753,6 @@
         </div>
 
         <!-- COMPARE -->
-        <div class="secret-section" id="scompare">
-          <div class="game-wrap">
-            <h2 class="game-title vault-title">⚖️ Compare</h2>
-            <p class="game-sub">Side by side. No mercy.</p>
-            <div class="div vault-div"></div>
-            <div id="compareWrap"></div>
-          </div>
-        </div>
-
-        <!-- MATCH CALCULATOR -->
-        <div class="secret-section" id="smatch">
-          <div class="game-wrap">
-            <h2 class="game-title vault-title">💘 Your Match</h2>
-            <p class="game-sub">5 questions. One answer.</p>
-            <div class="div vault-div"></div>
-            <div id="matchContainer"></div>
-          </div>
-        </div>
-
         <!-- SHE SAID -->
         <div class="secret-section" id="sshesaid">
           <div class="game-wrap">
@@ -899,6 +875,103 @@
             <div class="bingo-board vault-bingo-board" id="vaultBingoBoard"></div>
             <button class="game-btn vault-btn" id="vaultBingoNew">New Card 🎯</button>
             <div class="bingo-status vault-bingo-status" id="vaultBingoStatus"></div>
+          </div>
+        </div>
+
+        <!-- VAULT TRADING CARDS -->
+        <div class="secret-section" id="scards">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">🃏 Vault Cards</h2>
+            <p class="game-sub">Collect. Battle. Dominate the vault.</p>
+            <div class="div vault-div"></div>
+            <div class="card-tabs vault-card-tabs">
+              <button class="card-tab vault-card-tab on" data-card-view="vault-collection">Collection</button>
+              <button class="card-tab vault-card-tab" data-card-view="vault-packs">Pack Shop</button>
+              <button class="card-tab vault-card-tab" data-card-view="vault-battle">Battle</button>
+            </div>
+            
+            <div class="card-view on" id="vaultCardCollection">
+              <div class="card-stats-bar vault-card-stats">
+                <div class="card-stat">
+                  <span class="card-stat-val" id="vaultCardTotal">0</span>
+                  <span class="card-stat-lbl">Cards</span>
+                </div>
+                <div class="card-stat">
+                  <span class="card-stat-val" id="vaultCardPoints">0</span>
+                  <span class="card-stat-lbl">Points</span>
+                </div>
+                <div class="card-stat">
+                  <span class="card-stat-val" id="vaultCardWins">0</span>
+                  <span class="card-stat-lbl">Wins</span>
+                </div>
+                <div class="card-stat">
+                  <span class="card-stat-val" id="vaultCardLegendary">0</span>
+                  <span class="card-stat-lbl">Legendary</span>
+                </div>
+              </div>
+              <div class="card-grid vault-card-grid" id="vaultCardGrid"></div>
+            </div>
+            
+            <div class="card-view" id="vaultCardPacks">
+              <div class="pack-shop-header">
+                <h3 style="font-family:'Playfair Display',serif;color:var(--red);margin-bottom:10px">Vault Pack Shop</h3>
+                <p style="font-size:12px;color:var(--red2)">Battle to earn points and collect the rarest vault cards</p>
+              </div>
+              <div class="pack-shop-grid vault-pack-shop" id="vaultPackShopGrid"></div>
+              <div class="pack-results vault-pack-results" id="vaultPackResults"></div>
+            </div>
+            
+            <div class="card-view" id="vaultCardBattle">
+              <div class="battle-arena vault-battle-arena">
+                <div class="battle-side">
+                  <div class="battle-card" id="vaultBattlePlayerCard"></div>
+                  <div class="battle-stats vault-battle-stats" id="vaultBattlePlayerStats"></div>
+                </div>
+                <div class="battle-vs" style="color:var(--red)">VS</div>
+                <div class="battle-side">
+                  <div class="battle-card" id="vaultBattleOpponentCard"></div>
+                  <div class="battle-stats vault-battle-stats" id="vaultBattleOpponentStats"></div>
+                </div>
+              </div>
+              <div class="battle-result" id="vaultBattleResult"></div>
+              <button class="game-btn vault-btn" id="vaultBattleBtn">START BATTLE ⚔️</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- VAULT SCREENSHOT -->
+        <div class="secret-section" id="sscreenshot">
+          <div class="game-wrap">
+            <h2 class="game-title vault-title">📱 Forged Messages</h2>
+            <p class="game-sub">Create fake texts. Make it convincing.</p>
+            <div class="div vault-div"></div>
+            <div class="screenshot-workspace vault-screenshot">
+              <div class="screenshot-preview">
+                <div class="phone-frame vault-phone-frame">
+                  <div class="phone-notch"></div>
+                  <div class="phone-screen" id="vaultPhoneScreen">
+                    <div class="screenshot-time">2:47 AM</div>
+                    <div class="screenshot-content" id="vaultScreenshotContent"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="screenshot-controls vault-screenshot-controls">
+                <div class="control-group">
+                  <label style="color:var(--red2)">Select Photo</label>
+                  <button class="game-btn vault-btn" id="vaultSelectPhotoBtn">Choose Photo</button>
+                  <div id="vaultSelectedPhotoPreview" style="margin-top:10px"></div>
+                </div>
+                <div class="control-group">
+                  <label style="color:var(--red2)">Message</label>
+                  <textarea id="vaultScreenshotText" class="screenshot-textarea vault-textarea" placeholder="Type message..."></textarea>
+                </div>
+                <div class="control-group">
+                  <label style="color:var(--red2)">Sender Name</label>
+                  <input type="text" id="vaultScreenshotName" class="screenshot-input vault-input" placeholder="Nya" value="Nya">
+                </div>
+                <button class="game-btn vault-btn" id="vaultDownloadScreenshot">📥 Save Screenshot</button>
+              </div>
+            </div>
           </div>
         </div>
 
