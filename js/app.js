@@ -140,6 +140,8 @@ function initVaultContent() {
   buildDraft();
   initLastSeen();
   initVaultGames();
+  initVaultTradingCards();
+  initVaultScreenshot();
 }
 $('secretExit').addEventListener('click', () => {
   $('secretWrap').classList.remove('open');
@@ -3749,15 +3751,23 @@ let pollVoted = false;
 
 function buildPollOfDay() {
   const el = $('pollContainer'); if (!el) return;
-  if (!currentPoll) currentPoll = rand(POLL_MATCHUPS);
+  if (!currentPoll) {
+    currentPoll = rand(POLL_MATCHUPS);
+    // Cache photos with this poll so they don't change on re-render
+    const photoA = rand(SECRET_PHOTOS.filter(ph=>ph.model===currentPoll.a)||SECRET_PHOTOS);
+    const photoB = rand(SECRET_PHOTOS.filter(ph=>ph.model===currentPoll.b)||SECRET_PHOTOS);
+    currentPoll.cachedPhotoA = photoA;
+    currentPoll.cachedPhotoB = photoB;
+  }
   const p = currentPoll;
   if (!pollVotes[p.q]) pollVotes[p.q] = { a: Math.floor(Math.random()*40+10), b: Math.floor(Math.random()*40+10) };
   const votes = pollVotes[p.q];
   const total = votes.a + votes.b;
   const pctA = Math.round(votes.a/total*100);
   const pctB = 100-pctA;
-  const photoA = rand(SECRET_PHOTOS.filter(ph=>ph.model===p.a)||SECRET_PHOTOS);
-  const photoB = rand(SECRET_PHOTOS.filter(ph=>ph.model===p.b)||SECRET_PHOTOS);
+  // Use cached photos instead of re-randomizing
+  const photoA = p.cachedPhotoA;
+  const photoB = p.cachedPhotoB;
   el.innerHTML = `
     <div class="poll-question">${p.q}</div>
     <div class="poll-options">
@@ -3783,7 +3793,16 @@ function castVote(side) {
   buildPollOfDay();
   addDangerScore(side==='a'?currentPoll.a:currentPoll.b, 2);
 }
-function newPoll() { currentPoll = rand(POLL_MATCHUPS); pollVoted = false; buildPollOfDay(); }
+function newPoll() { 
+  currentPoll = rand(POLL_MATCHUPS); 
+  // Cache new photos when creating new poll
+  const photoA = rand(SECRET_PHOTOS.filter(ph=>ph.model===currentPoll.a)||SECRET_PHOTOS);
+  const photoB = rand(SECRET_PHOTOS.filter(ph=>ph.model===currentPoll.b)||SECRET_PHOTOS);
+  currentPoll.cachedPhotoA = photoA;
+  currentPoll.cachedPhotoB = photoB;
+  pollVoted = false; 
+  buildPollOfDay(); 
+}
 window.castVote = castVote;
 window.newPoll = newPoll;
 
@@ -4949,52 +4968,141 @@ function renderBingoBoard() {
   if (!board) return;
   
   board.innerHTML = '';
-  const photos = shuffle([...PHOTOS]).slice(0, 25);
   
   bingoCard.forEach((obj, idx) => {
     const cell = document.createElement('div');
     cell.className = 'bingo-cell';
+    cell.dataset.objective = obj;
+    
     if (obj === 'FREE') {
       cell.classList.add('free');
       cell.textContent = 'FREE';
+      bingoMarked.add(idx);
     } else {
-      // Add photo to cell
-      const photo = photos[idx] || rand(PHOTOS);
-      const img = document.createElement('img');
-      img.src = photo.src;
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'cover';
-      img.style.position = 'absolute';
-      img.style.inset = '0';
-      cell.appendChild(img);
-      
-      // Add objective label
+      // Empty cell with objective label - user clicks to add photo
       const label = document.createElement('div');
-      label.className = 'bingo-label';
+      label.className = 'bingo-label-empty';
       label.textContent = obj;
       cell.appendChild(label);
-    }
-    
-    if (bingoMarked.has(idx)) cell.classList.add('marked');
-    cell.style.position = 'relative';
-    cell.style.overflow = 'hidden';
-    
-    if (obj !== 'FREE') {
+      
+      // Click to select photo for this objective
       cell.addEventListener('click', () => {
-        if (bingoMarked.has(idx)) {
+        if (!bingoMarked.has(idx)) {
+          selectPhotoForBingo(idx, obj, cell);
+        } else {
+          // Already filled - click to unmark
           bingoMarked.delete(idx);
           cell.classList.remove('marked');
-        } else {
-          bingoMarked.add(idx);
-          cell.classList.add('marked');
+          // Remove photo, keep label
+          const img = cell.querySelector('img');
+          if (img) img.remove();
+          const overlay = cell.querySelector('.bingo-marked-overlay');
+          if (overlay) overlay.remove();
         }
-        checkBingo();
       });
     }
     
+    if (bingoMarked.has(idx) && obj !== 'FREE') cell.classList.add('marked');
+    cell.style.position = 'relative';
+    cell.style.overflow = 'hidden';
+    
     board.appendChild(cell);
   });
+}
+
+function selectPhotoForBingo(idx, objective, cell) {
+  // Open photo picker for this bingo square
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.background = 'rgba(0,0,0,0.95)';
+  
+  const container = document.createElement('div');
+  container.style.maxWidth = '90%';
+  container.style.maxHeight = '90vh';
+  container.style.overflow = 'auto';
+  container.style.padding = '20px';
+  
+  const title = document.createElement('h3');
+  title.textContent = `Select photo for: ${objective}`;
+  title.style.color = 'var(--pink)';
+  title.style.textAlign = 'center';
+  title.style.marginBottom = '20px';
+  title.style.fontFamily = "'Playfair Display', serif";
+  container.appendChild(title);
+  
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
+  grid.style.gap = '8px';
+
+  PHOTOS.forEach(photo => {
+    const img = document.createElement('img');
+    img.src = photo.src;
+    img.style.width = '100%';
+    img.style.height = '150px';
+    img.style.objectFit = 'cover';
+    img.style.cursor = 'pointer';
+    img.style.border = '2px solid var(--border)';
+    img.style.transition = 'all 0.3s';
+    
+    img.addEventListener('mouseenter', () => {
+      img.style.borderColor = 'var(--pink)';
+      img.style.transform = 'scale(1.05)';
+    });
+    img.addEventListener('mouseleave', () => {
+      img.style.borderColor = 'var(--border)';
+      img.style.transform = 'scale(1)';
+    });
+    
+    img.addEventListener('click', () => {
+      // Add photo to bingo cell
+      cell.innerHTML = '';
+      const cellImg = document.createElement('img');
+      cellImg.src = photo.src;
+      cellImg.style.width = '100%';
+      cellImg.style.height = '100%';
+      cellImg.style.objectFit = 'cover';
+      cellImg.style.position = 'absolute';
+      cellImg.style.inset = '0';
+      cell.appendChild(cellImg);
+      
+      const label = document.createElement('div');
+      label.className = 'bingo-label';
+      label.textContent = objective;
+      cell.appendChild(label);
+      
+      bingoMarked.add(idx);
+      cell.classList.add('marked');
+      
+      document.body.removeChild(overlay);
+      checkBingo();
+      toast(`Photo added to ${objective}!`);
+    });
+    
+    grid.appendChild(img);
+  });
+
+  container.appendChild(grid);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.position = 'fixed';
+  closeBtn.style.top = '20px';
+  closeBtn.style.right = '20px';
+  closeBtn.style.background = 'var(--bg)';
+  closeBtn.style.border = '1px solid var(--pink)';
+  closeBtn.style.color = 'var(--pink)';
+  closeBtn.style.padding = '10px 20px';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.fontSize = '20px';
+  closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+  overlay.appendChild(container);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
 }
 
 function checkBingo() {
@@ -5340,52 +5448,136 @@ function renderVaultBingoBoard() {
   if (!board) return;
   
   board.innerHTML = '';
-  const photos = shuffle([...SECRET_PHOTOS]).slice(0, 25);
   
   vaultBingoCard.forEach((obj, idx) => {
     const cell = document.createElement('div');
     cell.className = 'bingo-cell';
+    cell.dataset.objective = obj;
+    
     if (obj === 'FREE') {
       cell.classList.add('free');
       cell.textContent = 'FREE';
+      vaultBingoMarked.add(idx);
     } else {
-      // Add photo to cell
-      const photo = photos[idx] || rand(SECRET_PHOTOS);
-      const img = document.createElement('img');
-      img.src = photo.src;
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'cover';
-      img.style.position = 'absolute';
-      img.style.inset = '0';
-      cell.appendChild(img);
-      
-      // Add objective label
+      // Empty cell - click to add photo
       const label = document.createElement('div');
-      label.className = 'bingo-label vault-bingo-label';
+      label.className = 'bingo-label-empty';
       label.textContent = obj;
       cell.appendChild(label);
-    }
-    
-    if (vaultBingoMarked.has(idx)) cell.classList.add('marked');
-    cell.style.position = 'relative';
-    cell.style.overflow = 'hidden';
-    
-    if (obj !== 'FREE') {
+      
       cell.addEventListener('click', () => {
-        if (vaultBingoMarked.has(idx)) {
+        if (!vaultBingoMarked.has(idx)) {
+          selectPhotoForVaultBingo(idx, obj, cell);
+        } else {
           vaultBingoMarked.delete(idx);
           cell.classList.remove('marked');
-        } else {
-          vaultBingoMarked.add(idx);
-          cell.classList.add('marked');
+          const img = cell.querySelector('img');
+          if (img) img.remove();
+          const overlay = cell.querySelector('.bingo-marked-overlay');
+          if (overlay) overlay.remove();
         }
-        checkVaultBingo();
       });
     }
     
+    if (vaultBingoMarked.has(idx) && obj !== 'FREE') cell.classList.add('marked');
+    cell.style.position = 'relative';
+    cell.style.overflow = 'hidden';
+    
     board.appendChild(cell);
   });
+}
+
+function selectPhotoForVaultBingo(idx, objective, cell) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.background = 'rgba(0,0,0,0.95)';
+  
+  const container = document.createElement('div');
+  container.style.maxWidth = '90%';
+  container.style.maxHeight = '90vh';
+  container.style.overflow = 'auto';
+  container.style.padding = '20px';
+  
+  const title = document.createElement('h3');
+  title.textContent = `Select photo for: ${objective}`;
+  title.style.color = 'var(--red)';
+  title.style.textAlign = 'center';
+  title.style.marginBottom = '20px';
+  title.style.fontFamily = "'Playfair Display', serif";
+  container.appendChild(title);
+  
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
+  grid.style.gap = '8px';
+
+  SECRET_PHOTOS.forEach(photo => {
+    const img = document.createElement('img');
+    img.src = photo.src;
+    img.style.width = '100%';
+    img.style.height = '150px';
+    img.style.objectFit = 'cover';
+    img.style.cursor = 'pointer';
+    img.style.border = '2px solid var(--red2)';
+    img.style.transition = 'all 0.3s';
+    
+    img.addEventListener('mouseenter', () => {
+      img.style.borderColor = 'var(--red)';
+      img.style.transform = 'scale(1.05)';
+    });
+    img.addEventListener('mouseleave', () => {
+      img.style.borderColor = 'var(--red2)';
+      img.style.transform = 'scale(1)';
+    });
+    
+    img.addEventListener('click', () => {
+      cell.innerHTML = '';
+      const cellImg = document.createElement('img');
+      cellImg.src = photo.src;
+      cellImg.style.width = '100%';
+      cellImg.style.height = '100%';
+      cellImg.style.objectFit = 'cover';
+      cellImg.style.position = 'absolute';
+      cellImg.style.inset = '0';
+      cell.appendChild(cellImg);
+      
+      const label = document.createElement('div');
+      label.className = 'bingo-label vault-bingo-label';
+      label.textContent = objective;
+      cell.appendChild(label);
+      
+      vaultBingoMarked.add(idx);
+      cell.classList.add('marked');
+      
+      document.body.removeChild(overlay);
+      checkVaultBingo();
+      toast(`Photo added to ${objective}!`);
+    });
+    
+    grid.appendChild(img);
+  });
+
+  container.appendChild(grid);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.position = 'fixed';
+  closeBtn.style.top = '20px';
+  closeBtn.style.right = '20px';
+  closeBtn.style.background = 'var(--bg)';
+  closeBtn.style.border = '1px solid var(--red)';
+  closeBtn.style.color = 'var(--red)';
+  closeBtn.style.padding = '10px 20px';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.fontSize = '20px';
+  closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+  overlay.appendChild(container);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
 }
 
 function checkVaultBingo() {
@@ -5452,22 +5644,47 @@ function initVaultGames() {
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// TRADING CARDS SYSTEM
+// TRADING CARDS SYSTEM - Points & Pack Shop
 // ═══════════════════════════════════════════════════════════════════════════
 
 const cardCollection = [];
 const CARD_RARITIES = ['common', 'rare', 'legendary'];
+let cardPoints = 0;
+let cardBattlesWon = 0;
 
-// Card rarity chances: 60% common, 30% rare, 10% legendary
-function getRandomRarity() {
+const PACK_PRICES = {
+  starter: 0,      // Free starter pack (5 cards, one time only)
+  basic: 100,      // 3 cards
+  premium: 250,    // 5 cards, better odds
+  ultimate: 500    // 10 cards, guaranteed legendary
+};
+
+let hasOpenedStarter = false;
+
+// Card rarity chances
+function getRandomRarity(packType = 'basic') {
   const roll = Math.random();
-  if (roll < 0.6) return 'common';
-  if (roll < 0.9) return 'rare';
-  return 'legendary';
+  
+  if (packType === 'ultimate') {
+    // Ultimate pack: guaranteed legendary + better odds
+    if (roll < 0.3) return 'legendary';
+    if (roll < 0.6) return 'rare';
+    return 'common';
+  } else if (packType === 'premium') {
+    // Premium pack: better odds
+    if (roll < 0.15) return 'legendary';
+    if (roll < 0.45) return 'rare';
+    return 'common';
+  } else {
+    // Basic/starter pack: normal odds
+    if (roll < 0.1) return 'legendary';
+    if (roll < 0.3) return 'rare';
+    return 'common';
+  }
 }
 
-function generateCard(photo) {
-  const rarity = getRandomRarity();
+function generateCard(photo, packType = 'basic') {
+  const rarity = getRandomRarity(packType);
   const basePower = rarity === 'legendary' ? 85 : rarity === 'rare' ? 65 : 45;
   const variance = Math.floor(Math.random() * 20);
   
@@ -5497,16 +5714,16 @@ function initTradingCards() {
     });
   });
   
-  // Give starter cards
+  // Give ONE starter card if brand new
   if (cardCollection.length === 0) {
-    for (let i = 0; i < 3; i++) {
-      const card = generateCard(rand(PHOTOS));
-      cardCollection.push(card);
-    }
+    const starterCard = generateCard(rand(PHOTOS));
+    cardCollection.push(starterCard);
+    toast('You got your first card! Win battles to earn points and buy more packs.');
   }
   
   renderCardCollection();
   updateCardStats();
+  renderPackShop();
 }
 
 function renderCardCollection() {
@@ -5514,7 +5731,7 @@ function renderCardCollection() {
   if (!grid) return;
   
   if (cardCollection.length === 0) {
-    grid.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px">No cards yet. Open a pack!</p>';
+    grid.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px">No cards yet. Win battles to earn points!</p>';
     return;
   }
   
@@ -5539,28 +5756,98 @@ function updateCardStats() {
   if ($('cardTotal')) $('cardTotal').textContent = total;
   if ($('cardLegendary')) $('cardLegendary').textContent = legendary;
   if ($('cardRare')) $('cardRare').textContent = rare;
+  if ($('cardPointsDisplay')) $('cardPointsDisplay').textContent = cardPoints;
+  if ($('cardWinsDisplay')) $('cardWinsDisplay').textContent = cardBattlesWon;
 }
 
-// Pack opening
-$('openPackBtn')?.addEventListener('click', openPack);
+function renderPackShop() {
+  const packsEl = $('packShopGrid');
+  if (!packsEl) return;
+  
+  packsEl.innerHTML = `
+    ${!hasOpenedStarter ? `
+      <div class="pack-shop-item">
+        <div class="pack-preview starter-pack">
+          <div class="pack-shine"></div>
+          <div class="pack-name">STARTER</div>
+          <div class="pack-desc">5 Cards</div>
+        </div>
+        <button class="game-btn primary" onclick="buyPack('starter')">CLAIM FREE ✦</button>
+      </div>
+    ` : ''}
+    <div class="pack-shop-item">
+      <div class="pack-preview basic-pack">
+        <div class="pack-shine"></div>
+        <div class="pack-name">BASIC</div>
+        <div class="pack-desc">3 Cards</div>
+      </div>
+      <button class="game-btn ${cardPoints >= 100 ? 'primary' : ''}" onclick="buyPack('basic')">
+        ${cardPoints >= 100 ? 'BUY - 100 PTS' : '🔒 100 PTS'}
+      </button>
+    </div>
+    <div class="pack-shop-item">
+      <div class="pack-preview premium-pack">
+        <div class="pack-shine"></div>
+        <div class="pack-name">PREMIUM</div>
+        <div class="pack-desc">5 Cards · Better Odds</div>
+      </div>
+      <button class="game-btn ${cardPoints >= 250 ? 'primary' : ''}" onclick="buyPack('premium')">
+        ${cardPoints >= 250 ? 'BUY - 250 PTS' : '🔒 250 PTS'}
+      </button>
+    </div>
+    <div class="pack-shop-item">
+      <div class="pack-preview ultimate-pack">
+        <div class="pack-shine"></div>
+        <div class="pack-name">ULTIMATE</div>
+        <div class="pack-desc">10 Cards · Guaranteed Legendary</div>
+      </div>
+      <button class="game-btn ${cardPoints >= 500 ? 'primary' : ''}" onclick="buyPack('ultimate')">
+        ${cardPoints >= 500 ? 'BUY - 500 PTS' : '🔒 500 PTS'}
+      </button>
+    </div>
+  `;
+}
 
-function openPack() {
+function buyPack(packType) {
+  const price = PACK_PRICES[packType];
+  
+  if (packType === 'starter' && hasOpenedStarter) {
+    toast('You already claimed your starter pack!');
+    return;
+  }
+  
+  if (packType !== 'starter' && cardPoints < price) {
+    toast(`Not enough points! Need ${price - cardPoints} more.`);
+    return;
+  }
+  
+  // Deduct points (except starter)
+  if (packType !== 'starter') {
+    cardPoints -= price;
+  } else {
+    hasOpenedStarter = true;
+  }
+  
+  // Determine pack size
+  let packSize = 5;
+  if (packType === 'basic') packSize = 3;
+  if (packType === 'premium') packSize = 5;
+  if (packType === 'ultimate') packSize = 10;
+  
+  // Generate cards
+  const newCards = [];
+  for (let i = 0; i < packSize; i++) {
+    const photo = rand(PHOTOS);
+    const card = generateCard(photo, packType);
+    cardCollection.push(card);
+    newCards.push(card);
+  }
+  
+  // Show pack results
   const results = $('packResults');
-  if (!results) return;
-  
-  results.innerHTML = '<p style="text-align:center;color:var(--pink);margin:20px">Opening pack...</p>';
-  
-  setTimeout(() => {
-    const newCards = [];
-    for (let i = 0; i < 5; i++) {
-      const photo = rand(PHOTOS);
-      const card = generateCard(photo);
-      cardCollection.push(card);
-      newCards.push(card);
-    }
-    
-    results.innerHTML = newCards.map(card => `
-      <div class="trading-card ${card.rarity}" style="animation:fadeInUp 0.${Math.random() * 5}s ease">
+  if (results) {
+    results.innerHTML = newCards.map((card, i) => `
+      <div class="trading-card ${card.rarity}" style="animation:fadeInUp 0.${i * 2}s ease">
         <div class="card-rarity ${card.rarity}">${card.rarity.toUpperCase()}</div>
         <img src="${card.photo.src}" class="card-img" alt="">
         <div class="card-info">
@@ -5570,19 +5857,20 @@ function openPack() {
         </div>
       </div>
     `).join('');
-    
-    renderCardCollection();
-    updateCardStats();
-    toast('Pack opened! 5 new cards!');
-  }, 1000);
+  }
+  
+  renderCardCollection();
+  updateCardStats();
+  renderPackShop();
+  toast(`Pack opened! Got ${packSize} cards!`);
 }
 
-// Card Battle
+// Card Battle - now with points rewards
 $('battleBtn')?.addEventListener('click', startCardBattle);
 
 function startCardBattle() {
   if (cardCollection.length < 1) {
-    toast('You need cards to battle! Open a pack first.');
+    toast('You need cards to battle! Win battles to earn points.');
     return;
   }
   
@@ -5600,15 +5888,26 @@ function startCardBattle() {
     if (!result) return;
     
     if (playerTotal > opponentTotal) {
-      result.textContent = `🏆 YOU WIN! +${opponentTotal} EXP`;
+      const pointsEarned = 50 + Math.floor(Math.random() * 30); // 50-80 points
+      cardPoints += pointsEarned;
+      cardBattlesWon++;
+      result.textContent = `🏆 YOU WIN! +${pointsEarned} POINTS`;
       result.style.color = 'var(--pink)';
+      toast(`Victory! Earned ${pointsEarned} points!`);
     } else if (playerTotal < opponentTotal) {
-      result.textContent = `💀 YOU LOSE!`;
+      const pointsEarned = 10; // Consolation points
+      cardPoints += pointsEarned;
+      result.textContent = `💀 YOU LOSE! +${pointsEarned} PTS`;
       result.style.color = 'var(--red)';
     } else {
-      result.textContent = `⚔️ DRAW!`;
+      const pointsEarned = 25;
+      cardPoints += pointsEarned;
+      result.textContent = `⚔️ DRAW! +${pointsEarned} PTS`;
       result.style.color = 'var(--gold)';
     }
+    
+    updateCardStats();
+    renderPackShop();
   }, 1500);
 }
 
@@ -5657,13 +5956,9 @@ document.querySelector('[data-pane="paneCards"]')?.addEventListener('click', () 
 let selectedScreenshotPhoto = null;
 
 function initScreenshot() {
-  const templateSelect = $('screenshotTemplate');
   const textInput = $('screenshotText');
   const nameInput = $('screenshotName');
   
-  if (templateSelect) {
-    templateSelect.addEventListener('change', updateScreenshotPreview);
-  }
   if (textInput) {
     textInput.addEventListener('input', updateScreenshotPreview);
   }
@@ -5749,44 +6044,16 @@ function updateScreenshotPreview() {
   const content = $('screenshotContent');
   if (!content) return;
   
-  const template = $('screenshotTemplate')?.value || 'text';
   const text = $('screenshotText')?.value || 'Hey';
   const name = $('screenshotName')?.value || 'Sophie';
   
-  if (template === 'text') {
-    content.innerHTML = `
-      <div class="ss-text-message">
-        <div class="ss-bubble received">${text}</div>
-        ${selectedScreenshotPhoto ? `<img src="${selectedScreenshotPhoto.src}" style="max-width:200px;border-radius:12px;margin-top:10px">` : ''}
-      </div>
-    `;
-  } else if (template === 'ig-dm') {
-    content.innerHTML = `
-      <div class="ss-ig-dm">
-        <div class="ss-ig-header">
-          <div class="ss-ig-avatar"></div>
-          <div class="ss-ig-name">${name}</div>
-        </div>
-        <div class="ss-ig-message">
-          <div class="ss-ig-bubble">${text}</div>
-          ${selectedScreenshotPhoto ? `<img src="${selectedScreenshotPhoto.src}" class="ss-ig-photo">` : ''}
-        </div>
-      </div>
-    `;
-  } else if (template === 'ig-story') {
-    content.style.padding = '0';
-    content.innerHTML = selectedScreenshotPhoto ? `
-      <img src="${selectedScreenshotPhoto.src}" style="width:100%;height:500px;object-fit:cover">
-      <div style="position:absolute;bottom:20px;left:20px;right:20px;color:#fff;font-size:18px;text-shadow:0 2px 10px rgba(0,0,0,0.8)">${text}</div>
-    ` : '<p style="padding:40px;text-align:center">Select a photo</p>';
-  } else if (template === 'snap') {
-    content.style.padding = '0';
-    content.innerHTML = selectedScreenshotPhoto ? `
-      <img src="${selectedScreenshotPhoto.src}" style="width:100%;height:500px;object-fit:cover">
-      <div style="position:absolute;bottom:40px;left:20px;right:20px;background:rgba(0,0,0,0.5);padding:15px;color:#fff;font-size:16px;border-radius:8px">${text}</div>
-      <div style="position:absolute;top:20px;left:20px;color:#fff;font-size:14px;font-weight:600;text-shadow:0 2px 4px rgba(0,0,0,0.8)">${name}</div>
-    ` : '<p style="padding:40px;text-align:center">Select a photo</p>';
-  }
+  // Text message only - no templates
+  content.innerHTML = `
+    <div class="ss-text-message">
+      <div class="ss-bubble received">${text}</div>
+      ${selectedScreenshotPhoto ? `<img src="${selectedScreenshotPhoto.src}" style="max-width:200px;border-radius:12px;margin-top:10px">` : ''}
+    </div>
+  `;
 }
 
 function downloadScreenshot() {
@@ -5798,3 +6065,295 @@ function downloadScreenshot() {
 document.querySelector('[data-pane="paneScreenshot"]')?.addEventListener('click', () => {
   setTimeout(initScreenshot, 100);
 });
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VAULT TRADING CARDS
+// ═══════════════════════════════════════════════════════════════════════════
+
+const vaultCardCollection = [];
+let vaultCardPoints = 0;
+let vaultCardBattlesWon = 0;
+let vaultHasOpenedStarter = false;
+
+function initVaultTradingCards() {
+  // Tabs
+  document.querySelectorAll('.vault-card-tab').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.vault-card-tab').forEach(b => b.classList.remove('on'));
+      document.querySelectorAll('#vaultCardCollection, #vaultCardPacks, #vaultCardBattle').forEach(v => v.classList.remove('on'));
+      this.classList.add('on');
+      const view = this.dataset.cardView;
+      if (view === 'vault-collection') $('vaultCardCollection').classList.add('on');
+      if (view === 'vault-packs') $('vaultCardPacks').classList.add('on');
+      if (view === 'vault-battle') $('vaultCardBattle').classList.add('on');
+    });
+  });
+  
+  if (vaultCardCollection.length === 0) {
+    const starterCard = generateCard(rand(SECRET_PHOTOS));
+    vaultCardCollection.push(starterCard);
+  }
+  
+  renderVaultCardCollection();
+  updateVaultCardStats();
+  renderVaultPackShop();
+}
+
+function renderVaultCardCollection() {
+  const grid = $('vaultCardGrid');
+  if (!grid) return;
+  
+  grid.innerHTML = vaultCardCollection.length > 0 ? vaultCardCollection.map(card => `
+    <div class="trading-card ${card.rarity}">
+      <div class="card-rarity ${card.rarity}">${card.rarity.toUpperCase()}</div>
+      <img src="${card.photo.src}" class="card-img" alt="">
+      <div class="card-info">
+        <div class="card-name">${card.name}</div>
+        <div class="card-model">${card.model}</div>
+        <div class="card-power">⚡ ${card.power}</div>
+      </div>
+    </div>
+  `).join('') : '<p style="text-align:center;color:var(--red2);padding:40px">Win battles to collect vault cards</p>';
+}
+
+function updateVaultCardStats() {
+  if ($('vaultCardTotal')) $('vaultCardTotal').textContent = vaultCardCollection.length;
+  if ($('vaultCardPoints')) $('vaultCardPoints').textContent = vaultCardPoints;
+  if ($('vaultCardWins')) $('vaultCardWins').textContent = vaultCardBattlesWon;
+  if ($('vaultCardLegendary')) $('vaultCardLegendary').textContent = vaultCardCollection.filter(c => c.rarity === 'legendary').length;
+}
+
+function renderVaultPackShop() {
+  const packsEl = $('vaultPackShopGrid');
+  if (!packsEl) return;
+  
+  packsEl.innerHTML = `
+    ${!vaultHasOpenedStarter ? `
+      <div class="pack-shop-item">
+        <div class="pack-preview starter-pack">
+          <div class="pack-shine"></div>
+          <div class="pack-name">STARTER</div>
+          <div class="pack-desc">5 Vault Cards</div>
+        </div>
+        <button class="game-btn vault-btn" onclick="buyVaultPack('starter')">CLAIM FREE ✦</button>
+      </div>
+    ` : ''}
+    <div class="pack-shop-item">
+      <div class="pack-preview basic-pack">
+        <div class="pack-shine"></div>
+        <div class="pack-name">BASIC</div>
+        <div class="pack-desc">3 Cards</div>
+      </div>
+      <button class="game-btn vault-btn ${vaultCardPoints >= 100 ? 'primary' : ''}" onclick="buyVaultPack('basic')">
+        ${vaultCardPoints >= 100 ? 'BUY - 100 PTS' : '🔒 100 PTS'}
+      </button>
+    </div>
+    <div class="pack-shop-item">
+      <div class="pack-preview premium-pack">
+        <div class="pack-shine"></div>
+        <div class="pack-name">PREMIUM</div>
+        <div class="pack-desc">5 Cards · Better Odds</div>
+      </div>
+      <button class="game-btn vault-btn ${vaultCardPoints >= 250 ? 'primary' : ''}" onclick="buyVaultPack('premium')">
+        ${vaultCardPoints >= 250 ? 'BUY - 250 PTS' : '🔒 250 PTS'}
+      </button>
+    </div>
+    <div class="pack-shop-item">
+      <div class="pack-preview ultimate-pack">
+        <div class="pack-shine"></div>
+        <div class="pack-name">ULTIMATE</div>
+        <div class="pack-desc">10 Cards · Guaranteed Legendary</div>
+      </div>
+      <button class="game-btn vault-btn ${vaultCardPoints >= 500 ? 'primary' : ''}" onclick="buyVaultPack('ultimate')">
+        ${vaultCardPoints >= 500 ? 'BUY - 500 PTS' : '🔒 500 PTS'}
+      </button>
+    </div>
+  `;
+}
+
+function buyVaultPack(packType) {
+  const price = PACK_PRICES[packType];
+  
+  if (packType === 'starter' && vaultHasOpenedStarter) {
+    toast('Already claimed starter pack!');
+    return;
+  }
+  
+  if (packType !== 'starter' && vaultCardPoints < price) {
+    toast(`Need ${price - vaultCardPoints} more points!`);
+    return;
+  }
+  
+  if (packType !== 'starter') vaultCardPoints -= price;
+  else vaultHasOpenedStarter = true;
+  
+  let packSize = packType === 'basic' ? 3 : packType === 'premium' ? 5 : packType === 'ultimate' ? 10 : 5;
+  
+  const newCards = [];
+  for (let i = 0; i < packSize; i++) {
+    const card = generateCard(rand(SECRET_PHOTOS), packType);
+    vaultCardCollection.push(card);
+    newCards.push(card);
+  }
+  
+  const results = $('vaultPackResults');
+  if (results) {
+    results.innerHTML = newCards.map((card, i) => `
+      <div class="trading-card ${card.rarity}" style="animation:fadeInUp 0.${i * 2}s ease">
+        <div class="card-rarity ${card.rarity}">${card.rarity.toUpperCase()}</div>
+        <img src="${card.photo.src}" class="card-img" alt="">
+        <div class="card-info">
+          <div class="card-name">${card.name}</div>
+          <div class="card-model">${card.model}</div>
+          <div class="card-power">⚡ ${card.power}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  renderVaultCardCollection();
+  updateVaultCardStats();
+  renderVaultPackShop();
+  toast(`Vault pack opened! ${packSize} cards!`);
+}
+
+$('vaultBattleBtn')?.addEventListener('click', startVaultCardBattle);
+
+function startVaultCardBattle() {
+  if (vaultCardCollection.length < 1) {
+    toast('Need cards to battle!');
+    return;
+  }
+  
+  const playerCard = rand(vaultCardCollection);
+  const opponentCard = generateCard(rand(SECRET_PHOTOS));
+  
+  renderBattleCard('vaultBattlePlayerCard', playerCard, 'vaultBattlePlayerStats');
+  renderBattleCard('vaultBattleOpponentCard', opponentCard, 'vaultBattleOpponentStats');
+  
+  setTimeout(() => {
+    const playerTotal = playerCard.attack + playerCard.defense;
+    const opponentTotal = opponentCard.attack + opponentCard.defense;
+    
+    const result = $('vaultBattleResult');
+    if (!result) return;
+    
+    if (playerTotal > opponentTotal) {
+      const pts = 50 + Math.floor(Math.random() * 30);
+      vaultCardPoints += pts;
+      vaultCardBattlesWon++;
+      result.textContent = `🏆 WIN! +${pts} POINTS`;
+      result.style.color = 'var(--red)';
+    } else if (playerTotal < opponentTotal) {
+      vaultCardPoints += 10;
+      result.textContent = `💀 LOSE! +10 PTS`;
+      result.style.color = 'var(--red2)';
+    } else {
+      vaultCardPoints += 25;
+      result.textContent = `⚔️ DRAW! +25 PTS`;
+      result.style.color = 'var(--gold)';
+    }
+    
+    updateVaultCardStats();
+    renderVaultPackShop();
+  }, 1500);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VAULT SCREENSHOT
+// ═══════════════════════════════════════════════════════════════════════════
+
+let vaultSelectedPhoto = null;
+
+function initVaultScreenshot() {
+  const textInput = $('vaultScreenshotText');
+  const nameInput = $('vaultScreenshotName');
+  
+  if (textInput) textInput.addEventListener('input', updateVaultScreenshotPreview);
+  if (nameInput) nameInput.addEventListener('input', updateVaultScreenshotPreview);
+  
+  $('vaultSelectPhotoBtn')?.addEventListener('click', openVaultScreenshotPhotoPicker);
+  $('vaultDownloadScreenshot')?.addEventListener('click', () => toast('Screenshot saved! (coming soon)'));
+  
+  updateVaultScreenshotPreview();
+}
+
+function openVaultScreenshotPhotoPicker() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.background = 'rgba(0,0,0,0.95)';
+  
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
+  grid.style.gap = '8px';
+  grid.style.maxWidth = '90%';
+  grid.style.maxHeight = '80vh';
+  grid.style.overflow = 'auto';
+  grid.style.padding = '20px';
+
+  SECRET_PHOTOS.forEach(photo => {
+    const img = document.createElement('img');
+    img.src = photo.src;
+    img.style.width = '100%';
+    img.style.height = '150px';
+    img.style.objectFit = 'cover';
+    img.style.cursor = 'pointer';
+    img.style.border = '2px solid var(--red2)';
+    img.style.transition = 'all 0.3s';
+    
+    img.addEventListener('mouseenter', () => {
+      img.style.borderColor = 'var(--red)';
+      img.style.transform = 'scale(1.05)';
+    });
+    img.addEventListener('mouseleave', () => {
+      img.style.borderColor = 'var(--red2)';
+      img.style.transform = 'scale(1)';
+    });
+    
+    img.addEventListener('click', () => {
+      vaultSelectedPhoto = photo;
+      updateVaultScreenshotPreview();
+      document.body.removeChild(overlay);
+      toast(`Photo selected: ${photo.model}`);
+    });
+    
+    grid.appendChild(img);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.position = 'fixed';
+  closeBtn.style.top = '20px';
+  closeBtn.style.right = '20px';
+  closeBtn.style.background = 'var(--bg)';
+  closeBtn.style.border = '1px solid var(--red)';
+  closeBtn.style.color = 'var(--red)';
+  closeBtn.style.padding = '10px 20px';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.fontSize = '20px';
+  closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+  overlay.appendChild(grid);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+}
+
+function updateVaultScreenshotPreview() {
+  const content = $('vaultScreenshotContent');
+  if (!content) return;
+  
+  const text = $('vaultScreenshotText')?.value || 'Hey';
+  const name = $('vaultScreenshotName')?.value || 'Nya';
+  
+  content.innerHTML = `
+    <div class="ss-text-message">
+      <div class="ss-bubble received">${text}</div>
+      ${vaultSelectedPhoto ? `<img src="${vaultSelectedPhoto.src}" style="max-width:200px;border-radius:12px;margin-top:10px">` : ''}
+    </div>
+  `;
+}
