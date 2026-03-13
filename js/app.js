@@ -4949,13 +4949,36 @@ function renderBingoBoard() {
   if (!board) return;
   
   board.innerHTML = '';
+  const photos = shuffle([...PHOTOS]).slice(0, 25);
+  
   bingoCard.forEach((obj, idx) => {
     const cell = document.createElement('div');
     cell.className = 'bingo-cell';
-    if (obj === 'FREE') cell.classList.add('free');
+    if (obj === 'FREE') {
+      cell.classList.add('free');
+      cell.textContent = 'FREE';
+    } else {
+      // Add photo to cell
+      const photo = photos[idx] || rand(PHOTOS);
+      const img = document.createElement('img');
+      img.src = photo.src;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.position = 'absolute';
+      img.style.inset = '0';
+      cell.appendChild(img);
+      
+      // Add objective label
+      const label = document.createElement('div');
+      label.className = 'bingo-label';
+      label.textContent = obj;
+      cell.appendChild(label);
+    }
+    
     if (bingoMarked.has(idx)) cell.classList.add('marked');
-    cell.textContent = obj;
     cell.style.position = 'relative';
+    cell.style.overflow = 'hidden';
     
     if (obj !== 'FREE') {
       cell.addEventListener('click', () => {
@@ -5317,13 +5340,36 @@ function renderVaultBingoBoard() {
   if (!board) return;
   
   board.innerHTML = '';
+  const photos = shuffle([...SECRET_PHOTOS]).slice(0, 25);
+  
   vaultBingoCard.forEach((obj, idx) => {
     const cell = document.createElement('div');
     cell.className = 'bingo-cell';
-    if (obj === 'FREE') cell.classList.add('free');
+    if (obj === 'FREE') {
+      cell.classList.add('free');
+      cell.textContent = 'FREE';
+    } else {
+      // Add photo to cell
+      const photo = photos[idx] || rand(SECRET_PHOTOS);
+      const img = document.createElement('img');
+      img.src = photo.src;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.position = 'absolute';
+      img.style.inset = '0';
+      cell.appendChild(img);
+      
+      // Add objective label
+      const label = document.createElement('div');
+      label.className = 'bingo-label vault-bingo-label';
+      label.textContent = obj;
+      cell.appendChild(label);
+    }
+    
     if (vaultBingoMarked.has(idx)) cell.classList.add('marked');
-    cell.textContent = obj;
     cell.style.position = 'relative';
+    cell.style.overflow = 'hidden';
     
     if (obj !== 'FREE') {
       cell.addEventListener('click', () => {
@@ -5403,3 +5449,352 @@ function initVaultGames() {
   initVaultRoster();
   initVaultBingo();
 }
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TRADING CARDS SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+
+const cardCollection = [];
+const CARD_RARITIES = ['common', 'rare', 'legendary'];
+
+// Card rarity chances: 60% common, 30% rare, 10% legendary
+function getRandomRarity() {
+  const roll = Math.random();
+  if (roll < 0.6) return 'common';
+  if (roll < 0.9) return 'rare';
+  return 'legendary';
+}
+
+function generateCard(photo) {
+  const rarity = getRandomRarity();
+  const basePower = rarity === 'legendary' ? 85 : rarity === 'rare' ? 65 : 45;
+  const variance = Math.floor(Math.random() * 20);
+  
+  return {
+    id: Math.random().toString(36).substr(2, 9),
+    photo: photo,
+    name: photo.name,
+    model: photo.model,
+    rarity: rarity,
+    power: basePower + variance,
+    attack: basePower + variance + Math.floor(Math.random() * 10),
+    defense: basePower + variance + Math.floor(Math.random() * 10)
+  };
+}
+
+function initTradingCards() {
+  // Card view tabs
+  document.querySelectorAll('.card-tab').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.card-tab').forEach(b => b.classList.remove('on'));
+      document.querySelectorAll('.card-view').forEach(v => v.classList.remove('on'));
+      this.classList.add('on');
+      const view = this.dataset.cardView;
+      if (view === 'collection') $('cardCollection').classList.add('on');
+      if (view === 'packs') $('cardPacks').classList.add('on');
+      if (view === 'battle') $('cardBattle').classList.add('on');
+    });
+  });
+  
+  // Give starter cards
+  if (cardCollection.length === 0) {
+    for (let i = 0; i < 3; i++) {
+      const card = generateCard(rand(PHOTOS));
+      cardCollection.push(card);
+    }
+  }
+  
+  renderCardCollection();
+  updateCardStats();
+}
+
+function renderCardCollection() {
+  const grid = $('cardGrid');
+  if (!grid) return;
+  
+  if (cardCollection.length === 0) {
+    grid.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px">No cards yet. Open a pack!</p>';
+    return;
+  }
+  
+  grid.innerHTML = cardCollection.map(card => `
+    <div class="trading-card ${card.rarity}" data-card-id="${card.id}">
+      <div class="card-rarity ${card.rarity}">${card.rarity.toUpperCase()}</div>
+      <img src="${card.photo.src}" class="card-img" alt="">
+      <div class="card-info">
+        <div class="card-name">${card.name}</div>
+        <div class="card-model">${card.model}</div>
+        <div class="card-power">⚡ ${card.power} POWER</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateCardStats() {
+  const total = cardCollection.length;
+  const legendary = cardCollection.filter(c => c.rarity === 'legendary').length;
+  const rare = cardCollection.filter(c => c.rarity === 'rare').length;
+  
+  if ($('cardTotal')) $('cardTotal').textContent = total;
+  if ($('cardLegendary')) $('cardLegendary').textContent = legendary;
+  if ($('cardRare')) $('cardRare').textContent = rare;
+}
+
+// Pack opening
+$('openPackBtn')?.addEventListener('click', openPack);
+
+function openPack() {
+  const results = $('packResults');
+  if (!results) return;
+  
+  results.innerHTML = '<p style="text-align:center;color:var(--pink);margin:20px">Opening pack...</p>';
+  
+  setTimeout(() => {
+    const newCards = [];
+    for (let i = 0; i < 5; i++) {
+      const photo = rand(PHOTOS);
+      const card = generateCard(photo);
+      cardCollection.push(card);
+      newCards.push(card);
+    }
+    
+    results.innerHTML = newCards.map(card => `
+      <div class="trading-card ${card.rarity}" style="animation:fadeInUp 0.${Math.random() * 5}s ease">
+        <div class="card-rarity ${card.rarity}">${card.rarity.toUpperCase()}</div>
+        <img src="${card.photo.src}" class="card-img" alt="">
+        <div class="card-info">
+          <div class="card-name">${card.name}</div>
+          <div class="card-model">${card.model}</div>
+          <div class="card-power">⚡ ${card.power}</div>
+        </div>
+      </div>
+    `).join('');
+    
+    renderCardCollection();
+    updateCardStats();
+    toast('Pack opened! 5 new cards!');
+  }, 1000);
+}
+
+// Card Battle
+$('battleBtn')?.addEventListener('click', startCardBattle);
+
+function startCardBattle() {
+  if (cardCollection.length < 1) {
+    toast('You need cards to battle! Open a pack first.');
+    return;
+  }
+  
+  const playerCard = rand(cardCollection);
+  const opponentCard = generateCard(rand(PHOTOS));
+  
+  renderBattleCard('battlePlayerCard', playerCard, 'battlePlayerStats');
+  renderBattleCard('battleOpponentCard', opponentCard, 'battleOpponentStats');
+  
+  setTimeout(() => {
+    const playerTotal = playerCard.attack + playerCard.defense;
+    const opponentTotal = opponentCard.attack + opponentCard.defense;
+    
+    const result = $('battleResult');
+    if (!result) return;
+    
+    if (playerTotal > opponentTotal) {
+      result.textContent = `🏆 YOU WIN! +${opponentTotal} EXP`;
+      result.style.color = 'var(--pink)';
+    } else if (playerTotal < opponentTotal) {
+      result.textContent = `💀 YOU LOSE!`;
+      result.style.color = 'var(--red)';
+    } else {
+      result.textContent = `⚔️ DRAW!`;
+      result.style.color = 'var(--gold)';
+    }
+  }, 1500);
+}
+
+function renderBattleCard(containerId, card, statsId) {
+  const container = $(containerId);
+  const statsContainer = $(statsId);
+  if (!container || !statsContainer) return;
+  
+  container.innerHTML = `
+    <div class="trading-card ${card.rarity}">
+      <div class="card-rarity ${card.rarity}">${card.rarity.toUpperCase()}</div>
+      <img src="${card.photo.src}" class="card-img" alt="">
+      <div class="card-info">
+        <div class="card-name">${card.name}</div>
+        <div class="card-model">${card.model}</div>
+        <div class="card-power">⚡ ${card.power}</div>
+      </div>
+    </div>
+  `;
+  
+  statsContainer.innerHTML = `
+    <div class="battle-stat-row">
+      <span class="battle-stat-label">Attack</span>
+      <span class="battle-stat-val">${card.attack}</span>
+    </div>
+    <div class="battle-stat-row">
+      <span class="battle-stat-label">Defense</span>
+      <span class="battle-stat-val">${card.defense}</span>
+    </div>
+    <div class="battle-stat-row">
+      <span class="battle-stat-label">Total Power</span>
+      <span class="battle-stat-val">${card.attack + card.defense}</span>
+    </div>
+  `;
+}
+
+// Initialize when tab clicked
+document.querySelector('[data-pane="paneCards"]')?.addEventListener('click', () => {
+  setTimeout(initTradingCards, 100);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCREENSHOT GALLERY
+// ═══════════════════════════════════════════════════════════════════════════
+
+let selectedScreenshotPhoto = null;
+
+function initScreenshot() {
+  const templateSelect = $('screenshotTemplate');
+  const textInput = $('screenshotText');
+  const nameInput = $('screenshotName');
+  
+  if (templateSelect) {
+    templateSelect.addEventListener('change', updateScreenshotPreview);
+  }
+  if (textInput) {
+    textInput.addEventListener('input', updateScreenshotPreview);
+  }
+  if (nameInput) {
+    nameInput.addEventListener('input', updateScreenshotPreview);
+  }
+  
+  // Select photo button
+  $('selectPhotoBtn')?.addEventListener('click', openScreenshotPhotoPicker);
+  
+  // Download button
+  $('downloadScreenshot')?.addEventListener('click', downloadScreenshot);
+  
+  // Set default
+  updateScreenshotPreview();
+}
+
+function openScreenshotPhotoPicker() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.background = 'rgba(0,0,0,0.95)';
+  
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
+  grid.style.gap = '8px';
+  grid.style.maxWidth = '90%';
+  grid.style.maxHeight = '80vh';
+  grid.style.overflow = 'auto';
+  grid.style.padding = '20px';
+
+  PHOTOS.forEach(photo => {
+    const img = document.createElement('img');
+    img.src = photo.src;
+    img.style.width = '100%';
+    img.style.height = '150px';
+    img.style.objectFit = 'cover';
+    img.style.cursor = 'pointer';
+    img.style.border = '2px solid var(--border)';
+    img.style.transition = 'all 0.3s';
+    
+    img.addEventListener('mouseenter', () => {
+      img.style.borderColor = 'var(--pink)';
+      img.style.transform = 'scale(1.05)';
+    });
+    img.addEventListener('mouseleave', () => {
+      img.style.borderColor = 'var(--border)';
+      img.style.transform = 'scale(1)';
+    });
+    
+    img.addEventListener('click', () => {
+      selectedScreenshotPhoto = photo;
+      updateScreenshotPreview();
+      document.body.removeChild(overlay);
+      toast(`Photo selected: ${photo.model}`);
+    });
+    
+    grid.appendChild(img);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.position = 'fixed';
+  closeBtn.style.top = '20px';
+  closeBtn.style.right = '20px';
+  closeBtn.style.background = 'var(--bg)';
+  closeBtn.style.border = '1px solid var(--pink)';
+  closeBtn.style.color = 'var(--pink)';
+  closeBtn.style.padding = '10px 20px';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.fontSize = '20px';
+  closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+  overlay.appendChild(grid);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+}
+
+function updateScreenshotPreview() {
+  const content = $('screenshotContent');
+  if (!content) return;
+  
+  const template = $('screenshotTemplate')?.value || 'text';
+  const text = $('screenshotText')?.value || 'Hey';
+  const name = $('screenshotName')?.value || 'Sophie';
+  
+  if (template === 'text') {
+    content.innerHTML = `
+      <div class="ss-text-message">
+        <div class="ss-bubble received">${text}</div>
+        ${selectedScreenshotPhoto ? `<img src="${selectedScreenshotPhoto.src}" style="max-width:200px;border-radius:12px;margin-top:10px">` : ''}
+      </div>
+    `;
+  } else if (template === 'ig-dm') {
+    content.innerHTML = `
+      <div class="ss-ig-dm">
+        <div class="ss-ig-header">
+          <div class="ss-ig-avatar"></div>
+          <div class="ss-ig-name">${name}</div>
+        </div>
+        <div class="ss-ig-message">
+          <div class="ss-ig-bubble">${text}</div>
+          ${selectedScreenshotPhoto ? `<img src="${selectedScreenshotPhoto.src}" class="ss-ig-photo">` : ''}
+        </div>
+      </div>
+    `;
+  } else if (template === 'ig-story') {
+    content.style.padding = '0';
+    content.innerHTML = selectedScreenshotPhoto ? `
+      <img src="${selectedScreenshotPhoto.src}" style="width:100%;height:500px;object-fit:cover">
+      <div style="position:absolute;bottom:20px;left:20px;right:20px;color:#fff;font-size:18px;text-shadow:0 2px 10px rgba(0,0,0,0.8)">${text}</div>
+    ` : '<p style="padding:40px;text-align:center">Select a photo</p>';
+  } else if (template === 'snap') {
+    content.style.padding = '0';
+    content.innerHTML = selectedScreenshotPhoto ? `
+      <img src="${selectedScreenshotPhoto.src}" style="width:100%;height:500px;object-fit:cover">
+      <div style="position:absolute;bottom:40px;left:20px;right:20px;background:rgba(0,0,0,0.5);padding:15px;color:#fff;font-size:16px;border-radius:8px">${text}</div>
+      <div style="position:absolute;top:20px;left:20px;color:#fff;font-size:14px;font-weight:600;text-shadow:0 2px 4px rgba(0,0,0,0.8)">${name}</div>
+    ` : '<p style="padding:40px;text-align:center">Select a photo</p>';
+  }
+}
+
+function downloadScreenshot() {
+  toast('Screenshot saved! (Feature coming soon)');
+  // In production, you'd use html2canvas or similar to convert the phone screen to image
+}
+
+// Initialize when tab clicked
+document.querySelector('[data-pane="paneScreenshot"]')?.addEventListener('click', () => {
+  setTimeout(initScreenshot, 100);
+});
